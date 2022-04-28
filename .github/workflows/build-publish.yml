@@ -11,7 +11,7 @@ jobs:
     env:
       MC_HOST_scrolls: https://${{ secrets.S3_API_KEY }}:${{ secrets.S3_API_SECRET }}@${{ secrets.S3_ENDPOINT }}
     steps:
-      - run: sudo apt install sponge golang-go -y
+      - run: sudo apt install moreutils golang-go -y
       - run: go install github.com/josephburnett/jd@latest
       - uses: actions/checkout@v2
       - name: Download latest.json
