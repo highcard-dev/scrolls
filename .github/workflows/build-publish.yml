@@ -13,6 +13,8 @@ jobs:
     steps:
       - run: sudo apt install moreutils golang-go -y
       - run: go install github.com/josephburnett/jd@latest
+        env:
+          GO111MODULE: on
       - uses: actions/checkout@v2
       - name: Download latest.json
         run: mc cp --recursive scrolls/druid-scrolls-staging/latest.json latest.json || true
