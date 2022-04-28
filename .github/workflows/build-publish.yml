@@ -14,9 +14,11 @@ jobs:
       - run: sudo apt install moreutils -y
       - uses: actions/checkout@v3
         with:
-          fetch-depth: "0"
+          fetch-depth: 0
       - name: Download latest.json
         run: mc cp --recursive scrolls/druid-scrolls-staging/latest.json latest.json || true
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - run: sh find-changed-scrolls.sh
         name: Building new files
       - name: Upload scrolls
