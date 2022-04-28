@@ -1,0 +1,22 @@
+name: Docker
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+jobs:
+   build-deploy:
+    runs-on: self-hosted
+    env:
+      MC_HOST_scrolls: https://${{ secrets.S3_API_KEY }}:${{ secrets.S3_API_SECRET }}@${{ secrets.S3_ENDPOINT }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download latest.json
+        run: mc cp --recursive scrolls/druid-scrolls-staging/latest.json latest.json
+      - run: sh find-changed-scrolls.sh
+        name: Building new files
+      - name: Upload scrolls
+        run: mc cp --recursive ./scrolls/*.tar.gz scrolls/druid-scrolls-staging
+      - name: Upload latest
+        run: mc cp --recursive ./latest.json scrolls/druid-scrolls-staging
