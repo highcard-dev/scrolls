@@ -19,7 +19,5 @@ jobs:
         run: mc cp scrolls/druid-scrolls-staging/latest.json latest.json || true
       - run: sh find-changed-scrolls.sh
         name: Building new files
-      - name: Upload scrolls
-        run: mc cp --recursive ./scrolls/*.tar.gz scrolls/druid-scrolls-staging
-      - name: Upload latest
-        run: mc cp --recursive ./latest.json scrolls/druid-scrolls-staging
+      - name: Pushing new scrolls
+        run: sh .ci/push.sh
