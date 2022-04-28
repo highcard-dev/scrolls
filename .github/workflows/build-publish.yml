@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download latest.json
-        run: mc cp --recursive scrolls/druid-scrolls-staging/latest.json latest.json || true
+        run: mc cp scrolls/druid-scrolls-staging/latest.json latest.json || true
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
       - run: sh find-changed-scrolls.sh
