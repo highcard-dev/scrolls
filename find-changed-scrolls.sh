@@ -17,11 +17,11 @@ for d in scrolls/*/ ; do
 done
 
 echo "scrolls that changed"
-changedScrolls=$(jd -f patch latest.json old-latest.json | jq -r '.[].path' | uniq )
+changedScrolls=$(node get-diff.js)
 
 ref=$(git rev-parse HEAD)
 for s in $changedScrolls ; do
     echo $s
-    jq '.ref = "'"$ref"'"' scrolls$s/scroll.json|sponge scrolls$s/scroll.json
-    tar -czvf scrolls$s.tar.gz -C scrolls$s .
+    jq '.ref = "'"$ref"'"' scrolls/$s/scroll.json|sponge scrolls/$s/scroll.json
+    tar -czvf scrolls/$s.tar.gz -C scrolls/$s .
 done
