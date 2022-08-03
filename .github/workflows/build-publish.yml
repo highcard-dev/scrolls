@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
       - name: Download latest.json
         run: mc cp scrolls/druid-scrolls-staging/latest.json old-latest.json || true
-      - run: sh find-changed-scrolls.sh
+      - run: sh build-changed-scrolls.sh
         name: Building new files
       - name: Pushing new scrolls
         run: sh .ci/push.sh
