@@ -1,2 +1,3 @@
 *latest.json
 *.tar.gz
+.vscode/*.log
