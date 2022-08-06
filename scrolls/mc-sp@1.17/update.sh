@@ -7,7 +7,7 @@ if [ ! -f "$SCRIPTPATH/scroll-lock.json" ]; then
 	exit 0
 fi
 
-versionsDirs=$(find update/* -maxdepth 0 -type d | sort --version-sort)
+versionsDirs=$(find $SCRIPTPATH/update/* -maxdepth 0 -type d | sort --version-sort)
 current=$(cat $SCRIPTPATH/scroll-lock.json | jq -r .version)
 
 for versionsDir in $versionsDirs
