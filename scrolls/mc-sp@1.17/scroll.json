@@ -1,7 +1,7 @@
 {
   "name": "mc-sp",
   "desc": "Minecraft Spigot",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "processes": {
     "main": {
       "commands": {
