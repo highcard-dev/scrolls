@@ -8,17 +8,21 @@ if [ ! -f "$SCRIPTPATH/scroll-lock.json" ]; then
 fi
 
 versionsDirs=$(find $SCRIPTPATH/update/* -maxdepth 0 -type d | sort --version-sort)
-current=$(cat $SCRIPTPATH/scroll-lock.json | jq -r .version)
+current=$(cat $SCRIPTPATH/scroll-lock.json | jq -r .scroll_version)
 
 for versionsDir in $versionsDirs
 do
 	version=$(basename $versionsDir)
 	if [ ! "$(printf '%s\n' "$version" "$current" | sort -V | head -n1)" = "$version" ] ;
 	then
-		if [ -f "$version/update.sh" ]; then
-			sh $version/update.sh
+		echo "$versionsDir/update.sh"
+		if [ -f "$versionsDir/update.sh" ]; then
+			sh $versionsDir/update.sh
 		else
 			echo "Warning: update $version has no update.sh... skipping"
 		fi
 	fi
 done
+
+LATEST_VERSION=$(cat $SCRIPTPATH/scroll.json | jq -r .version)
+jq --arg LV "$LATEST_VERSION" -r '.scroll_version = $LV' $SCRIPTPATH/scroll-lock.json | sponge $SCRIPTPATH/scroll-lock.json 

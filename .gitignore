@@ -1,3 +1,4 @@
 *latest.json
 *.tar.gz
 .vscode/*.log
+scroll-lock.json
