@@ -1,7 +1,7 @@
 {
   "name": "mc-sp",
   "desc": "Minecraft Spigot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "processes": {
     "main": {
       "commands": {
@@ -32,7 +32,7 @@
                 "wget",
                 "-O",
                 "spigot.jar",
-                "https://download.getbukkit.org/spigot/spigot-1.17.jar"
+                "https://download.getbukkit.org/spigot/spigot-1.18.jar"
               ]
             },
             {
