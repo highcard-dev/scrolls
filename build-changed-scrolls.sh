@@ -14,6 +14,7 @@ done
 
 echo "scrolls that changed"
 changedScrolls=$(node get-diff.js)
+echo $changedScrolls
 
 for s in $changedScrolls ; do
     tar -czvf scrolls/$s.tar.gz -C scrolls/$s .

@@ -19,5 +19,7 @@ jobs:
         run: mc cp scrolls/druid-scrolls-staging/latest.json old-latest.json || true
       - name: Building new files
         run: sh build-changed-scrolls.sh
+      - name: Pushing new scrolls i18n
+        run: sh .ci/push-i18n.sh
       - name: Pushing new scrolls
         run: sh .ci/push.sh
