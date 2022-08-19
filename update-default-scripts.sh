@@ -1,4 +1,4 @@
-SCROLLS_DIRS=$(ls -d scrolls/*/)
+SCROLLS_DIRS=$(ls -d scrolls/*/*/)
 
 #scroll switch
 for SCROLL in $SCROLLS_DIRS

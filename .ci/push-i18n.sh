@@ -1,6 +1,16 @@
-for dir in ./scrolls/*.tar.gz
+for dir in scrolls/*/info
 do
-    filename=$(basename -- "$dir")
-    filename="${filename%.tar.gz}"
-    mc cp --recursive ./scrolls/$filename/info/ scrolls/druid-scrolls-staging/info/$filename/
+    base=$(dirname $dir)
+    cat=$(basename $base)
+    echo $cat $dir
+    mc cp --recursive ./$dir/* scrolls/druid-scrolls-staging/info/cat/$cat/
+done
+
+for dir in scrolls/*/*/info
+do
+    base=$(dirname $dir)
+    scroll=$(basename $base)
+    echo $scroll $dir
+
+    mc cp --recursive ./$dir/* scrolls/druid-scrolls-staging/info/scroll/$scroll/
 done
