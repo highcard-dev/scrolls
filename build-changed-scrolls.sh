@@ -19,7 +19,7 @@ echo $changedScrolls
 for d in scrolls/*/*/*/ ; do
     b=$(basename $d)
     for  i in $changedScrolls ; do
-        if [[ "$i" == "$b" ]]; then
+        if [ "$i" = "$b" ]; then
             tar -czvf scrolls/$b.tar.gz -C $d .
         fi
     done
