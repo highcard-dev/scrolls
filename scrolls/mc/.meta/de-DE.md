@@ -1,9 +1,8 @@
 ---
 name: Minecraft
 description: Minecraft
+create-cta: Let's start crafting!
 ---
-
-# Minecraft
 
 Minecraft ist ein Open-World-Spiel.
 Das Hauptaugenmerk liegt auf der Erkundung und Entdeckung der Welt und sowie dem Bau eigener Gebäude und Vorrichtungen.
