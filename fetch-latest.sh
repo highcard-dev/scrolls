@@ -1,1 +1,0 @@
-wget $LATEST_URL -O latest.json
