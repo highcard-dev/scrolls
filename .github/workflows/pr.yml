@@ -19,8 +19,8 @@ jobs:
           cache-dependency-path: scrolls-registry
       - name: Build Scroll Registry Tool
         run:
-          go install ./scrolls-registry/main.go
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          - go install ./scrolls-registry/main.go
+          - echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Building all
         run:
           scrolls-registry build -d ./scrolls
