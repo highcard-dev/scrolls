@@ -10,11 +10,13 @@ import (
 var CleanCommand = &cobra.Command{
 	Use:   "clean",
 	Short: "Clean build folder",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		err := os.RemoveAll(buildsDir)
 		if err != nil {
 			logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextPush), zap.Error(err))
+			return err
 		}
+		return nil
 	},
 }
 

@@ -12,7 +12,7 @@ import (
 var PrintCommand = &cobra.Command{
 	Use:   "print",
 	Short: "Print remote .registry file",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		defer logger.Log.Sync()
 		client, err := registry.NewS3Client(os.Getenv("SCROLL_REGISTRY_ENDPOINT"), os.Getenv("SCROLL_REGISTRY_BUCKET"), os.Getenv("SCROLL_REGISTRY_API_KEY"), os.Getenv("SCROLL_REGISTRY_API_SECRET"))
 		if err != nil {
@@ -28,5 +28,6 @@ var PrintCommand = &cobra.Command{
 				logger.Log.Info(fmt.Sprintf("Latest: %s", version.Latest.String()))
 			}
 		}
+		return nil
 	},
 }

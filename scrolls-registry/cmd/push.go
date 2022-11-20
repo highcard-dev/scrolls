@@ -33,7 +33,7 @@ var (
 var PushCommand = &cobra.Command{
 	Use:   "push",
 	Short: "Package scrolls and generate updated version of .registry file",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		defer logger.Log.Sync()
 		client, err := registry.NewS3Client(os.Getenv("SCROLL_REGISTRY_ENDPOINT"), os.Getenv("SCROLL_REGISTRY_BUCKET"), os.Getenv("SCROLL_REGISTRY_API_KEY"), os.Getenv("SCROLL_REGISTRY_API_SECRET"))
 		if err != nil {
@@ -49,7 +49,7 @@ var PushCommand = &cobra.Command{
 			}
 			if len(files) <= 0 {
 				logger.Log.Warn("No files were found", zap.String("type", string(pushTypeConverted)))
-				return
+				return nil
 			}
 			for _, filePath := range files {
 				_, fileName := filepath.Split(filePath)
@@ -67,7 +67,7 @@ var PushCommand = &cobra.Command{
 			}
 			if len(filesScroll) <= 0 {
 				logger.Log.Warn("No files were found", zap.String("type", string(PushTypeTranslationsScroll)))
-				return
+				return nil
 			}
 			filesVariant, err := filterFiles(scrollsDir, PushTypeRegex[PushTypeTranslationsVariant])
 			if err != nil {
@@ -75,7 +75,7 @@ var PushCommand = &cobra.Command{
 			}
 			if len(filesVariant) <= 0 {
 				logger.Log.Warn("No files were found", zap.String("type", string(PushTypeTranslationsVariant)))
-				return
+				return nil
 			}
 			for _, filePath := range filesScroll {
 				key := getKeyByType(PushTypeTranslationsScroll, filePath)
@@ -101,6 +101,7 @@ var PushCommand = &cobra.Command{
 			}
 			break
 		}
+		return nil
 	},
 }
 
