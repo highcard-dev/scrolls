@@ -22,6 +22,8 @@ jobs:
         run: |
           go install ./scrolls-registry/scroll-registry.go
           echo "$GOBIN" >> $GITHUB_PATH
+      - name: Check current registry
+        run: scroll-registry print
       - name: Building all
         run:
           scroll-registry build -d ./scrolls

@@ -87,3 +87,15 @@ func (c *S3Client) PutObject(path string, key string) error {
 	}
 	return nil
 }
+
+func (r Registry) String() string {
+	builder := strings.Builder{}
+	fmt.Fprintf(&builder, "\n")
+	for variantName, variant := range r {
+		for versionName, version := range variant {
+			fmt.Fprintf(&builder, "------------ Scroll: %s@%s ------------\n", variantName, versionName)
+			fmt.Fprintf(&builder, "Latest: %s\n", version.Latest.String())
+		}
+	}
+	return builder.String()
+}

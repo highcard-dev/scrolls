@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/highcard-dev/scrolls-registry/internal/registry"
 	"github.com/highcard-dev/scrolls-registry/internal/util/logger"
 	"github.com/spf13/cobra"
@@ -22,12 +21,7 @@ var PrintCommand = &cobra.Command{
 		if err != nil {
 			logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 		}
-		for variantName, variant := range registry {
-			for versionName, version := range variant {
-				logger.Log.Info(fmt.Sprintf("------------ Scroll: %s@%s ------------", variantName, versionName))
-				logger.Log.Info(fmt.Sprintf("Latest: %s", version.Latest.String()))
-			}
-		}
+		logger.Log.Info(registry.String())
 		return nil
 	},
 }
