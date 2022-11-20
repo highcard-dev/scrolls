@@ -81,14 +81,16 @@ var UpdateCommand = &cobra.Command{
 						}
 					} else {
 						//new to the registry
+						logger.Log.Info("new registry entry", zap.String("variant", variant.Name()), zap.String("version", version.Name()))
+						currentRegistry[registry.Variant(variant.Name())] = map[registry.VariantVersion]registry.Entry{}
+						currentRegistry[registry.Variant(variant.Name())][registry.VariantVersion(version.Name())] = registry.NewRegistryEntry(scrollFile.Version)
+
 						if err := generatePackage(versionPath, variant.Name(), version.Name(), scrollFile.Version); err != nil {
 							logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 						}
 						if err := generatePackage(versionPath, variant.Name(), version.Name(), "latest"); err != nil {
 							logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 						}
-						currentRegistry[registry.Variant(variant.Name())] = map[registry.VariantVersion]registry.Entry{}
-						currentRegistry[registry.Variant(variant.Name())][registry.VariantVersion(version.Name())] = registry.NewRegistryEntry(scrollFile.Version)
 					}
 				}
 			}
