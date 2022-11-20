@@ -24,7 +24,7 @@ jobs:
           echo "$GOBIN" >> $GITHUB_PATH
       - name: Building all
         run:
-          scrolls-registry build -d ./scrolls
+          scroll-registry build -d ./scrolls
       - name: Pushing new scrolls
         run:
           scroll-registry push -d ./scrolls -t packages
