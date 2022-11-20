@@ -1,27 +1,30 @@
 
 build-app:
-	go build  -o ./.bin/scrolls-registry ./scrolls-registry/main.go
+	go install  -o ./.bin/scrolls-registry ./scrolls-registry/scroll-registry.go
 
-build-all: build-app
-	 ./.bin/scrolls-registry build -e ./.env -d ./scrolls
+install-app:
+	go install  ./scrolls-registry/scroll-registry.go
 
-build-only-changed: build-app
-	 ./.bin/scrolls-registry build -e ./.env -d ./scrolls -c
+build-all: install-app
+	 scrolls-registry build -e ./.env -d ./scrolls
 
-push-all: build-app build-all
-	 ./.bin/scrolls-registry push -e ./.env -d ./scrolls -t packages
-	 ./.bin/scrolls-registry push -e ./.env -d ./scrolls -t registry-index
-	 ./.bin/scrolls-registry push -e ./.env -d ./scrolls -t translations
-	 ./.bin/scrolls-registry clean
+build-only-changed: install-app
+	 scrolls-registry build -e ./.env -d ./scrolls -c
 
-push-only-changed: build-app build-only-changed
-	 ./.bin/scrolls-registry push -e ./.env -d ./scrolls -t packages
-	 ./.bin/scrolls-registry push -e ./.env -d ./scrolls -t registry-index
-	 ./.bin/scrolls-registry push -e ./.env -d ./scrolls -t translations
-	 ./.bin/scrolls-registry clean
+push-all: install-app build-all
+	 scrolls-registry push -e ./.env -d ./scrolls -t packages
+	 scrolls-registry push -e ./.env -d ./scrolls -t registry-index
+	 scrolls-registry push -e ./.env -d ./scrolls -t translations
+	 scrolls-registry clean
 
-print: build-app
-	 ./.bin/scrolls-registry print -e ./.env
+push-only-changed: install-app build-only-changed
+	 scrolls-registry push -e ./.env -d ./scrolls -t packages
+	 scrolls-registry push -e ./.env -d ./scrolls -t registry-index
+	 scrolls-registry push -e ./.env -d ./scrolls -t translations
+	 scrolls-registry clean
 
-clean: build-app
-	 ./.bin/scrolls-registry clean
+print: install-app
+	 scrolls-registry print -e ./.env
+
+clean: install-app
+	 scrolls-registry clean
