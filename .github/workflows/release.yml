@@ -29,7 +29,8 @@ jobs:
         run:
           scroll-registry build -d ./scrolls
       - name: Pushing new scrolls
-        run:
+        shell: bash
+        run: |
           scroll-registry push -d ./scrolls -t packages
           scroll-registry push -d ./scrolls -t registry-index
       - name: Pushing new scrolls i18n
