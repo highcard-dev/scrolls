@@ -23,5 +23,6 @@ var PrintCommand = &cobra.Command{
 		}
 		logger.Log.Info(registry.String())
 		return nil
+
 	},
 }
