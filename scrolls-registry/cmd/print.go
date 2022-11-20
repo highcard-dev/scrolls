@@ -14,7 +14,7 @@ var PrintCommand = &cobra.Command{
 	Short: "Print remote .registry file",
 	Run: func(cmd *cobra.Command, args []string) {
 		defer logger.Log.Sync()
-		client, err := registry.NewClient(os.Getenv("SCROLL_REGISTRY_ENDPOINT"), os.Getenv("SCROLL_REGISTRY_API_KEY"), os.Getenv("SCROLL_REGISTRY_API_SECRET"))
+		client, err := registry.NewClient(os.Getenv("SCROLL_REGISTRY_ENDPOINT"), os.Getenv("SCROLL_REGISTRY_BUCKET"), os.Getenv("SCROLL_REGISTRY_API_KEY"), os.Getenv("SCROLL_REGISTRY_API_SECRET"))
 		if err != nil {
 			logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextView), zap.Error(err))
 		}

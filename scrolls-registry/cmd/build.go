@@ -16,7 +16,7 @@ var UpdateCommand = &cobra.Command{
 	Use:   "build",
 	Short: "Package scrolls and generate updated version of .registry file",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := registry.NewClient(os.Getenv("SCROLL_REGISTRY_ENDPOINT"), os.Getenv("SCROLL_REGISTRY_API_KEY"), os.Getenv("SCROLL_REGISTRY_API_SECRET"))
+		client, err := registry.NewClient(os.Getenv("SCROLL_REGISTRY_ENDPOINT"), os.Getenv("SCROLL_REGISTRY_BUCKET"), os.Getenv("SCROLL_REGISTRY_API_KEY"), os.Getenv("SCROLL_REGISTRY_API_SECRET"))
 		if err != nil {
 			logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 		}

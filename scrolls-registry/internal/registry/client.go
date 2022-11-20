@@ -27,31 +27,23 @@ type S3Client struct {
 
 type Registry map[Variant]map[VariantVersion]Entry
 
-func NewClient(endpoint string, apiKey string, apiSecret string) (*Client, error) {
+func NewClient(endpoint string, bucket string, apiKey string, apiSecret string) (*Client, error) {
 	var user *url.Userinfo
-	parts := strings.Split(endpoint, "/")
-	if len(parts) < 2 {
-		return nil, fmt.Errorf("invalid registry endpoint")
-	}
 	if apiKey != "" && apiSecret != "" {
 		user = url.UserPassword(apiKey, apiSecret)
 	}
-	return &Client{BaseURL: &url.URL{Host: parts[0], Scheme: "https", User: user}, bucket: parts[1], httpClient: http.DefaultClient}, nil
+	return &Client{BaseURL: &url.URL{Host: endpoint, Scheme: "https", User: user}, bucket: bucket, httpClient: http.DefaultClient}, nil
 }
 
-func NewS3Client(endpoint string, apiKey string, apiSecret string) (*S3Client, error) {
-	parts := strings.Split(endpoint, "/")
-	if len(parts) < 2 {
-		return nil, fmt.Errorf("invalid registry endpoint")
-	}
-	partsBase := strings.Split(parts[0], ".")
-	if len(parts) < 2 {
+func NewS3Client(endpoint string, bucket string, apiKey string, apiSecret string) (*S3Client, error) {
+	partsBase := strings.Split(endpoint, ".")
+	if len(endpoint) < 2 {
 		return nil, fmt.Errorf("invalid registry endpoint (base)")
 	}
 	s3Config := aws.Config{
 		Credentials: credentials.NewStaticCredentials(apiKey, apiSecret, ""),
 		//Endpoint:         aws.String("https://s3.wasabisys.com"),
-		Endpoint:         aws.String(fmt.Sprintf("https://%s", parts[0])),
+		Endpoint:         aws.String(fmt.Sprintf("https://%s", endpoint)),
 		Region:           aws.String(partsBase[1]),
 		S3ForcePathStyle: aws.Bool(true),
 	}
@@ -61,7 +53,7 @@ func NewS3Client(endpoint string, apiKey string, apiSecret string) (*S3Client, e
 	if err != nil {
 		return nil, err
 	}
-	return &S3Client{s3Client: s3.New(goSession), bucket: parts[1]}, nil
+	return &S3Client{s3Client: s3.New(goSession), bucket: bucket}, nil
 }
 
 func (c *Client) GetRegistry() (Registry, error) {

@@ -1,0 +1,34 @@
+name: Docker
+on:
+  pull_request:
+    branches: [ master ]
+jobs:
+  build-deploy:
+    runs-on: self-hosted
+    env:
+      SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
+      SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
+      SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
+      SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.19.3'
+          cache: true
+      - name: Build Scroll Registry Tool
+        run:
+          go install ./scrolls-registry/main.go
+      - name: Building all
+        run:
+          scrolls-registry build -d ./scrolls
+      - name: Pushing new scrolls i18n
+        run:
+          scrolls-registry push -d ./scrolls -t packages
+          scrolls-registry push -d ./scrolls -t registry-index
+      - name: Pushing new scrolls
+        run:
+          scrolls-registry push -d ./scrolls -t translations
+      - name: Cleanup
+        run:
+          scrolls-registry clean
