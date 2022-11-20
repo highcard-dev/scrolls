@@ -1,4 +1,6 @@
-*latest.json
-*.tar.gz
+.bin
 .vscode/*.log
-scroll-lock.json
+.env
+scrolls-registry/.builds
+.builds
+*.tar.gz

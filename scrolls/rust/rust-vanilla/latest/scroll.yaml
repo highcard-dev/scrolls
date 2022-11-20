@@ -1,0 +1,33 @@
+name: rust-vanilla
+desc: Rust Vanilla
+version: 0.0.1
+processes:
+  main:
+    commands:
+      start:
+        type: start
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - ./start.sh
+      stop:
+        type: stop
+        procedures:
+          - mode: rcon_web_rust
+            data:
+              - quit
+      install:
+        type: install
+        procedures:
+          - mode: exec
+            data:
+              - steamcmd
+              - app/resources/druid-deployment
+              - +login
+              - anonymous
+              - +app_update
+              - 258550
+              - +quit
+plugins:
+  rcon_web_rust: {}
