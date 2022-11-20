@@ -8,17 +8,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"gopkg.in/yaml.v3"
 	"io"
-	"net/http"
-	"net/url"
 	"os"
 	"strings"
 )
-
-type Client struct {
-	BaseURL    *url.URL
-	httpClient *http.Client
-	bucket     string
-}
 
 type S3Client struct {
 	s3Client *s3.S3
@@ -26,14 +18,6 @@ type S3Client struct {
 }
 
 type Registry map[Variant]map[VariantVersion]Entry
-
-func NewClient(endpoint string, bucket string, apiKey string, apiSecret string) (*Client, error) {
-	var user *url.Userinfo
-	if apiKey != "" && apiSecret != "" {
-		user = url.UserPassword(apiKey, apiSecret)
-	}
-	return &Client{BaseURL: &url.URL{Host: endpoint, Scheme: "https", User: user}, bucket: bucket, httpClient: http.DefaultClient}, nil
-}
 
 func NewS3Client(endpoint string, bucket string, apiKey string, apiSecret string) (*S3Client, error) {
 	partsBase := strings.Split(endpoint, ".")
@@ -56,32 +40,32 @@ func NewS3Client(endpoint string, bucket string, apiKey string, apiSecret string
 	return &S3Client{s3Client: s3.New(goSession), bucket: bucket}, nil
 }
 
-func (c *Client) GetRegistry() (Registry, error) {
-	rel := &url.URL{Path: fmt.Sprintf("%s/.registry", c.bucket)}
-	formattedUrl := c.BaseURL.ResolveReference(rel)
-	req, err := http.NewRequest("GET", formattedUrl.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Accept", "text/yaml")
-	response, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("error when retrieving .registry: status code %d - %s", response.StatusCode, response.Status)
-	}
-	defer response.Body.Close()
-	b, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
+func (c *S3Client) GetRegistry() (Registry, error) {
+	file, err := c.GetObject(".registry")
 	var latest Registry
-	err = yaml.Unmarshal(b, &latest)
+	err = yaml.Unmarshal(file, &latest)
 	if err != nil {
 		return nil, err
 	}
 	return latest, nil
+}
+
+func (c *S3Client) GetObject(key string) ([]byte, error) {
+	getObjectInput := &s3.GetObjectInput{
+		Bucket: aws.String(c.bucket),
+		Key:    aws.String(key),
+	}
+	// get file
+	resp, err := c.s3Client.GetObject(getObjectInput)
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
 func (c *S3Client) PutObject(path string, key string) error {
