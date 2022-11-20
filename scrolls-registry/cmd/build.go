@@ -11,7 +11,6 @@ import (
 )
 
 var onlyChanged bool
-var buildDir string
 
 var UpdateCommand = &cobra.Command{
 	Use:   "build",
@@ -25,11 +24,11 @@ var UpdateCommand = &cobra.Command{
 		if err != nil {
 			logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 		}
-		scrolls, err := os.ReadDir(dir)
+		scrolls, err := os.ReadDir(scrollsDir)
 		if err != nil {
 			logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 		}
-		err = util.RecreateDir(buildDir)
+		err = util.RecreateDir(buildsDir)
 		if err != nil {
 			logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 		}
@@ -39,7 +38,7 @@ var UpdateCommand = &cobra.Command{
 				//.sample
 				continue
 			}
-			scrollPath := fmt.Sprintf("%s/%s", dir, scroll.Name())
+			scrollPath := fmt.Sprintf("%s/%s", scrollsDir, scroll.Name())
 			variants, err := os.ReadDir(scrollPath)
 			if err != nil {
 				logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
@@ -93,7 +92,7 @@ var UpdateCommand = &cobra.Command{
 				}
 			}
 		}
-		err = util.CreateYamlFile(currentRegistry, fmt.Sprintf("%s/.registry", buildDir))
+		err = util.CreateYamlFile(currentRegistry, fmt.Sprintf("%s/.registry", buildsDir))
 		if err != nil {
 			logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 		}
@@ -103,9 +102,9 @@ var UpdateCommand = &cobra.Command{
 func generatePackage[T registry.SemanticVersion | string](srcPath string, variant string, version string, scrollVersion T) error {
 	var destinationPath string
 	if version == "latest" {
-		destinationPath = fmt.Sprintf("%s/%s:%s.tar.gz", buildDir, variant, scrollVersion)
+		destinationPath = fmt.Sprintf("%s/%s:%s.tar.gz", buildsDir, variant, scrollVersion)
 	} else {
-		destinationPath = fmt.Sprintf("%s/%s@%s:%s.tar.gz", buildDir, variant, version, scrollVersion)
+		destinationPath = fmt.Sprintf("%s/%s@%s:%s.tar.gz", buildsDir, variant, version, scrollVersion)
 	}
 	logger.Log.Info("generating package...", zap.String("package", destinationPath))
 	if err := util.TarDirectory(srcPath, destinationPath); err != nil {
@@ -116,6 +115,6 @@ func generatePackage[T registry.SemanticVersion | string](srcPath string, varian
 }
 
 func init() {
-	UpdateCommand.Flags().StringVarP(&buildDir, "builds-dir", "b", "./.builds", "Directory in which the built scrolls should be placed")
+	UpdateCommand.Flags().StringVarP(&buildsDir, "builds-dir", "b", "./.builds", "Directory in which the built scrolls should be placed")
 	UpdateCommand.Flags().BoolVarP(&onlyChanged, "only-changed", "c", false, "Should rebuild only changed scrolls")
 }

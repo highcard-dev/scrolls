@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var dir, envPath string
+var scrollsDir, envPath, buildsDir string
 var RootCmd = &cobra.Command{
 	Use:   "scrolls-registry",
 	Short: "Druid Scroll Registry Tool",
@@ -19,6 +19,6 @@ var RootCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.PersistentFlags().StringVarP(&dir, "dir", "d", "./", "Directory in which the scrolls files are placed")
+	RootCmd.PersistentFlags().StringVarP(&scrollsDir, "scrolls-dir", "d", "./", "Directory in which the scrolls files are placed")
 	RootCmd.PersistentFlags().StringVarP(&envPath, "env-file", "e", "./../.env", "Path to environment file (.env)")
 }

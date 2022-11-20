@@ -18,7 +18,6 @@ var Log *zap.Logger
 
 func init() {
 	Log = NewLogger("main")
-	Log.Info("Initializing logger...")
 }
 
 func NewLogger(name string) *zap.Logger {

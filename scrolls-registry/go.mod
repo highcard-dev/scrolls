@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+	github.com/aws/aws-sdk-go v1.44.142 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/spf13/cobra v1.6.1 // indirect

@@ -11,6 +11,7 @@ func main() {
 	cmd.RootCmd.AddCommand(cmd.UpdateCommand)
 	cmd.RootCmd.AddCommand(cmd.PushCommand)
 	cmd.RootCmd.AddCommand(cmd.PrintCommand)
+	cmd.RootCmd.AddCommand(cmd.CleanCommand)
 	err := cmd.RootCmd.Execute()
 	if err != nil {
 		logger.Log.Fatal("fatal error on command", zap.Error(err))
