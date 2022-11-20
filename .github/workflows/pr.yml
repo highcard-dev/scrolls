@@ -20,7 +20,6 @@ jobs:
       - name: Build Scroll Registry Tool
         shell: bash
         run: |
-          echo "$GOBIN"
           go install ./scrolls-registry/scroll-registry.go
           echo "$GOBIN" >> $GITHUB_PATH
       - name: Building all
@@ -28,11 +27,11 @@ jobs:
           scrolls-registry build -d ./scrolls
       - name: Pushing new scrolls i18n
         run:
-          scrolls-registry push -d ./scrolls -t packages
-          scrolls-registry push -d ./scrolls -t registry-index
+          scroll-registry push -d ./scrolls -t packages
+          scroll-registry push -d ./scrolls -t registry-index
       - name: Pushing new scrolls
         run:
-          scrolls-registry push -d ./scrolls -t translations
+          scroll-registry push -d ./scrolls -t translations
       - name: Cleanup
         run:
-          scrolls-registry clean
+          scroll-registry clean
