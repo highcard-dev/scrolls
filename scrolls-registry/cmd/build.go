@@ -87,6 +87,7 @@ var UpdateCommand = &cobra.Command{
 						if err := generatePackage(versionPath, variant.Name(), version.Name(), "latest"); err != nil {
 							logger.Log.Fatal("fatal", zap.String(logger.LogKeyContext, logger.LogContextUpdate), zap.Error(err))
 						}
+						currentRegistry[registry.Variant(variant.Name())] = map[registry.VariantVersion]registry.Entry{}
 						currentRegistry[registry.Variant(variant.Name())][registry.VariantVersion(version.Name())] = registry.NewRegistryEntry(scrollFile.Version)
 					}
 				}
