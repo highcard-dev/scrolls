@@ -20,8 +20,9 @@ jobs:
       - name: Build Scroll Registry Tool
         shell: bash
         run: |
+          echo "$GOBIN"
           go install ./scrolls-registry/main.go
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$GOBIN" >> $GITHUB_PATH
       - name: Building all
         run:
           scrolls-registry build -d ./scrolls
