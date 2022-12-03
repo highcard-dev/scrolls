@@ -1,4 +1,4 @@
-name: Docker
+name: PR Pipeline
 on:
   pull_request:
     branches: [ master ]

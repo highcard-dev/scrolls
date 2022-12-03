@@ -1,10 +1,6 @@
-name: Release Changed Pipeline
+name: Release All Pipeline
 on:
-  push:
-    branches:
-      - master
-    tags:
-      - v*
+  workflow_dispatch:
 jobs:
    build-deploy:
     runs-on: self-hosted
@@ -27,7 +23,7 @@ jobs:
           echo "$GOBIN" >> $GITHUB_PATH
       - name: Building only version updates
         run:
-          scroll-registry build -d ./scrolls -c
+          scroll-registry build -d ./scrolls
       - name: Pushing new scrolls
         shell: bash
         run: |
