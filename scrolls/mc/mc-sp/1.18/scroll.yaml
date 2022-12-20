@@ -9,10 +9,8 @@ processes:
         procedures:
           - mode: exec
             data:
-              - java
-              - -jar
-              - spigot.jar
-              - nogui
+              - bash
+              - ./start.sh
       stop:
         type: stop
         procedures:
