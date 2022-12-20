@@ -1,6 +1,6 @@
 name: mc-sp
 desc: Minecraft Spigot
-version: 0.2.4
+version: 0.2.5
 processes:
   main:
     commands:
