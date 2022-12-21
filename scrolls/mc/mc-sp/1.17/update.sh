@@ -30,5 +30,5 @@ fi
 
 
 
-LATEST_VERSION=$(cat $SCRIPTPATH/scroll.json | jq -r .version)
+LATEST_VERSION=$(cat $SCRIPTPATH/scroll.yaml | yq -r .version)
 jq --arg LV "$LATEST_VERSION" -r '.scroll_version = $LV' $SCRIPTPATH/scroll-lock.json | sponge $SCRIPTPATH/scroll-lock.json 
