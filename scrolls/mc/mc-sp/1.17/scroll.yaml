@@ -1,6 +1,6 @@
 name: mc-sp
 desc: Minecraft Spigot
-version: 0.2.5
+version: 0.2.6
 processes:
   main:
     commands:
@@ -37,7 +37,7 @@ processes:
           - mode: exec
             data:
               - sh
-              - $DRUID_SCROLL_DIR/update.sh
+              - $SCROLL_DIR/update.sh
           - mode: exec
             data:
               - bash
@@ -51,13 +51,13 @@ processes:
           - mode: exec
             data:
               - sh
-              - $DRUID_SCROLL_DIR/scroll-switch/mc-sp@1.18/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/mc-sp@1.18/scroll-switch.sh
       mc-sp@1.19:
         type: "scroll-switch"
         procedures:
           - mode: exec
             data:
               - sh
-              - $DRUID_SCROLL_DIR/scroll-switch/mc-sp@1.19/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/mc-sp@1.19/scroll-switch.sh
 plugins:
   rcon: {}
