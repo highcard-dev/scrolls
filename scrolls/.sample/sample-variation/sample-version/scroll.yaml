@@ -1,4 +1,4 @@
-name: sample
+name: sample@1.23
 desc: Sample Game
 version: 0.0.1
 processes:

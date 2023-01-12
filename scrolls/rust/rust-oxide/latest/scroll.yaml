@@ -1,6 +1,6 @@
-name: rust-oxide
+name: rust-oxide@latest
 desc: Rust Oxide
-version: 0.0.1
+version: 0.0.2
 processes:
   main:
     commands:
