@@ -1,0 +1,22 @@
+FROM highcard/druidd-base:latest as base
+FROM openjdk:17-slim-bullseye
+WORKDIR /app
+
+RUN apt update
+RUN apt install -y ca-certificates wget jq moreutils htop procps nano
+RUN wget https://github.com/mikefarah/yq/releases/download/v4.30.6/yq_linux_amd64 -O /usr/bin/yq
+RUN chmod +x /usr/bin/yq
+
+#RUN wget "https://github.com/highcard-dev/druidd/releases/download/latest/druid_linux_386.deb" -O "druidd.deb"
+#RUN apt install ./druidd.deb
+
+RUN useradd -ms /bin/bash druid
+USER druid
+
+COPY --from=base /usr/bin/druid* /usr/bin/druid*
+
+COPY --chown=druid:druid .docker/prepare-switch-scroll.sh /usr/bin/prepare-switch-scroll
+RUN chmod +x /usr/bin/prepare-switch-scroll
+
+CMD "/app/druid"
+#ENTRYPOINT [ "/app/druid" ]
