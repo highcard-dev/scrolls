@@ -13,7 +13,7 @@ RUN chmod +x /usr/bin/yq
 RUN useradd -ms /bin/bash druid
 USER druid
 
-COPY --from=base /usr/bin/druid* /usr/bin/druid*
+COPY --from=base /usr/bin/druid* /usr/bin
 
 COPY --chown=druid:druid .docker/prepare-switch-scroll.sh /usr/bin/prepare-switch-scroll
 RUN chmod +x /usr/bin/prepare-switch-scroll
