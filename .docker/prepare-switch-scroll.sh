@@ -6,7 +6,7 @@ echo "Current scroll: $CURRENT_SCROLL"
 DESIRED_SCROLL="$SCROLL@$SCROLL_VERSION"
 
 if [ "$CURRENT_SCROLL" != "$DESIRED_SCROLL" ]; then
-    druid run switch-scroll $DESIRED_SCROLL
+    druid run -p scroll-switch $DESIRED_SCROLL
     rm $SCROLL_DIR/scroll-lock.json
 else
     echo "Already on $CURRENT_SCROLL. Nothing to do."
