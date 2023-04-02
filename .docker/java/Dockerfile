@@ -5,7 +5,7 @@ FROM $IMAGE
 WORKDIR /app
 
 RUN apt update
-RUN apt install -y ca-certificates wget jq moreutils htop procps nano
+RUN apt install -y ca-certificates wget jq moreutils htop procps nano net-tools
 RUN wget https://github.com/mikefarah/yq/releases/download/v4.30.6/yq_linux_amd64 -O /usr/bin/yq
 RUN chmod +x /usr/bin/yq
 

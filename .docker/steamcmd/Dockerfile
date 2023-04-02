@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 
 RUN dpkg --add-architecture i386
 RUN apt update
-RUN apt install -y lib32gcc1 ca-certificates wget curl libgcc1 vim net-tools jq moreutils
+RUN apt install -y lib32gcc1 ca-certificates wget curl libgcc1 vim net-tools jq moreutils net-tools
 RUN wget https://github.com/mikefarah/yq/releases/download/v4.30.6/yq_linux_amd64 -O /usr/bin/yq
 RUN chmod +x /usr/bin/yq
 
