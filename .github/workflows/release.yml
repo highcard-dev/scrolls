@@ -18,13 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Get registry binary
-        shell: bash
-        - uses: robinraju/release-downloader@v1.7
-          with: 
-            repository: "highcard-dev/backend-monorepo-go"
-            latest: true
-            fileName: "scrolls-registry"
-            
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: "highcard-dev/backend-monorepo-go"
+          latest: true
+          fileName: "scrolls-registry"
+
       - name: Building only version updates
         run: ./scroll-registry build -d ./scrolls -c
       - name: Pushing new scrolls
