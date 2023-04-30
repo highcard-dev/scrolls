@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/highcard-dev/scrolls-registry/internal/registry"
 	"github.com/highcard-dev/scrolls-registry/internal/util"
 	"github.com/highcard-dev/scrolls-registry/internal/util/logger"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
-	"os"
 )
 
 var onlyChanged bool
@@ -104,12 +105,7 @@ var UpdateCommand = &cobra.Command{
 }
 
 func generatePackage[T registry.SemanticVersion | string](srcPath string, variant string, version string, scrollVersion T) error {
-	var destinationPath string
-	if version == "latest" {
-		destinationPath = fmt.Sprintf("%s/%s:%s.tar.gz", buildsDir, variant, scrollVersion)
-	} else {
-		destinationPath = fmt.Sprintf("%s/%s@%s:%s.tar.gz", buildsDir, variant, version, scrollVersion)
-	}
+	destinationPath := fmt.Sprintf("%s/%s@%s:%s.tar.gz", buildsDir, variant, version, scrollVersion)
 	logger.Log.Info("generating package...", zap.String("package", destinationPath))
 	if err := util.TarDirectory(srcPath, destinationPath); err != nil {
 		return err
