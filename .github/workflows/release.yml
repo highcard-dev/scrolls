@@ -1,4 +1,6 @@
 name: Release Changed Pipeline
+permissions:
+  contents: read
 on:
   push:
     branches:
@@ -6,36 +8,32 @@ on:
     tags:
       - v*
 jobs:
-   build-deploy:
+  build-deploy:
     runs-on: self-hosted
     env:
-       SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
-       SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
-       SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
-       SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
+      SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
+      SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
+      SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
+      SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: '>=1.19.3'
+          go-version: ">=1.19.3"
           cache: true
           cache-dependency-path: scrolls-registry
       - name: Build Scroll Registry Tool
         shell: bash
         run: |
-          go install ./scrolls-registry/scroll-registry.go
-          echo "$GOBIN" >> $GITHUB_PATH
+          wget -O- --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' https://github.com/highcard-dev/backend-monorepo-go/releases/download/latest/scrolls-registry
       - name: Building only version updates
-        run:
-          scroll-registry build -d ./scrolls -c
+        run: ./scroll-registry build -d ./scrolls -c
       - name: Pushing new scrolls
         shell: bash
         run: |
-          scroll-registry push -d ./scrolls -t packages
-          scroll-registry push -d ./scrolls -t registry-index
+          ./scroll-registry push -d ./scrolls -t packages
+          ./scroll-registry push -d ./scrolls -t registry-index
       - name: Pushing new scrolls i18n
-        run:
-          scroll-registry push -d ./scrolls -t translations
+        run: ./scroll-registry push -d ./scrolls -t translations
       - name: Cleanup
-        run:
-          scroll-registry clean
+        run: ./scroll-registry clean
