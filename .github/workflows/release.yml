@@ -17,12 +17,7 @@ jobs:
       SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ">=1.19.3"
-          cache: true
-          cache-dependency-path: scrolls-registry
-      - name: Build Scroll Registry Tool
+      - name: Get registry binary
         shell: bash
         run: |
           wget -O- --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' https://github.com/highcard-dev/backend-monorepo-go/releases/download/latest/scrolls-registry
