@@ -1,15 +1,4 @@
 name: Release Changed Pipeline
-permissions:
-  contents: read
-  actions: write
-  checks: write
-  deployments: write
-  issues: write
-  packages: write
-  pull-requests: write
-  repository-projects: write
-  security-events: write
-  statuses: write
 on:
   push:
     branches:
@@ -33,9 +22,6 @@ jobs:
           latest: true
           fileName: "scrolls-registry"
           token: ${{ secrets.GO_REPO_TOKEN }}
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
       - run: chmod +x ./scrolls-registry
       - name: Building only version updates
         run: ./scrolls-registry build -d ./scrolls -c

@@ -2,36 +2,31 @@ name: Release All Pipeline
 on:
   workflow_dispatch:
 jobs:
-   build-deploy:
+  build-deploy:
     runs-on: self-hosted
     env:
-       SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
-       SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
-       SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
-       SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_LIVE }}
+      SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
+      SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
+      SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
+      SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_LIVE }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - name: Get registry binary
+        uses: robinraju/release-downloader@v1.7
         with:
-          go-version: '>=1.19.3'
-          cache: true
-          cache-dependency-path: scrolls-registry
-      - name: Build Scroll Registry Tool
-        shell: bash
-        run: |
-          go install ./scrolls-registry/scroll-registry.go
-          echo "$GOBIN" >> $GITHUB_PATH
+          repository: "highcard-dev/backend-monorepo-go"
+          latest: true
+          fileName: "scrolls-registry"
+          token: ${{ secrets.GO_REPO_TOKEN }}
+      - run: chmod +x ./scrolls-registry
       - name: Building only version updates
-        run:
-          scroll-registry build -d ./scrolls
+        run: ./scrolls-registry build -d ./scrolls
       - name: Pushing new scrolls
         shell: bash
         run: |
-          scroll-registry push -d ./scrolls -t packages
-          scroll-registry push -d ./scrolls -t registry-index
+          ./scrolls-registry push -d ./scrolls -t packages
+          ./scrolls-registry push -d ./scrolls -t registry-index
       - name: Pushing new scrolls i18n
-        run:
-          scroll-registry push -d ./scrolls -t translations
+        run: ./scrolls-registry push -d ./scrolls -t translations
       - name: Cleanup
-        run:
-          scroll-registry clean
+        run: ./scrolls-registry clean

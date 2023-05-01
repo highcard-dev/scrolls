@@ -1,7 +1,7 @@
 name: PR Pipeline
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
 jobs:
   build-deploy:
     runs-on: self-hosted
@@ -14,27 +14,27 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: '>=1.19.3'
+          go-version: ">=1.19.3"
           cache: true
           cache-dependency-path: scrolls-registry
-      - name: Build Scroll Registry Tool
-        shell: bash
-        run: |
-          go install ./scrolls-registry/scroll-registry.go
-          echo "$GOBIN" >> $GITHUB_PATH
+      - name: Get registry binary
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: "highcard-dev/backend-monorepo-go"
+          latest: true
+          fileName: "scrolls-registry"
+          token: ${{ secrets.GO_REPO_TOKEN }}
+      - run: chmod +x ./scrolls-registry
       - name: Check current registry
-        run: scroll-registry print
+        run: ./scrolls-registry print
       - name: Building all
-        run:
-          scroll-registry build -d ./scrolls
+        run: ./scrolls-registry build -d ./scrolls
       - name: Pushing new scrolls
         shell: bash
         run: |
-          scroll-registry push -d ./scrolls -t packages
-          scroll-registry push -d ./scrolls -t registry-index
+          ./scrolls-registry push -d ./scrolls -t packages
+          ./scrolls-registry push -d ./scrolls -t registry-index
       - name: Pushing new scrolls i18n
-        run:
-          scroll-registry push -d ./scrolls -t translations
+        run: ./scrolls-registry push -d ./scrolls -t translations
       - name: Cleanup
-        run:
-          scroll-registry clean
+        run: ./scrolls-registry clean
