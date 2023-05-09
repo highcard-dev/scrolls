@@ -5,7 +5,7 @@ processes:
   main:
     commands:
       start:
-        type: start
+        should_change_status: start
         procedures:
           - mode: exec
             data:
@@ -18,7 +18,7 @@ processes:
             data:
               - stop
       install:
-        type: install
+        should_change_status: start
         procedures:
           - mode: exec
             data:
@@ -46,14 +46,12 @@ processes:
   scroll-switch:
     commands:
       mc-sp@1.18:
-        type: "scroll-switch"
         procedures:
           - mode: exec
             data:
               - sh
               - $SCROLL_DIR/scroll-switch/mc-sp@1.18/scroll-switch.sh
       mc-sp@1.19:
-        type: "scroll-switch"
         procedures:
           - mode: exec
             data:

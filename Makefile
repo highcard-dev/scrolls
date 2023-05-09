@@ -1,9 +1,9 @@
 
 build-app:
-	go install  -o ./.bin/scrolls-registry ./scrolls-registry/scroll-registry.go
+	go install  -o ./.bin/druid registry ./druid/scroll-registry.go
 
 install-app:
-	go install  ./scrolls-registry/scroll-registry.go
+	go install  ./druid/scroll-registry.go
 
 build-all: install-app
 	 scroll-registry build -e ./.env -d ./scrolls

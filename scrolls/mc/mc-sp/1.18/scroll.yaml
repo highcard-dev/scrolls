@@ -5,7 +5,7 @@ processes:
   main:
     commands:
       start:
-        type: start
+        should_change_status: start
         procedures:
           - mode: exec
             data:
@@ -18,7 +18,7 @@ processes:
             data:
               - stop
       install:
-        type: install
+        should_change_status: start
         procedures:
           - mode: exec
             data:

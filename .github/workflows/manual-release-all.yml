@@ -16,17 +16,17 @@ jobs:
         with:
           repository: "highcard-dev/backend-monorepo-go"
           latest: true
-          fileName: "scrolls-registry"
+          fileName: "druid"
           token: ${{ secrets.GO_REPO_TOKEN }}
-      - run: chmod +x ./scrolls-registry
+      - run: chmod +x ./druid
       - name: Building only version updates
-        run: ./scrolls-registry build -d ./scrolls
+        run: ./druid registry build  --scrolls-dir ./scrolls
       - name: Pushing new scrolls
         shell: bash
         run: |
-          ./scrolls-registry push -d ./scrolls -t packages
-          ./scrolls-registry push -d ./scrolls -t registry-index
+          ./druid registry push  --scrolls-dir ./scrolls -t packages
+          ./druid registry push  --scrolls-dir ./scrolls -t registry-index
       - name: Pushing new scrolls i18n
-        run: ./scrolls-registry push -d ./scrolls -t translations
+        run: ./druid registry push  --scrolls-dir ./scrolls -t translations
       - name: Cleanup
-        run: ./scrolls-registry clean
+        run: ./druid registry clean
