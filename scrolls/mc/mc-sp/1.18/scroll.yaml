@@ -1,6 +1,6 @@
 name: mc-sp@1.18
 desc: Minecraft Spigot
-version: 0.10.0
+version: 0.10.1
 processes:
   main:
     commands:
@@ -31,6 +31,8 @@ processes:
               - bash
               - -c
               - echo eula=true > eula.txt
+          - mode: command
+            data: start
       update:
         type: update
         procedures:
