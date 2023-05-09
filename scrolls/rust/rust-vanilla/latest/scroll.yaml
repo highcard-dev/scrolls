@@ -1,6 +1,6 @@
 name: rust-vanilla@latest
 desc: Rust Vanilla
-version: 0.0.3
+version: 0.10.0
 processes:
   main:
     commands:
