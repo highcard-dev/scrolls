@@ -1,6 +1,6 @@
 name: rust-oxide@latest
 desc: Rust Oxide
-version: 0.10.0
+version: 0.10.2
 init: "main.install"
 processes:
   main:
