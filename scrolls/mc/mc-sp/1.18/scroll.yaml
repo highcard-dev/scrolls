@@ -1,6 +1,6 @@
 name: mc-sp@1.18
 desc: Minecraft Spigot
-version: 0.10.2
+version: 0.10.3
 init: "main.install"
 processes:
   main:
@@ -48,12 +48,12 @@ processes:
               - echo eula=true > eula.txt
   scroll-switch:
     commands:
-      mc-sp@1.19:
+      mc-sp@1-19:
         type: "scroll-switch"
         procedures:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/mc-sp@1.19/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/mc-sp@1-19/scroll-switch.sh
 plugins:
   rcon: {}

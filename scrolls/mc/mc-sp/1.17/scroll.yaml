@@ -46,19 +46,19 @@ processes:
               - echo eula=true > eula.txt
   scroll-switch:
     commands:
-      mc-sp@1.18:
+      mc-sp@1-18:
         procedures:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/mc-sp@1.18/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/mc-sp@1-18/scroll-switch.sh
           - mode: scroll-switch
             data: mc-sp@18
-      mc-sp@1.19:
+      mc-sp@1-19:
         procedures:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/mc-sp@1.19/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/mc-sp@1-19/scroll-switch.sh
 plugins:
   rcon: {}
