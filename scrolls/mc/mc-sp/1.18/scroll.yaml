@@ -1,6 +1,7 @@
 name: mc-sp@1.18
 desc: Minecraft Spigot
 version: 0.10.1
+init: "main.install"
 processes:
   main:
     commands:

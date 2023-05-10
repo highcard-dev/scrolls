@@ -1,6 +1,7 @@
 name: mc-sp@1.17
 desc: Minecraft Spigot
 version: 0.10.0
+init: "main.install"
 processes:
   main:
     commands:
@@ -51,6 +52,8 @@ processes:
             data:
               - sh
               - $SCROLL_DIR/scroll-switch/mc-sp@1.18/scroll-switch.sh
+          - mode: scroll-switch
+            data: mc-sp@18
       mc-sp@1.19:
         procedures:
           - mode: exec
