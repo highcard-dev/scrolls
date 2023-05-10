@@ -24,7 +24,7 @@ jobs:
           token: ${{ secrets.GO_REPO_TOKEN }}
       - run: chmod +x ./druid
       - name: Building only version updates
-        run: ./druid registry build --scrolls-dir ./scrolls -c
+        run: ./druid registry build --scrolls-dir ./scrolls
       - name: Pushing new scrolls
         shell: bash
         run: |
