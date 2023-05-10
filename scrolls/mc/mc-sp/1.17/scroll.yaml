@@ -53,12 +53,14 @@ processes:
               - sh
               - $SCROLL_DIR/scroll-switch/mc-sp@1-18/scroll-switch.sh
           - mode: scroll-switch
-            data: mc-sp@18
+            data: mc-sp@1.18
       mc-sp@1-19:
         procedures:
           - mode: exec
             data:
               - sh
               - $SCROLL_DIR/scroll-switch/mc-sp@1-19/scroll-switch.sh
+          - mode: scroll-switch
+            data: mc-sp@1.19
 plugins:
   rcon: {}

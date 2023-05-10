@@ -55,5 +55,7 @@ processes:
             data:
               - sh
               - $SCROLL_DIR/scroll-switch/mc-sp@1-19/scroll-switch.sh
+          - mode: scroll-switch
+            data: mc-sp@1.19
 plugins:
   rcon: {}
