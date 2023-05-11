@@ -1,6 +1,6 @@
 name: mc-sp@1.18
 desc: Minecraft Spigot
-version: 0.10.4
+version: 0.10.5
 init: "main.install"
 processes:
   main:
@@ -16,8 +16,7 @@ processes:
         type: stop
         procedures:
           - mode: rcon
-            data:
-              - stop
+            data: stop
       install:
         should_change_status: start
         procedures:

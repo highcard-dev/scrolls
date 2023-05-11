@@ -16,8 +16,7 @@ processes:
         type: stop
         procedures:
           - mode: rcon
-            data:
-              - stop
+            data: stop
       install:
         should_change_status: start
         procedures:
