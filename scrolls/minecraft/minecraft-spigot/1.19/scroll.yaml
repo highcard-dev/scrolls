@@ -22,6 +22,7 @@ processes:
           - mode: exec
             data:
               - wget
+              - -q
               - -O
               - spigot.jar
               - https://download.getbukkit.org/spigot/spigot-1.19.jar
