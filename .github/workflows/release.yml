@@ -23,6 +23,8 @@ jobs:
           fileName: "druid"
           token: ${{ secrets.GO_REPO_TOKEN }}
       - run: chmod +x ./druid
+      - name: Login to registry
+        run: ./druid registry login --host ${{ env.SCROLL_REGISTRY_HOST }} --user ${{ env.SCROLL_REGISTRY_USER }} --password ${{ env.SCROLL_REGISTRY_PASSWORD }}
       - name: Pushing new scrolls
         shell: bash
         run: |

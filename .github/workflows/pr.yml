@@ -25,10 +25,8 @@ jobs:
           fileName: "scrolls-registry"
           token: ${{ secrets.GO_REPO_TOKEN }}
       - run: chmod +x ./druid
-      - name: Check current registry
-        run: ./druid registry print
-      - name: Building all
-        run: ./druid registry build  --scrolls-dir ./scrolls
+      - name: Login to registry
+        run: ./druid registry login --host ${{ env.SCROLL_REGISTRY_HOST }} --user ${{ env.SCROLL_REGISTRY_USER }} --password ${{ env.SCROLL_REGISTRY_PASSWORD }}
       - name: Pushing new scrolls
         shell: bash
         run: |
@@ -37,7 +35,3 @@ jobs:
           ./druid registry push ./scrolls/mc/mc-sp/1.19 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.19-pr-${{ env.GITHUB_REF_NAME }}
           ./druid registry push ./scrolls/mc/rust-oxide registry-1.docker.io/highcard/scroll-rust-oxide:latest
           ./druid registry push ./scrolls/mc/rust-vanilla registry-1.docker.io/highcard/scroll-rust-vanilla:latest
-      - name: Pushing new scrolls i18n
-        run: ./druid registry push  --scrolls-dir ./scrolls -t translations
-      - name: Cleanup
-        run: ./druid registry clean
