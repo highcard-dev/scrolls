@@ -28,8 +28,8 @@ jobs:
       - name: Pushing new scrolls
         shell: bash
         run: |
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.17-latest
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.18-latest
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.19-latest
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.17
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.18
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.19
           ./druid registry push ./scrolls/rust/rust-oxide/latest registry-1.docker.io/highcard/scroll-rust-oxide:latest
           ./druid registry push ./scrolls/rust/rust-vanilla/latest registry-1.docker.io/highcard/scroll-rust-vanilla:latest
