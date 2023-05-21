@@ -1,6 +1,7 @@
-name: mc-sp@1.18
+name: minecraft-spigot
 desc: Minecraft Spigot
 version: 0.10.5
+app_version: 1.18
 init: "main.install"
 processes:
   main:
@@ -13,12 +14,10 @@ processes:
               - bash
               - ./start.sh
       stop:
-        type: stop
         procedures:
           - mode: rcon
             data: stop
       install:
-        should_change_status: start
         procedures:
           - mode: exec
             data:
@@ -34,7 +33,6 @@ processes:
           - mode: command
             data: start
       update:
-        type: update
         procedures:
           - mode: exec
             data:
@@ -48,7 +46,6 @@ processes:
   scroll-switch:
     commands:
       mc-sp@1-19:
-        type: "scroll-switch"
         procedures:
           - mode: exec
             data:

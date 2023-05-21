@@ -32,8 +32,11 @@ jobs:
       - name: Pushing new scrolls
         shell: bash
         run: |
-          ./druid registry push  --scrolls-dir ./scrolls -t packages
-          ./druid registry push  --scrolls-dir ./scrolls -t registry-index
+          ./druid registry push ./scrolls/mc/mc-sp/1.17 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.17-pr-${{ env.GITHUB_REF_NAME }}
+          ./druid registry push ./scrolls/mc/mc-sp/1.18 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.18-pr-${{ env.GITHUB_REF_NAME }}
+          ./druid registry push ./scrolls/mc/mc-sp/1.19 registry-1.docker.io/highcard/scroll-minecraft-spigot:1.19-pr-${{ env.GITHUB_REF_NAME }}
+          ./druid registry push ./scrolls/mc/rust-oxide registry-1.docker.io/highcard/scroll-rust-oxide:latest
+          ./druid registry push ./scrolls/mc/rust-vanilla registry-1.docker.io/highcard/scroll-rust-vanilla:latest
       - name: Pushing new scrolls i18n
         run: ./druid registry push  --scrolls-dir ./scrolls -t translations
       - name: Cleanup

@@ -1,6 +1,7 @@
-name: rust-vanilla@latest
+name: rust-vanilla
 desc: Rust Vanilla
 version: 0.10.5
+app_version: latest
 init: "main.install"
 processes:
   main:
@@ -19,7 +20,6 @@ processes:
             data:
               - quit
       install:
-        should_change_status: start
         procedures:
           - mode: exec
             data:
@@ -30,5 +30,7 @@ processes:
               - +app_update
               - 258550
               - +quit
+          - mode: command
+            data: start
 plugins:
   rcon_web_rust: {}
