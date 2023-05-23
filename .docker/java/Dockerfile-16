@@ -16,9 +16,6 @@ RUN useradd -ms /bin/bash druid
 USER druid
 
 COPY --from=base /usr/bin/druid* /usr/bin
+COPY --from=base /entrypoint.sh /entrypoint.sh
 
-COPY --chown=druid:druid .docker/prepare-switch-scroll.sh /usr/bin/prepare-switch-scroll
-RUN chmod +x /usr/bin/prepare-switch-scroll
-
-CMD "/app/druid"
-#ENTRYPOINT [ "/app/druid" ]
+ENTRYPOINT [ "/entrypoint.sh" ]

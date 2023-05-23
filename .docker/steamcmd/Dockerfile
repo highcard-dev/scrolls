@@ -17,17 +17,13 @@ USER druid
 COPY --chown=druid:druid .docker/steamcmd/steamcmd /usr/bin/steamcmd
 RUN chmod +x /usr/bin/steamcmd
 
-COPY --chown=druid:druid .docker/prepare-switch-scroll.sh /usr/bin/prepare-switch-scroll
-RUN chmod +x /usr/bin/prepare-switch-scroll
-
-COPY --from=base /usr/bin/druid* /usr/bin
-
 WORKDIR /home/druid
 RUN mkdir -p /home/druid/.steam/steamcmd
 RUN wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" -O /home/druid/.steam/steamcmd/steamcmd_linux.tar.gz
 RUN cd /home/druid/.steam/steamcmd/ && tar zxvf steamcmd_linux.tar.gz
 WORKDIR /app
 
+COPY --from=base /usr/bin/druid* /usr/bin
+COPY --from=base /entrypoint.sh /entrypoint.sh
 
-CMD "/app/druid"
-ENTRYPOINT [ "/app/druid" ]
+ENTRYPOINT [ "/entrypoint.sh" ]
