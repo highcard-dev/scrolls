@@ -1,4 +1,4 @@
-name: minecraft-spigot
+name: registry-1.docker.io/highcard/scroll-minecraft-spigot
 desc: Minecraft Spigot
 version: 0.10.5
 app_version: 1.17
