@@ -28,7 +28,7 @@ processes:
               - +login
               - anonymous
               - +app_update
-              - 258550
+              - "258550"
               - +quit
           - mode: command
             data: start
