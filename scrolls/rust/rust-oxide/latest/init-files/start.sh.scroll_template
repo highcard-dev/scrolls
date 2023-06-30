@@ -3,8 +3,8 @@
    -server.ip "0.0.0.0" \
    -server.port 28015 \
    -rcon.ip "0.0.0.0" \
-   -rcon.port {{ .Config.rcon.port }} \
-   -rcon.password {{ .Config.rcon.password }} \
+   -rcon.port {{ .Config.rcon_web_rust.port }} \
+   -rcon.password {{ .Config.rcon_web_rust.password }} \
    -server.maxplayers 75 \
    -server.hostname "Druid Test Server" \
    -server.identity "my_server_identity" \
