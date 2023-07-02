@@ -31,6 +31,18 @@ processes:
               - +app_update
               - "258550"
               - +quit
+          - mode: exec
+            data:
+              - wget
+              - -O
+              - oxide.zip
+              - https://umod.org/games/rust/download/develop
+          - mode: exec
+            data:
+              - unzip
+              - oxide.zip
+              - -d
+              - /app/resources/deployment
           - mode: command
             data: start
 plugins:

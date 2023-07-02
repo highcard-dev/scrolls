@@ -1,10 +1,10 @@
 ./RustDedicated -batchmode -nographics \
-   -app.port $DRUID_PORT_RUSTPLUS \
+   -app.port $DRUID_PORT_RUSTPLUS_1 \
    -server.ip "0.0.0.0" \
    -server.port 28015 \
    -rcon.ip "0.0.0.0" \
-   -rcon.port $DRUID_PORT_RCON \
-   -rcon.password $DRUID_PASSWORD_RCON \
+   -rcon.port {{ .Config.rcon_web_rust.port }} \
+   -rcon.password {{ .Config.rcon_web_rust.password }} \
    -server.maxplayers 75 \
    -server.hostname "Druid Test Server" \
    -server.identity "my_server_identity" \

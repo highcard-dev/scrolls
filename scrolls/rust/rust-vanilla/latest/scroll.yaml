@@ -1,6 +1,6 @@
 name: registry-1.docker.io/highcard/scroll-rust-vanilla
 desc: Rust Vanilla
-version: 0.10.5
+version: 0.0.1
 app_version: latest
 init: "main.install"
 processes:
@@ -24,11 +24,12 @@ processes:
           - mode: exec
             data:
               - steamcmd
-              - app/resources/druid-deployment
+              - +force_install_dir
+              - /app/resources/deployment
               - +login
               - anonymous
               - +app_update
-              - 258550
+              - "258550"
               - +quit
           - mode: command
             data: start
