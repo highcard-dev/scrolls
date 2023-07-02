@@ -44,6 +44,10 @@ processes:
               - oxide.zip
               - -d
               - /app/resources/deployment
+          - mode: exec
+            data:
+              - rm
+              - oxide.zip
           - mode: command
             data: start
 plugins:
