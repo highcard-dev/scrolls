@@ -12,8 +12,8 @@ jobs:
       matrix:
         version:
           [
-            { java-version: "16", spigot-version: "1.17" },
-            { java-version: "16", spigot-version: "1.17.1" },
+            { java-version: "17", spigot-version: "1.17" },
+            { java-version: "17", spigot-version: "1.17.1" },
             { java-version: "17", spigot-version: "1.18" },
             { java-version: "17", spigot-version: "1.18.1" },
             { java-version: "17", spigot-version: "1.18.2" },
