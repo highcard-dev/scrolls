@@ -12,8 +12,8 @@ jobs:
       matrix:
         version:
           [
-            { java-version: "17", spigot-version: "1.17" },
-            { java-version: "17", spigot-version: "1.17.1" },
+            { java-version: "16", spigot-version: "1.17" },
+            { java-version: "16", spigot-version: "1.17.1" },
             { java-version: "17", spigot-version: "1.18" },
             { java-version: "17", spigot-version: "1.18.1" },
             { java-version: "17", spigot-version: "1.18.2" },
@@ -33,4 +33,10 @@ jobs:
           distribution: "microsoft" # See 'Supported distributions' for available options
           java-version: "${{ matrix.version.java-version }}"
       - run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-      - run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
+      #- run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
+      - uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          source_dir: "BuildTools.jar"
