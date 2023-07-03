@@ -1,0 +1,23 @@
+name: Build Spigot
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+jobs:
+  build-spigot:
+    strategy:
+      matrix:
+        version: [{ java-version: "16-open", spigot-version: "1.17.1" }]
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - uses: sdkman/sdkman-action@v1
+        id: sdkman
+        with:
+          candidate: java
+          version: ${{ matrix.version.java-version }}
+      - run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+      - run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
