@@ -14,11 +14,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-      - uses: sdkman/sdkman-action@master
-        id: sdkman
-        with:
-          candidate: java
-          version: ${{ matrix.version.java-version }}
       - uses: actions/setup-java@v3
         with:
           distribution: "microsoft" # See 'Supported distributions' for available options
