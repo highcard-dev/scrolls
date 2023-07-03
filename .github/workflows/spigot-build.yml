@@ -27,19 +27,19 @@ jobs:
     runs-on: self-hosted
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          distribution: "microsoft" # See 'Supported distributions' for available options
-          java-version: "${{ matrix.version.java-version }}"
-      - run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+      #- uses: actions/checkout@v3
+      #- uses: actions/setup-java@v3
+      #  with:
+      #    distribution: "microsoft" # See 'Supported distributions' for available options
+      #    java-version: "${{ matrix.version.java-version }}"
+      #- run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
       #- run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
       - uses: jakejarvis/s3-sync-action@master
         with:
-          args: --exclude '*' --include '/BuildTools.jar'
+          args: --exclude '*' --include './BuildTools.jar'
         env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
+          AWS_S3_BUCKET: "scroll-artifacts"
+          AWS_ACCESS_KEY_ID: "V7K0ZLGJ7JKCON9J7NPY"
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_ENDPOINT: https://s3.eu-central-2.wasabisys.com/
           AWS_REGION: "eu-central-2"
