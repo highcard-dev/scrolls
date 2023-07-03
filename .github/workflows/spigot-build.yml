@@ -27,13 +27,13 @@ jobs:
     runs-on: self-hosted
     continue-on-error: true
     steps:
-      #- uses: actions/checkout@v3
-      #- uses: actions/setup-java@v3
-      #  with:
-      #    distribution: "microsoft" # See 'Supported distributions' for available options
-      #    java-version: "${{ matrix.version.java-version }}"
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "microsoft" # See 'Supported distributions' for available options
+          java-version: "${{ matrix.version.java-version }}"
       - run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-      #- run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
+      - run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
       - uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
