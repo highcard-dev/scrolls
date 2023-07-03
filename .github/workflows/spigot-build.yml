@@ -10,7 +10,20 @@ jobs:
   build-spigot:
     strategy:
       matrix:
-        version: [{ java-version: "16", spigot-version: "1.17.1" }]
+        version:
+          [
+            { java-version: "16", spigot-version: "1.17" },
+            { java-version: "16", spigot-version: "1.17.1" },
+            { java-version: "17", spigot-version: "1.18" },
+            { java-version: "17", spigot-version: "1.18.1" },
+            { java-version: "18", spigot-version: "1.18.2" },
+            { java-version: "18", spigot-version: "1.19" },
+            { java-version: "18", spigot-version: "1.19.1" },
+            { java-version: "18", spigot-version: "1.19.2" },
+            { java-version: "18", spigot-version: "1.19.3" },
+            { java-version: "18", spigot-version: "1.19.4" },
+            { java-version: "20", spigot-version: "1.20.1" },
+          ]
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
