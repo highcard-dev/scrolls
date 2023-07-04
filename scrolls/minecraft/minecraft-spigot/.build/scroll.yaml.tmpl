@@ -44,6 +44,7 @@ processes:
               - bash
               - -c
               - echo eula=true > eula.txt
+{{- if .Artifacts }}
   scroll-switch:
     commands:
 {{- range $k, $v  := .Artifacts }}
@@ -55,6 +56,7 @@ processes:
               - $SCROLL_DIR/scroll-switch/minecraft-spigot@{{ $k }}/scroll-switch.sh
           - mode: scroll-switch
             data: {{ $v }}
+{{- end }}
 {{- end }}
 plugins:
   rcon: {}
