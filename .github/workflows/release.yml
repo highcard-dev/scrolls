@@ -1,5 +1,6 @@
 name: Release Changed Pipeline
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -29,7 +30,15 @@ jobs:
         shell: bash
         run: |
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17.1
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18.1
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18.2
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.1
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.2
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.3
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.4
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.1
           ./druid registry push ./scrolls/rust/rust-oxide/latest
           ./druid registry push ./scrolls/rust/rust-vanilla/latest
