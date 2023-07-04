@@ -43,3 +43,4 @@ jobs:
           AWS_S3_ENDPOINT: https://s3.eu-central-1.wasabisys.com/
           AWS_REGION: "eu-central-1"
           SOURCE_DIR: spigot
+          DEST_DIR: minecraft/spigot
