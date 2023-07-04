@@ -1,11 +1,8 @@
 name: Build Spigot
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    tags:
-      - v*
+  schedule:
+    - cron: '0 2 * * *'
 jobs:
   build-spigot:
     strategy:
