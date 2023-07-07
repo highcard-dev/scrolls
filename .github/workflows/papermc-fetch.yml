@@ -25,10 +25,6 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          distribution: "microsoft" # See 'Supported distributions' for available options
-          java-version: "${{ matrix.version.java-version }}"
       - run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version.version }}/builds
       - run: echo "BUILD_NUMBER=$(cat build.json | jq '[ .builds[] | select(.channel == "default") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
       - run: wget -O paper-${{ matrix.version.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/paper-${{ matrix.version.version }}-${{ env.BUILD_NUMBER }}.jar
