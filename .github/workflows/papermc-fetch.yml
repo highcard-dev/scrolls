@@ -9,25 +9,25 @@ jobs:
       matrix:
         version:
           [
-            { version: "1.17" },
-            { version: "1.17.1" },
-#            { version: "1.18" }, Has Only experimental channel. Let's dont use it, until someone really wants it
-            { version: "1.18.1" },
-            { version: "1.18.2" },
-            { version: "1.19" },
-            { version: "1.19.1" },
-            { version: "1.19.2" },
-            { version: "1.19.3" },
-            { version: "1.19.4" },
-            { version: "1.20.1" },
+            1.17,
+            1.17.1,
+#            1.18, Has Only experimental channel. Let's dont use it, until someone really wants it
+            1.18.1,
+            1.18.2,
+            1.19,
+            1.19.1,
+            1.19.2,
+            1.19.3,
+            1.19.4,
+            1.20.1,
           ]
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-      - run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version.version }}/builds
+      - run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds
       - run: echo "BUILD_NUMBER=$(cat builds.json | jq '[ .builds[] | select(.channel == "default") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
-      - run: wget -O paper-${{ matrix.version.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/paper-${{ matrix.version.version }}-${{ env.BUILD_NUMBER }}.jar
-      - run: mkdir -p papermc && mv paper-${{ matrix.version.version }}.jar papermc/paper-${{ matrix.version.version }}.jar
+      - run: wget -O paper-${{ matrix.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/paper-${{ matrix.version }}-${{ env.BUILD_NUMBER }}.jar
+      - run: mkdir -p papermc && mv paper-${{ matrix.version }}.jar papermc/paper-${{ matrix.version }}.jar
       - uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
