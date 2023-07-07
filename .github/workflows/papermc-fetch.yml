@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version.version }}/builds
-      - run: echo "BUILD_NUMBER=$(cat build.json | jq '[ .builds[] | select(.channel == "default") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
+      - run: echo "BUILD_NUMBER=$(cat builds.json | jq '[ .builds[] | select(.channel == "default") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
       - run: wget -O paper-${{ matrix.version.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/paper-${{ matrix.version.version }}-${{ env.BUILD_NUMBER }}.jar
       - run: mkdir -p papermc && mv paper-${{ matrix.version.version }}.jar papermc/paper-${{ matrix.version.version }}.jar
       - uses: jakejarvis/s3-sync-action@master
