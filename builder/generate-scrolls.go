@@ -20,6 +20,7 @@ type TemplateVars struct {
 	Version        string
 	VersionEscaped string
 	Artifacts      map[string]string
+	Vars           map[string]string
 }
 
 func replace(input, from, to string) string {
@@ -43,11 +44,25 @@ func main() {
 	artifactsPath := path + "/artifacts.json"
 	switchScrollDir := path + "/scroll-switch"
 	scrollYamlTemplate := path + "/scroll.yaml.tmpl"
+	varsFile := path + "/vars.json"
 
 	println("Path: " + path)
 	println("Artifacts Path: " + artifactsPath)
 	println("Switch Scroll Dir: " + switchScrollDir)
 	println("Scroll Yaml Template: " + scrollYamlTemplate)
+	println("Vars File: " + varsFile)
+
+	//parse vars json file, if exists
+	var vars map[string]map[string]string
+	vars = make(map[string]map[string]string)
+	varsBytes, err := ioutil.ReadFile(varsFile)
+	if err != nil {
+		fmt.Printf("Error reading vars.json file. %s", err.Error())
+	}
+
+	if varsBytes != nil {
+		json.Unmarshal(varsBytes, &vars)
+	}
 
 	//parse artifacs json file
 	var artifacts map[string]string
@@ -73,6 +88,7 @@ func main() {
 		templateVars.Version = version
 		templateVars.VersionEscaped = strings.Replace(version, ".", "-", -1)
 		templateVars.Artifacts = GetArtifactsAbove(version, artifacts, true)
+		templateVars.Vars = vars[version]
 
 		//create scroll dir
 		dir := filepath.Join(basepath, version)
