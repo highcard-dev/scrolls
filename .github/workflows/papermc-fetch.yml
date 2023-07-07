@@ -11,7 +11,7 @@ jobs:
           [
             { version: "1.17" },
             { version: "1.17.1" },
-            { version: "1.18" },
+#            { version: "1.18" }, Has Only experimental channel. Let's dont use it, until someone really wants it
             { version: "1.18.1" },
             { version: "1.18.2" },
             { version: "1.19" },
@@ -22,7 +22,6 @@ jobs:
             { version: "1.20.1" },
           ]
     runs-on: self-hosted
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
       - run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version.version }}/builds
