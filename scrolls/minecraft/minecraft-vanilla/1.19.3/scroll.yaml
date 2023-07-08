@@ -24,7 +24,7 @@ processes:
               - wget
               - -q
               - -O
-              - spigot.jar
+              - server.jar
               - https://launcher.mojang.com/v1/objects/c9df48efed58511cdd0213c56b9013a7b5c9ac1f/server.jar
           - mode: exec
             data:

@@ -6,4 +6,4 @@ then
     MAX=1024M
 fi
 
-java -Xmx$MAX -Xms1024M -jar spigot.jar nogui
+java -Xmx$MAX -Xms1024M -jar server.jar nogui

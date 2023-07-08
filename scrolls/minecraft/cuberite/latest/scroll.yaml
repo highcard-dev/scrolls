@@ -1,0 +1,41 @@
+name: registry-1.docker.io/highcard/scroll-minecraft-cuberite
+desc: PaperMC
+version: 0.0.1
+app_version: latest
+init: "main.install"
+processes:
+  main:
+    commands:
+      start:
+        should_change_status: start
+        procedures:
+          - mode: exec
+            data:
+              - bash
+              - ./start.sh
+      stop:
+        procedures:
+          - mode: rcon
+            data: stop
+      install:
+        procedures:
+          - mode: exec
+            data:
+              - wget
+              - -q
+              - -O
+              - Cuberite.tar.gz
+              - https://download.cuberite.org/linux-x86_64/Cuberite.tar.gz
+          - mode: exec
+            data:
+              - tar
+              - -xzf
+              - Cuberite.tar.gz
+          - mode: command
+            data: start
+      update:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - $SCROLL_DIR/update.sh
