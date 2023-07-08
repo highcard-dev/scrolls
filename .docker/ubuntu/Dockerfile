@@ -1,5 +1,5 @@
 #Dockerhub does not allow for setting of build args :/
-ARG IMAGE=openjdk:18-slim-bullseye
+ARG IMAGE=ubuntu:22.04
 FROM highcard/druidd-base:latest as base
 FROM $IMAGE
 WORKDIR /app
