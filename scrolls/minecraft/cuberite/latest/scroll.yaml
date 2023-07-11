@@ -15,7 +15,7 @@ processes:
               - ./start.sh
       stop:
         procedures:
-          - mode: rcon
+          - mode: stdin
             data: stop
       install:
         procedures:
