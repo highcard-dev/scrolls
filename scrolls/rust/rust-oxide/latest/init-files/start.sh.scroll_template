@@ -1,3 +1,6 @@
+#!/bin/sh
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
+
 ./RustDedicated -batchmode -nographics \
    -app.port $DRUID_PORT_RUSTPLUS_1 \
    -server.ip "0.0.0.0" \
