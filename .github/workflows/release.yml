@@ -19,8 +19,8 @@ jobs:
       - name: Get registry binary
         uses: robinraju/release-downloader@v1.7
         with:
-          repository: "highcard-dev/backend-monorepo-go"
-          latest: true
+          repository: "highcard-dev/monorepo"
+          tag: "daemon-0.1.14" #TODO: is there a ways to allways get the latest?
           fileName: "druid"
           token: ${{ secrets.GO_REPO_TOKEN }}
       - run: chmod +x ./druid
