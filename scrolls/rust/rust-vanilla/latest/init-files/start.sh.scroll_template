@@ -3,6 +3,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
 
 ./RustDedicated -batchmode -nographics \
    -app.port $DRUID_PORT_RUSTPLUS_1 \
+   -app.publicip $DRUID_IP_1 \
    -server.ip "0.0.0.0" \
    -server.port 28015 \
    -rcon.ip "0.0.0.0" \

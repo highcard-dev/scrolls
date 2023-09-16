@@ -1,6 +1,6 @@
 name: registry-1.docker.io/highcard/scroll-rust-oxide
 desc: Rust Oxide
-version: 0.10.6
+version: 0.10.7
 app_version: latest
 init: "main.install"
 processes:
