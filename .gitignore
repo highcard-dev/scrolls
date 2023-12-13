@@ -4,3 +4,5 @@
 scrolls-registry/.builds
 .builds
 *.tar.gz
+
+scroll-builder

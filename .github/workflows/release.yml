@@ -40,6 +40,8 @@ jobs:
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.3
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.4
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.1
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.2
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.4
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17.1
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18
@@ -52,7 +54,6 @@ jobs:
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.4
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.1
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.2
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.3
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.4
           ./druid registry push ./scrolls/minecraft/papermc/1.17
           ./druid registry push ./scrolls/minecraft/papermc/1.17.1
@@ -64,6 +65,8 @@ jobs:
           ./druid registry push ./scrolls/minecraft/papermc/1.19.3
           ./druid registry push ./scrolls/minecraft/papermc/1.19.4
           ./druid registry push ./scrolls/minecraft/papermc/1.20.1
+          ./druid registry push ./scrolls/minecraft/papermc/1.20.2
+          ./druid registry push ./scrolls/minecraft/papermc/1.20.4
           ./druid registry push ./scrolls/minecraft/cuberite/latest
           ./druid registry push ./scrolls/rust/rust-oxide/latest
           ./druid registry push ./scrolls/rust/rust-vanilla/latest
