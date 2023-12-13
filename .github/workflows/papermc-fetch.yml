@@ -26,8 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds
-      - run: echo "BUILD_NUMBER=$(cat builds.json | jq '[ .builds[] | select(.channel == "default") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
+      - name: Fetch latest builds
+        run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds
+      - name: Fetch latest stable
+        run: echo "BUILD_NUMBER=$(cat builds.json | jq '[ .builds[] | select(.channel == "default") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
+      - name: Fetch Experimental if no stable found
+        run: echo "BUILD_NUMBER=$(cat builds.json | jq '[ .builds[] | select(.channel == "experimental") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
+        if: env.BUILD_NUMBER == 'null'
       - run: wget -O paper-${{ matrix.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/paper-${{ matrix.version }}-${{ env.BUILD_NUMBER }}.jar
       - run: mkdir -p papermc && mv paper-${{ matrix.version }}.jar papermc/paper-${{ matrix.version }}.jar
       - uses: jakejarvis/s3-sync-action@master
