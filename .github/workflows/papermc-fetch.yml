@@ -20,8 +20,11 @@ jobs:
             1.19.3,
             1.19.4,
             1.20.1,
+            1.20.2,
+            1.20.3,
+            1.20.4,
           ]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds
