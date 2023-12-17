@@ -1,0 +1,39 @@
+name: Fetch PaperMC
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+jobs:
+  build-spigot:
+    strategy:
+      matrix:
+        version:
+          [
+            1.17,
+            1.17.1,
+#            1.18, Has Only experimental channel. Let's dont use it, until someone really wants it
+            1.18.1,
+            1.18.2,
+            1.19,
+            1.19.1,
+            1.19.2,
+            1.19.3,
+            1.19.4,
+            1.20.1,
+            1.20.2,
+            1.20.4,
+          ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: ./scrolls/minecraft/forge/fetch.sh ${{ matrix.version }}
+      - run: mkdir -p forge && mv forge-${{ matrix.version }}.jar forge/forge-${{ matrix.version }}.jar
+      - uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_S3_ENDPOINT: https://s3.eu-central-1.wasabisys.com/
+          AWS_REGION: "eu-central-1"
+          SOURCE_DIR: forge
+          DEST_DIR: minecraft/forge
