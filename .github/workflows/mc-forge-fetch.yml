@@ -1,4 +1,4 @@
-name: Fetch PaperMC
+name: Fetch Forge
 on:
   workflow_dispatch:
   schedule:
