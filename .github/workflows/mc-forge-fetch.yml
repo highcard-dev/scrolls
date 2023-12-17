@@ -9,9 +9,8 @@ jobs:
       matrix:
         version:
           [
-            1.17,
             1.17.1,
-#            1.18, Has Only experimental channel. Let's dont use it, until someone really wants it
+            1.18,
             1.18.1,
             1.18.2,
             1.19,
@@ -19,6 +18,7 @@ jobs:
             1.19.2,
             1.19.3,
             1.19.4,
+            1.20,
             1.20.1,
             1.20.2,
             1.20.4,
@@ -27,7 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: go install github.com/ericchiang/pup@latest
-      - run: export PATH=${PATH}:`go env GOPATH`/bin
       - run: ./scrolls/minecraft/forge/fetch.sh ${{ matrix.version }}
       - run: mkdir -p forge && mv forge-${{ matrix.version }}.jar forge/forge-${{ matrix.version }}.jar
       - uses: jakejarvis/s3-sync-action@master
