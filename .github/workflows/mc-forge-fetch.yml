@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - run: go get github.com/ericchiang/pup
       - run: ./scrolls/minecraft/forge/fetch.sh ${{ matrix.version }}
       - run: mkdir -p forge && mv forge-${{ matrix.version }}.jar forge/forge-${{ matrix.version }}.jar
       - uses: jakejarvis/s3-sync-action@master
