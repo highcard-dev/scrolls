@@ -27,6 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: go install github.com/ericchiang/pup@latest
+      - run: export PATH=${PATH}:`go env GOPATH`/bin
       - run: ./scrolls/minecraft/forge/fetch.sh ${{ matrix.version }}
       - run: mkdir -p forge && mv forge-${{ matrix.version }}.jar forge/forge-${{ matrix.version }}.jar
       - uses: jakejarvis/s3-sync-action@master
