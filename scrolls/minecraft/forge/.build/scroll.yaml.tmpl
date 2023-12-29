@@ -61,13 +61,14 @@ processes:
 {{- if .Artifacts }}
   scroll-switch:
     commands:
-{{- range $k, $v  := .Artifacts }}
+{{- range $k, $v  := .ArtifactsUnescaped }}
       {{ $v }}:
         procedures:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@{{ $k }}/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "{{ $k }}"
           - mode: scroll-switch
             data: {{ $v }}
 {{- end }}

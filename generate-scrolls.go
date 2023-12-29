@@ -16,11 +16,12 @@ import (
 )
 
 type TemplateVars struct {
-	Artifact       string
-	Version        string
-	VersionEscaped string
-	Artifacts      map[string]string
-	Vars           map[string]string
+	Artifact           string
+	Version            string
+	VersionEscaped     string
+	Artifacts          map[string]string
+	ArtifactsUnescaped map[string]string
+	Vars               map[string]string
 }
 
 func replace(input, from, to string) string {
@@ -33,13 +34,13 @@ func main() {
 	//	funcMap := template.FuncMap{
 	//		"replace": replace,
 	//	}
-	basepath := os.Args[1]
 
-	if basepath == "" {
+	if len(os.Args) < 2 {
 		fmt.Println("Please enter a path.")
 		return
 	}
 
+	basepath := os.Args[1]
 	path := basepath + "/.build"
 	artifactsPath := path + "/artifacts.json"
 	switchScrollDir := path + "/scroll-switch"
@@ -88,6 +89,7 @@ func main() {
 		templateVars.Version = version
 		templateVars.VersionEscaped = strings.Replace(version, ".", "-", -1)
 		templateVars.Artifacts = GetArtifactsAbove(version, artifacts, true)
+		templateVars.ArtifactsUnescaped = GetArtifactsAbove(version, artifacts, false)
 		templateVars.Vars = vars[version]
 
 		//create scroll dir
@@ -113,6 +115,8 @@ func main() {
 		subitems, _ := ioutil.ReadDir(switchScrollDir)
 		for _, subitem := range subitems {
 			if !subitem.IsDir() {
+				//just copy the files instead
+				cp.Copy(filepath.Join(switchScrollDir, subitem.Name()), filepath.Join(dir, "scroll-switch", subitem.Name()))
 				continue
 			}
 			filename := subitem.Name()

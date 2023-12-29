@@ -1,4 +1,0 @@
-wget -O forge-installer-new.jar https://s3.eu-central-1.wasabisys.com/druid-scroll-artifacts/minecraft/forge/forge-1.19.1.jar
-
-java -jar forge-installer-new.jar --installServer
-rm forge-installer-new.jar

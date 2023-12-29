@@ -65,7 +65,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-19-1/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.19.1"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.19.1
       registry-1.docker.io/highcard/scroll-minecraft-forge:1.19.2:
@@ -73,7 +74,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-19-2/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.19.2"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.19.2
       registry-1.docker.io/highcard/scroll-minecraft-forge:1.19.3:
@@ -81,7 +83,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-19-3/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.19.3"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.19.3
       registry-1.docker.io/highcard/scroll-minecraft-forge:1.19.4:
@@ -89,7 +92,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-19-4/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.19.4"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.19.4
       registry-1.docker.io/highcard/scroll-minecraft-forge:1.20:
@@ -97,7 +101,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-20/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.20"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20
       registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.1:
@@ -105,7 +110,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-20-1/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.20.1"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.1
       registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.2:
@@ -113,7 +119,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-20-2/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.20.2"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.2
       registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.3:
@@ -121,7 +128,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-20-3/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.20.3"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.3
       registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.4:
@@ -129,7 +137,8 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-20-4/scroll-switch.sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.20.4"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.4
 plugins:
