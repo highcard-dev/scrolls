@@ -88,7 +88,7 @@ jobs:
         run: |
           ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot/.meta
           ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-vanilla ./scrolls/minecraft/minecraft-vanilla/.meta
-          ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-papermc ./scrolls/minecraft/papermc/.meta
+          ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-paper ./scrolls/minecraft/papermc/.meta
           ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-forge ./scrolls/minecraft/forge/.meta
           ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-cuberite ./scrolls/minecraft/cuberite/.meta
           ./druid registry push meta registry-1.docker.io/highcard/scroll-rust-oxide ./scrolls/rust/rust-oxide/.meta
