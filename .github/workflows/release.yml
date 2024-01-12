@@ -20,7 +20,7 @@ jobs:
         uses: robinraju/release-downloader@v1.7
         with:
           repository: "highcard-dev/monorepo"
-          tag: "daemon-0.1.14" #TODO: is there a ways to allways get the latest?
+          latest: true
           fileName: "druid"
           token: ${{ secrets.GO_REPO_TOKEN }}
       - run: chmod +x ./druid
@@ -84,3 +84,12 @@ jobs:
           ./druid registry push ./scrolls/minecraft/cuberite/latest
           ./druid registry push ./scrolls/rust/rust-oxide/latest
           ./druid registry push ./scrolls/rust/rust-vanilla/latest
+      - name: Push Meta
+        run: |
+          ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot/.meta
+          ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-vanilla ./scrolls/minecraft/minecraft-vanilla/.meta
+          ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-papermc ./scrolls/minecraft/papermc/.meta
+          ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-forge ./scrolls/minecraft/forge/.meta
+          ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-cuberite ./scrolls/minecraft/cuberite/.meta
+          ./druid registry push meta registry-1.docker.io/highcard/scroll-rust-oxide ./scrolls/rust/rust-oxide/.meta
+          ./druid registry push meta registry-1.docker.io/highcard/scroll-rust-vanilla ./scrolls/rust/rust-vanilla/.meta
