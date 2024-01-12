@@ -29,61 +29,61 @@ jobs:
       - name: Pushing new scrolls
         shell: bash
         run: |
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.3 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.4 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.4 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.3 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.4 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.4 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.17 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.17.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.18.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.18.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.19 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.19.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.19.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.19.3 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.19.4 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.20.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.20.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/papermc/1.20.4 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.17.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.18 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.18.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.18.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.19 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.19.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.19.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.19.3 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.19.4 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.20 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.20.1 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.20.2 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.20.3 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/forge/1.20.4 -p main:25565 -p rcon:25575
-          ./druid registry push ./scrolls/minecraft/cuberite/latest -p main:25565 -p webpanel:8080
-          ./druid registry push ./scrolls/rust/rust-oxide/latest -p main:28015 -p rcon -p rustplus
-          ./druid registry push ./scrolls/rust/rust-vanilla/latest -p main:28015 -p rcon -p rustplus
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.3 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19.4 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.4 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.3 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.19.4 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.4 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.17 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.17.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.18.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.18.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.19 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.19.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.19.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.19.3 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.19.4 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.20.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.20.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/papermc/1.20.4 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.17.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.18 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.18.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.18.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.19 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.19.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.19.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.19.3 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.19.4 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.20 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.20.1 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.20.2 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.20.3 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/forge/1.20.4 -p main=25565 -p rcon=25575
+          ./druid registry push ./scrolls/minecraft/cuberite/latest -p main=25565 -p webpanel=8080
+          ./druid registry push ./scrolls/rust/rust-oxide/latest -p main=28015 -p rcon -p rustplus
+          ./druid registry push ./scrolls/rust/rust-vanilla/latest -p main=28015 -p rcon -p rustplus
       - name: Push Meta
         run: |
           ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot/.meta
