@@ -1,0 +1,41 @@
+name: registry-1.docker.io/highcard/scroll-lgsm
+desc:momserver
+version: 0.0.1
+app_version: momserver
+init: "main.install"
+processes:
+  main:
+    commands:
+      start:
+        should_change_status: start
+        procedures:
+          - mode: exec
+            data:
+              - ./momserver
+              - start
+      console:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - attach.sh
+      stop:
+        procedures:
+          - mode: stdin
+            data: stop
+      install:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - $SCROLL_DIR/install-lgsm.sh
+          - mode: exec
+            data:
+              - ./linuxgsm.sh
+              - momserver
+          - mode: exec
+            data:
+              - ./momserver
+              - auto-install
+          - mode: command
+            data: start

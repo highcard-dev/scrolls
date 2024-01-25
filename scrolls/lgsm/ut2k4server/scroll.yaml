@@ -1,0 +1,41 @@
+name: registry-1.docker.io/highcard/scroll-lgsm
+desc:ut2k4server
+version: 0.0.1
+app_version: ut2k4server
+init: "main.install"
+processes:
+  main:
+    commands:
+      start:
+        should_change_status: start
+        procedures:
+          - mode: exec
+            data:
+              - ./ut2k4server
+              - start
+      console:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - attach.sh
+      stop:
+        procedures:
+          - mode: stdin
+            data: stop
+      install:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - $SCROLL_DIR/install-lgsm.sh
+          - mode: exec
+            data:
+              - ./linuxgsm.sh
+              - ut2k4server
+          - mode: exec
+            data:
+              - ./ut2k4server
+              - auto-install
+          - mode: command
+            data: start

@@ -1,0 +1,41 @@
+name: registry-1.docker.io/highcard/scroll-lgsm
+desc:doiserver
+version: 0.0.1
+app_version: doiserver
+init: "main.install"
+processes:
+  main:
+    commands:
+      start:
+        should_change_status: start
+        procedures:
+          - mode: exec
+            data:
+              - ./doiserver
+              - start
+      console:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - attach.sh
+      stop:
+        procedures:
+          - mode: stdin
+            data: stop
+      install:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - $SCROLL_DIR/install-lgsm.sh
+          - mode: exec
+            data:
+              - ./linuxgsm.sh
+              - doiserver
+          - mode: exec
+            data:
+              - ./doiserver
+              - auto-install
+          - mode: command
+            data: start

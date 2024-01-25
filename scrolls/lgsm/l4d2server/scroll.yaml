@@ -1,0 +1,41 @@
+name: registry-1.docker.io/highcard/scroll-lgsm
+desc:l4d2server
+version: 0.0.1
+app_version: l4d2server
+init: "main.install"
+processes:
+  main:
+    commands:
+      start:
+        should_change_status: start
+        procedures:
+          - mode: exec
+            data:
+              - ./l4d2server
+              - start
+      console:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - attach.sh
+      stop:
+        procedures:
+          - mode: stdin
+            data: stop
+      install:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - $SCROLL_DIR/install-lgsm.sh
+          - mode: exec
+            data:
+              - ./linuxgsm.sh
+              - l4d2server
+          - mode: exec
+            data:
+              - ./l4d2server
+              - auto-install
+          - mode: command
+            data: start

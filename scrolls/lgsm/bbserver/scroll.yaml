@@ -1,0 +1,41 @@
+name: registry-1.docker.io/highcard/scroll-lgsm
+desc:bbserver
+version: 0.0.1
+app_version: bbserver
+init: "main.install"
+processes:
+  main:
+    commands:
+      start:
+        should_change_status: start
+        procedures:
+          - mode: exec
+            data:
+              - ./bbserver
+              - start
+      console:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - attach.sh
+      stop:
+        procedures:
+          - mode: stdin
+            data: stop
+      install:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - $SCROLL_DIR/install-lgsm.sh
+          - mode: exec
+            data:
+              - ./linuxgsm.sh
+              - bbserver
+          - mode: exec
+            data:
+              - ./bbserver
+              - auto-install
+          - mode: command
+            data: start

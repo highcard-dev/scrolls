@@ -197,6 +197,7 @@ func SafeParseVersion(version string) semver.Version {
 		version = version + ".0"
 	}
 
-	return semver.MustParse(version)
+	v, _ := semver.Parse(version)
+	return v
 
 }
