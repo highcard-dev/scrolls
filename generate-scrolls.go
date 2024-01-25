@@ -110,6 +110,12 @@ func main() {
 		cp.Copy(path+"/init-files", dir+"/init-files")
 		cp.Copy(path+"/init-files-template", dir+"/init-files-template")
 		cp.Copy(path+"/update", dir+"/update")
+		//copy shell scripts
+		cp.Copy(path, dir, cp.Options{
+			Skip: func(info os.FileInfo, src, dest string) (bool, error) {
+				return !strings.HasSuffix(src, ".sh") || strings.HasPrefix(info.Name(), "_"), nil
+			},
+		})
 
 		//render and copy switch scroll
 		subitems, _ := ioutil.ReadDir(switchScrollDir)
