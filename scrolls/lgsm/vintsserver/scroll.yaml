@@ -28,7 +28,7 @@ processes:
           - mode: exec
             data:
               - sh
-              - $SCROLL_DIR/install-lgsm.sh
+              - install-lgsm.sh
           - mode: exec
             data:
               - ./linuxgsm.sh
