@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:pmcserver
+desc: pmcserver
 version: 0.0.1
 app_version: pmcserver
 init: "main.install"

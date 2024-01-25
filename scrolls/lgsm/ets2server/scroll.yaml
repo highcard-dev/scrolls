@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:ets2server
+desc: ets2server
 version: 0.0.1
 app_version: ets2server
 init: "main.install"

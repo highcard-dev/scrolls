@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:cssserver
+desc: cssserver
 version: 0.0.1
 app_version: cssserver
 init: "main.install"

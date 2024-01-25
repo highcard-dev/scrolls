@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:squadserver
+desc: squadserver
 version: 0.0.1
 app_version: squadserver
 init: "main.install"

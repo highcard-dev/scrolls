@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:btlserver
+desc: btlserver
 version: 0.0.1
 app_version: btlserver
 init: "main.install"

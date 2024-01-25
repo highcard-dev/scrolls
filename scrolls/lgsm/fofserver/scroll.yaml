@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:fofserver
+desc: fofserver
 version: 0.0.1
 app_version: fofserver
 init: "main.install"

@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:sfcserver
+desc: sfcserver
 version: 0.0.1
 app_version: sfcserver
 init: "main.install"

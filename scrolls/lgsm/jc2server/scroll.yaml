@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:jc2server
+desc: jc2server
 version: 0.0.1
 app_version: jc2server
 init: "main.install"

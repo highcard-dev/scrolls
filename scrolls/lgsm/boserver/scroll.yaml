@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:boserver
+desc: boserver
 version: 0.0.1
 app_version: boserver
 init: "main.install"

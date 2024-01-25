@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:vintsserver
+desc: vintsserver
 version: 0.0.1
 app_version: vintsserver
 init: "main.install"

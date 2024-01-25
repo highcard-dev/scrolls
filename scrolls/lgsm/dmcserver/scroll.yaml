@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:dmcserver
+desc: dmcserver
 version: 0.0.1
 app_version: dmcserver
 init: "main.install"

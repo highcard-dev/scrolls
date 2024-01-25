@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:hl2dmserver
+desc: hl2dmserver
 version: 0.0.1
 app_version: hl2dmserver
 init: "main.install"

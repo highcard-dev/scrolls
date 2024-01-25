@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:zpsserver
+desc: zpsserver
 version: 0.0.1
 app_version: zpsserver
 init: "main.install"

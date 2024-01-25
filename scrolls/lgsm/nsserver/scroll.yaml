@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:nsserver
+desc: nsserver
 version: 0.0.1
 app_version: nsserver
 init: "main.install"

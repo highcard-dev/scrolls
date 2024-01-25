@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:vpmcserver
+desc: vpmcserver
 version: 0.0.1
 app_version: vpmcserver
 init: "main.install"

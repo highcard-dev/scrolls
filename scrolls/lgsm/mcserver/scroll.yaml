@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:mcserver
+desc: mcserver
 version: 0.0.1
 app_version: mcserver
 init: "main.install"

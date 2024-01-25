@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:l4d2server
+desc: l4d2server
 version: 0.0.1
 app_version: l4d2server
 init: "main.install"

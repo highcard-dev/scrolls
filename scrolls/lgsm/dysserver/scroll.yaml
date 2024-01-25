@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:dysserver
+desc: dysserver
 version: 0.0.1
 app_version: dysserver
 init: "main.install"

@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:dabserver
+desc: dabserver
 version: 0.0.1
 app_version: dabserver
 init: "main.install"

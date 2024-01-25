@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:rwserver
+desc: rwserver
 version: 0.0.1
 app_version: rwserver
 init: "main.install"

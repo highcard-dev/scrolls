@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:cod2server
+desc: cod2server
 version: 0.0.1
 app_version: cod2server
 init: "main.install"

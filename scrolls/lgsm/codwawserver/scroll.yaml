@@ -1,5 +1,5 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
-desc:codwawserver
+desc: codwawserver
 version: 0.0.1
 app_version: codwawserver
 init: "main.install"
