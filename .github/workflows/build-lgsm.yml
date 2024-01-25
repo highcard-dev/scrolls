@@ -14,4 +14,4 @@ jobs:
           username: ${{ secrets.SCROLL_REGISTRY_USER }}
           password: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
       - name: Build all LGSM games
-        run: cd .docker/linuxgsm/ && bash build-docker-images.sh
+        run: cd .docker/linuxgsm/ && bash build-push-docker-images.sh
