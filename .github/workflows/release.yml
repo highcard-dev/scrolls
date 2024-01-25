@@ -84,7 +84,7 @@ jobs:
           ./druid registry push ./scrolls/minecraft/cuberite/latest -p main=25565 -p webpanel=8080 -i highcard/druidd-ubuntu
           ./druid registry push ./scrolls/rust/rust-oxide/latest -p main=28015 -p rcon -p rustplus -i highcard/druidd-steamcmd
           ./druid registry push ./scrolls/rust/rust-vanilla/latest -p main=28015 -p rcon -p rustplus -i highcard/druidd-steamcmd
-          ./druid registry push ./scrolls/lgsm/pwserver -p main=8211 -p rcon=25575 -i highcard/druidd-lgsm:pwserver
+          ./druid registry push ./scrolls/lgsm/pwserver -p main=8211 -p rcon=25575 -i highcard/druidd-lgsm:pw
       - name: Push Meta
         run: |
           ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot/.meta
