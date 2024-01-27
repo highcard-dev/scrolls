@@ -2,6 +2,16 @@ ARG SHORTNAME
 FROM highcard/druidd-base:latest as base
 FROM gameservermanagers/gameserver:${SHORTNAME}
 
+RUN apt-get update \
+    && apt-get install -y \
+    net-tools \
+    psmisc \
+    && apt-get -y autoremove \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
+
 COPY --from=base /usr/bin/druid* /usr/bin
 COPY --from=base /entrypoint.sh /entrypoint.sh
 
