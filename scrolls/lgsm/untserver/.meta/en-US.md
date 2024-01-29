@@ -1,0 +1,6 @@
+---
+name: Unturned
+description: Unturned is a multiplayer survival game where players navigate a zombie-infested world, gathering resources, crafting items, and building shelters.
+---
+
+Unturned is an engaging multiplayer survival game set in a post-apocalyptic world overrun by zombies. Players find themselves in a fight for survival against the constant threat of zombies and the challenges of sustaining life. The game emphasizes resource gathering, crafting, and building. Players must scavenge for food, water, and supplies while avoiding or combating zombies and potentially hostile players. Crafting plays a crucial role, allowing players to create weapons, tools, and structures from collected resources. Building shelters and bases is vital for survival, providing protection against zombies and other players. Unturned offers various environments to explore, from urban areas to rural settings. The game features a simple yet charming blocky graphic style, reminiscent of games like Minecraft. Multiplayer servers allow players to collaborate or compete with others, adding a social aspect to the survival challenge. Unturned's mix of survival mechanics, zombie combat, and crafting elements makes it an appealing and enjoyable experience for players who enjoy survival and sandbox games.
