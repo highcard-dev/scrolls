@@ -1,8 +1,10 @@
-name: Build LinuxGSM images
+name: Build single LinuxGSM images
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 2 * * *"
+    inputs:
+      image:
+        description: "Image"
+        required: true
 jobs:
   build-lgsm:
     runs-on: ubuntu-latest
@@ -14,4 +16,4 @@ jobs:
           username: ${{ secrets.SCROLL_REGISTRY_USER }}
           password: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
       - name: Build all LGSM games
-        run: cd .docker/linuxgsm/ && bash build-push-docker-images.sh
+        run: cd .docker/linuxgsm/ && bash build-push-docker-images.sh ${{ github.event.inputs.image }}
