@@ -1,6 +1,6 @@
 name: registry-1.docker.io/highcard/scroll-lgsm
 desc: sfcserver
-version: 0.0.1
+version: 0.0.2
 app_version: sfcserver
 init: "main.install"
 processes:
@@ -21,8 +21,10 @@ processes:
               - attach.sh
       stop:
         procedures:
-          - mode: stdin
-            data: stop
+          - mode: exec
+            data:
+              - ./sfcserver
+              - stop
       install:
         procedures:
           - mode: exec

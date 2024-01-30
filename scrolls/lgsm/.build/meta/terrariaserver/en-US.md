@@ -1,0 +1,6 @@
+---
+name: Terraria
+description: Terraria is a sandbox adventure game with a focus on exploration, building, crafting, and combat, set in a dynamic 2D world filled with various biomes and mysteries.
+---
+
+Terraria is a popular sandbox adventure game known for its deep exploration, building, and crafting elements, set in a vibrant and dynamic 2D world. Players start in a randomly generated world filled with various biomes, each offering unique resources and challenges. The game combines classic action with sandbox-style creativity, allowing players to shape the world in almost any way they see fit. From constructing elaborate buildings and crafting complex machinery to battling a wide array of enemies and colossal bosses, Terraria offers a rich and varied gameplay experience. The game also features a dynamic day-night cycle and weather system, which affects gameplay and enemy behavior. Multiplayer mode allows players to explore and build together, enhancing the collaborative and creative aspects of the game. Terraria's blend of exploration, creativity, and combat has made it a beloved title in the gaming community, appealing to players who enjoy adventure, creativity, and a touch of challenge.

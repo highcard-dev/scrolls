@@ -1,0 +1,6 @@
+---
+name: "Ark: Survival Evolved"
+description: "Ark: Survival Evolved ist ein Multiplayer, Open-World Survival Crafting-Spiel, in dem Spieler auf einer geheimnisvollen Insel überleben, indem sie Dinosaurier zähmen und Strukturen bauen."
+---
+
+Ark: Survival Evolved ist eine spannende Mischung aus Überlebensstrategie, Tiersimulation und Abenteuer. Spieler finden sich auf einer geheimnisvollen Insel wieder, auf der sie überleben, Ressourcen sammeln, Werkzeuge herstellen und Strukturen bauen müssen. Ein besonderes Merkmal des Spiels ist die Möglichkeit, Dinosaurier und andere prähistorische Tiere zu zähmen und zu reiten. Diese Kreaturen können in Kämpfen eingesetzt oder als Lasttiere genutzt werden. Das Spiel bietet sowohl einen Einzelspieler- als auch einen Multiplayer-Modus, in dem Spieler kooperieren oder gegeneinander antreten können. Die Spieler müssen nicht nur gegen die Umgebung und wilde Tiere kämpfen, sondern auch auf ihre Ernährung und Gesundheit achten. Die Welt von Ark ist groß und vielfältig, mit einer Reihe von unterschiedlichen Umgebungen wie Dschungeln, Wüsten und Schneegebieten. Ark: Survival Evolved bietet eine einzigartige Kombination aus Survival-Gameplay, Tierinteraktion und Konstruktion, was es zu einem herausfordernden und unterhaltsamen Erlebnis für Spieler macht.

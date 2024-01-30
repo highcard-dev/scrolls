@@ -41,13 +41,13 @@ func main() {
 	}
 
 	basepath := os.Args[1]
-	path := basepath + "/.build"
-	artifactsPath := path + "/artifacts.json"
-	switchScrollDir := path + "/scroll-switch"
-	scrollYamlTemplate := path + "/scroll.yaml.tmpl"
-	varsFile := path + "/vars.json"
+	buildPath := basepath + "/.build"
+	artifactsPath := buildPath + "/artifacts.json"
+	switchScrollDir := buildPath + "/scroll-switch"
+	scrollYamlTemplate := buildPath + "/scroll.yaml.tmpl"
+	varsFile := buildPath + "/vars.json"
 
-	println("Path: " + path)
+	println("Path: " + buildPath)
 	println("Artifacts Path: " + artifactsPath)
 	println("Switch Scroll Dir: " + switchScrollDir)
 	println("Scroll Yaml Template: " + scrollYamlTemplate)
@@ -107,11 +107,20 @@ func main() {
 		// Print out the template to std
 		scollYamltemplate.Execute(outputFile, templateVars)
 
-		cp.Copy(path+"/init-files", dir+"/init-files")
-		cp.Copy(path+"/init-files-template", dir+"/init-files-template")
-		cp.Copy(path+"/update", dir+"/update")
+		cp.Copy(buildPath+"/init-files", dir+"/init-files")
+		cp.Copy(buildPath+"/init-files-template", dir+"/init-files-template")
+		cp.Copy(buildPath+"/update", dir+"/update")
+		//copy metadata, this might copy nothing
+		cp.Copy(buildPath+"/meta/"+version, dir+"/.meta")
+		//copy version specific files
+		cp.Copy(buildPath+"/init-files-versions/"+version, dir+"/init-files", cp.Options{
+			OnDirExists: func(src, dest string) cp.DirExistsAction {
+				return cp.Merge
+			},
+		})
+
 		//copy shell scripts
-		cp.Copy(path, dir, cp.Options{
+		cp.Copy(buildPath, dir, cp.Options{
 			Skip: func(info os.FileInfo, src, dest string) (bool, error) {
 				return !strings.HasSuffix(src, ".sh") || strings.HasPrefix(info.Name(), "_"), nil
 			},

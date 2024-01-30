@@ -1,0 +1,6 @@
+---
+name: 7 Days to Die
+description: 7 Days to Die is an open-world survival horror game that combines first-person shooter, tower defense, and role-playing elements set in a post-apocalyptic world overrun by zombies.
+---
+
+7 Days to Die is a unique open-world survival horror game that blends first-person shooter, tower defense, and role-playing elements in a post-apocalyptic world dominated by zombies. Players find themselves in a relentless environment where survival is a constant challenge. The game is known for its crafting system, where players can construct shelters, craft weapons, and build defenses to protect against the relentless zombie hordes. Exploration and scavenging are crucial as players search for resources and learn new skills to improve their chances of survival. The game features a dynamic day-night cycle, with zombies becoming more aggressive and dangerous at night. Environmental factors like weather and wildlife also play a significant role. The game’s title, "7 Days to Die," refers to the blood moon event occurring every seventh day, bringing a massive and more challenging wave of zombies. This unique blend of survival, crafting, and combat mechanics, coupled with the looming threat of the blood moon, makes 7 Days to Die a captivating and challenging experience for players who enjoy survival horror games.
