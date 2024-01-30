@@ -85,13 +85,14 @@ jobs:
           ./druid registry push ./scrolls/rust/rust-oxide/latest -p main=28015/udp -p rcon -p rustplus -i highcard/druidd-steamcmd
           ./druid registry push ./scrolls/rust/rust-vanilla/latest -p main=28015/udp -p rcon -p rustplus -i highcard/druidd-steamcmd
           ./druid registry push ./scrolls/lgsm/pwserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:pw -m
-          ./druid registry push ./scrolls/lgsm/arkserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:ark -m
-          ./druid registry push ./scrolls/lgsm/csgoserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:csgo -m
-          ./druid registry push ./scrolls/lgsm/untserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:unt -m
-          ./druid registry push ./scrolls/lgsm/dayzserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:dayz -m
-          ./druid registry push ./scrolls/lgsm/sdtdserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:sdtd -m
-          ./druid registry push ./scrolls/lgsm/terrariaserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:terraria -m
-          ./druid registry push ./scrolls/lgsm/gmodserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:gmod -m
+          ./druid registry push ./scrolls/lgsm/arkserver -p main=7777/udp -p raw-udp=7777/udp -p query=27015/udp -p rcon=27020 -i highcard/druidd-lgsm:ark -m
+
+          ./druid registry push ./scrolls/lgsm/csgoserver -p query=27005/udp -p main=27015/udp -p sourcetv=27020/udp -p steam=27015 -i highcard/druidd-lgsm:csgo -m
+          ./druid registry push ./scrolls/lgsm/untserver -p main=27015/udp -p mainv6=27016 -i highcard/druidd-lgsm:unt -m
+          ./druid registry push ./scrolls/lgsm/dayzserver -p main=2302/udp -p battle-eye=2304/udp -p query=27016/udp -i highcard/druidd-lgsm:dayz -m
+          ./druid registry push ./scrolls/lgsm/sdtdserver -p main=26900/udp -p main2=26902/udp -p maintcp=26900 -i highcard/druidd-lgsm:sdtd -m
+          ./druid registry push ./scrolls/lgsm/terrariaserver -p todo=8211/udp -i highcard/druidd-lgsm:terraria -m
+          ./druid registry push ./scrolls/lgsm/gmodserver -p todo=8211/udp  -i highcard/druidd-lgsm:gmod -m
       - name: Push Meta
         run: |
           ./druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot/.meta

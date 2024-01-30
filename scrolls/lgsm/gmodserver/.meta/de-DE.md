@@ -1,6 +1,6 @@
 ---
-name: Garry's Mod
-description: Garry's Mod ist ein Physik-Sandbox-Spiel ohne festgelegte Ziele, das Spielern unendliche Möglichkeiten bietet, zu kreieren, zu experimentieren und mit seinem umfangreichen Werkzeugset und Modding-Fähigkeiten zu spielen.
+name: "Garry's Mod"
+description: "Garry's Mod ist ein Physik-Sandbox-Spiel ohne festgelegte Ziele, das Spielern unendliche Möglichkeiten bietet, zu kreieren, zu experimentieren und mit seinem umfangreichen Werkzeugset und Modding-Fähigkeiten zu spielen."
 ---
 
 Garry's Mod, allgemein bekannt als GMod, ist ein einzigartiges Physik-Sandbox-Spiel, das Spielern eine offene Plattform für Kreativität und Experimente bietet. Im Gegensatz zu traditionellen Spielen hat es keine festgelegten Ziele oder Aufgaben. Stattdessen erhalten die Spieler eine breite Palette an Werkzeugen, um alles zu erschaffen, was sie sich vorstellen können, von komplexen Maschinen und Gebäuden bis hin zu dynamischen Physikexperimenten und interaktiven Umgebungen. GMod ist berühmt für seine Modding-Community, die eine riesige Bibliothek an zusätzlichem Inhalt erstellt hat, einschließlich neuer Modi, Assets und sogar ganzer Spiele innerhalb des Spiels. Spieler können Objekte manipulieren und mit der Physik-Engine experimentieren, um komplexe Vorrichtungen oder einfache, unterhaltsame Szenarien zu erstellen. Der Mehrspielermodus ermöglicht kollaborative Kreationen und Gameplay, was zu endlosen Möglichkeiten und oft humorvollen Ergebnissen führt. Die Flexibilität von Garry's Mod und die dadurch geförderte Kreativität haben es zu einem beliebten Sandbox-Spiel gemacht, das besonders für diejenigen ansprechend ist, die gerne tüfteln, kreieren und ihre einzigartigen Kreationen mit einer lebendigen Community teilen.
