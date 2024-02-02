@@ -10,13 +10,12 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
    -rcon.port {{ .Config.rcon_web_rust.port }} \
    -rcon.password {{ .Config.rcon_web_rust.password }} \
    -server.maxplayers 75 \
-   -server.hostname "Druid Test Server" \
-   -server.identity "my_server_identity" \
+   -server.hostname "Rust Server by druid.gg" \
+   -server.identity "druid" \
    -server.level "Procedural Map" \
-   -server.seed 12345 \
-   -server.worldsize 3000 \
+   -server.worldsize 1000 \
    -server.saveinterval 300 \
    -server.globalchat true \
-   -server.description "A druid test server" \
+   -server.description "A Server hosted on druid.gg" \
    -server.headerimage "https://druid.gg/" \
    -server.url "https://druid.gg/"
