@@ -84,7 +84,7 @@ jobs:
           ./druid registry push ./scrolls/minecraft/cuberite/latest -p main=25565 -p webpanel=8080 -i highcard/druidd-ubuntu
           ./druid registry push ./scrolls/rust/rust-oxide/latest -p main=28015/udp -p rcon -p rustplus -i highcard/druidd-steamcmd
           ./druid registry push ./scrolls/rust/rust-vanilla/latest -p main=28015/udp -p rcon -p rustplus -i highcard/druidd-steamcmd
-          ./druid registry push ./scrolls/lgsm/pwserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:pw -m
+          ./druid registry push ./scrolls/lgsm/pwserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:pw -m --min-disk 5Gi --min-ram 2Gi --min-cpu 1
           ./druid registry push ./scrolls/lgsm/arkserver -p main=7777/udp -p raw-udp=7777/udp -p query=27015/udp -p rcon=27020 -i highcard/druidd-lgsm:ark -m
           ./druid registry push ./scrolls/lgsm/untserver -p main=27015/udp -p mainv6=27016 -i highcard/druidd-lgsm:unt -m
           ./druid registry push ./scrolls/lgsm/dayzserver -p main=2302/udp -p battle-eye=2304/udp -p query=27016/udp -i highcard/druidd-lgsm:dayz -m
