@@ -90,6 +90,10 @@ func main() {
 		templateVars.VersionEscaped = strings.Replace(version, ".", "-", -1)
 		templateVars.Artifacts = GetArtifactsAbove(version, artifacts, true)
 		templateVars.ArtifactsUnescaped = GetArtifactsAbove(version, artifacts, false)
+		if varsBytes != nil && vars[version] == nil {
+			log.Fatalln("No vars found for version " + version + " in vars.json file. Please add vars for this version.")
+			return
+		}
 		templateVars.Vars = vars[version]
 
 		//create scroll dir
