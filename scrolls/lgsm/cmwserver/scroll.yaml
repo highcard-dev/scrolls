@@ -13,12 +13,10 @@ processes:
             data:
               - ./cmwserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./cmwserver
+              - console
       stop:
         procedures:
           - mode: exec

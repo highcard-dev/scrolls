@@ -13,12 +13,10 @@ processes:
             data:
               - ./l4dserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./l4dserver
+              - console
       stop:
         procedures:
           - mode: exec

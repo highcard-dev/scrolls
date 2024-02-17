@@ -13,12 +13,10 @@ processes:
             data:
               - ./vsserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./vsserver
+              - console
       stop:
         procedures:
           - mode: exec

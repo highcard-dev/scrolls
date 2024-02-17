@@ -13,12 +13,10 @@ processes:
             data:
               - ./fctrserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./fctrserver
+              - console
       stop:
         procedures:
           - mode: exec

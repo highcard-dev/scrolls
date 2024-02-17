@@ -13,12 +13,10 @@ processes:
             data:
               - ./gmodserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./gmodserver
+              - console
       stop:
         procedures:
           - mode: exec

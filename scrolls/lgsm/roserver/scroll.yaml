@@ -13,12 +13,10 @@ processes:
             data:
               - ./roserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./roserver
+              - console
       stop:
         procedures:
           - mode: exec

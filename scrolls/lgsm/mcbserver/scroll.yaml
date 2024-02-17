@@ -13,12 +13,10 @@ processes:
             data:
               - ./mcbserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./mcbserver
+              - console
       stop:
         procedures:
           - mode: exec

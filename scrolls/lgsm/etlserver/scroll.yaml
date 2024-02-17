@@ -13,12 +13,10 @@ processes:
             data:
               - ./etlserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./etlserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./ccserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ccserver
+              - console
       stop:
         procedures:
           - mode: exec

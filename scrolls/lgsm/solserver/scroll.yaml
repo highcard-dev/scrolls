@@ -13,12 +13,10 @@ processes:
             data:
               - ./solserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./solserver
+              - console
       stop:
         procedures:
           - mode: exec

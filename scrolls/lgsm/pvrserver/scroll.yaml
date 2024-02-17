@@ -13,12 +13,10 @@ processes:
             data:
               - ./pvrserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./pvrserver
+              - console
       stop:
         procedures:
           - mode: exec

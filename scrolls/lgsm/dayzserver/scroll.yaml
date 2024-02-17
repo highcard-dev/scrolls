@@ -13,12 +13,10 @@ processes:
             data:
               - ./dayzserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./dayzserver
+              - console
       stop:
         procedures:
           - mode: exec

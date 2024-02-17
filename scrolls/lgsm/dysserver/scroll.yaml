@@ -13,12 +13,10 @@ processes:
             data:
               - ./dysserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./dysserver
+              - console
       stop:
         procedures:
           - mode: exec

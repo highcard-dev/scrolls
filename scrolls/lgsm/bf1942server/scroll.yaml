@@ -13,12 +13,10 @@ processes:
             data:
               - ./bf1942server
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./bf1942server
+              - console
       stop:
         procedures:
           - mode: exec

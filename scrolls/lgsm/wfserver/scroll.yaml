@@ -13,12 +13,10 @@ processes:
             data:
               - ./wfserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./wfserver
+              - console
       stop:
         procedures:
           - mode: exec

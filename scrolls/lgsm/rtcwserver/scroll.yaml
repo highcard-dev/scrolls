@@ -13,12 +13,10 @@ processes:
             data:
               - ./rtcwserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./rtcwserver
+              - console
       stop:
         procedures:
           - mode: exec

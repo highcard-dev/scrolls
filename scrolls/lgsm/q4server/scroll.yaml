@@ -13,12 +13,10 @@ processes:
             data:
               - ./q4server
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./q4server
+              - console
       stop:
         procedures:
           - mode: exec

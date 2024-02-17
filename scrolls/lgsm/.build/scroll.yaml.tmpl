@@ -13,12 +13,10 @@ processes:
             data:
               - ./{{ .Version }}
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./{{ .Version }}
+              - console
       stop:
         procedures:
           - mode: exec

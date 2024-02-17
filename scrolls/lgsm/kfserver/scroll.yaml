@@ -13,12 +13,10 @@ processes:
             data:
               - ./kfserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./kfserver
+              - console
       stop:
         procedures:
           - mode: exec

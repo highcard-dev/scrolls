@@ -13,12 +13,10 @@ processes:
             data:
               - ./arkserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./arkserver
+              - console
       stop:
         procedures:
           - mode: exec

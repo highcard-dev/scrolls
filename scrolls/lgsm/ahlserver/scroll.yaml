@@ -13,12 +13,10 @@ processes:
             data:
               - ./ahlserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ahlserver
+              - console
       stop:
         procedures:
           - mode: exec

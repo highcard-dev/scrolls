@@ -13,12 +13,10 @@ processes:
             data:
               - ./boserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./boserver
+              - console
       stop:
         procedures:
           - mode: exec

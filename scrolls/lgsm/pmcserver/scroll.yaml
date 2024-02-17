@@ -13,12 +13,10 @@ processes:
             data:
               - ./pmcserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./pmcserver
+              - console
       stop:
         procedures:
           - mode: exec

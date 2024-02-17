@@ -13,12 +13,10 @@ processes:
             data:
               - ./iosserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./iosserver
+              - console
       stop:
         procedures:
           - mode: exec

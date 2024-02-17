@@ -13,12 +13,10 @@ processes:
             data:
               - ./cssserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./cssserver
+              - console
       stop:
         procedures:
           - mode: exec

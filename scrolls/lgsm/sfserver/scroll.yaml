@@ -13,12 +13,10 @@ processes:
             data:
               - ./sfserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./sfserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./vpmcserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./vpmcserver
+              - console
       stop:
         procedures:
           - mode: exec

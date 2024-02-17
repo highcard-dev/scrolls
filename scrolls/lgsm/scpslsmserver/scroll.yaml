@@ -13,12 +13,10 @@ processes:
             data:
               - ./scpslsmserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./scpslsmserver
+              - console
       stop:
         procedures:
           - mode: exec

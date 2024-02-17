@@ -13,12 +13,10 @@ processes:
             data:
               - ./ctserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ctserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./ndserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ndserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./qlserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./qlserver
+              - console
       stop:
         procedures:
           - mode: exec

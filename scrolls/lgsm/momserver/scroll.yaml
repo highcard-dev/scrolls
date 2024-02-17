@@ -13,12 +13,10 @@ processes:
             data:
               - ./momserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./momserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./jc3server
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./jc3server
+              - console
       stop:
         procedures:
           - mode: exec

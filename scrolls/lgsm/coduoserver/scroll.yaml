@@ -13,12 +13,10 @@ processes:
             data:
               - ./coduoserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./coduoserver
+              - console
       stop:
         procedures:
           - mode: exec

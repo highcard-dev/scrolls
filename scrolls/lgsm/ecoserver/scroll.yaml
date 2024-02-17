@@ -13,12 +13,10 @@ processes:
             data:
               - ./ecoserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ecoserver
+              - console
       stop:
         procedures:
           - mode: exec

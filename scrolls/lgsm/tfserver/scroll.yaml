@@ -13,12 +13,10 @@ processes:
             data:
               - ./tfserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./tfserver
+              - console
       stop:
         procedures:
           - mode: exec

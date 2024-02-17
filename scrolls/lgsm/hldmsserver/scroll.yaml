@@ -13,12 +13,10 @@ processes:
             data:
               - ./hldmsserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./hldmsserver
+              - console
       stop:
         procedures:
           - mode: exec

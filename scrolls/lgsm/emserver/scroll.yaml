@@ -13,12 +13,10 @@ processes:
             data:
               - ./emserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./emserver
+              - console
       stop:
         procedures:
           - mode: exec

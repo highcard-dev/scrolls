@@ -13,12 +13,10 @@ processes:
             data:
               - ./ut2k4server
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ut2k4server
+              - console
       stop:
         procedures:
           - mode: exec

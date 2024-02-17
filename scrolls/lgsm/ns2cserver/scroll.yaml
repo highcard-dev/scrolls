@@ -13,12 +13,10 @@ processes:
             data:
               - ./ns2cserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ns2cserver
+              - console
       stop:
         procedures:
           - mode: exec

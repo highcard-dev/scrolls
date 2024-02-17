@@ -13,12 +13,10 @@ processes:
             data:
               - ./qwserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./qwserver
+              - console
       stop:
         procedures:
           - mode: exec

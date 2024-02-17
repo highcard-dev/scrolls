@@ -13,12 +13,10 @@ processes:
             data:
               - ./mohaaserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./mohaaserver
+              - console
       stop:
         procedures:
           - mode: exec

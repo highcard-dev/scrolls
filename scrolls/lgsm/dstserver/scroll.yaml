@@ -13,12 +13,10 @@ processes:
             data:
               - ./dstserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./dstserver
+              - console
       stop:
         procedures:
           - mode: exec

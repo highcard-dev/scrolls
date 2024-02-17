@@ -13,12 +13,10 @@ processes:
             data:
               - ./bmdmserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./bmdmserver
+              - console
       stop:
         procedures:
           - mode: exec

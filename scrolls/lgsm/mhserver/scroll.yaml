@@ -13,12 +13,10 @@ processes:
             data:
               - ./mhserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./mhserver
+              - console
       stop:
         procedures:
           - mode: exec

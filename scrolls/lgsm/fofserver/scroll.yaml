@@ -13,12 +13,10 @@ processes:
             data:
               - ./fofserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./fofserver
+              - console
       stop:
         procedures:
           - mode: exec

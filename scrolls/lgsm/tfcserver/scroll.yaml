@@ -13,12 +13,10 @@ processes:
             data:
               - ./tfcserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./tfcserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./pvkiiserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./pvkiiserver
+              - console
       stop:
         procedures:
           - mode: exec

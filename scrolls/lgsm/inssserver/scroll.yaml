@@ -13,12 +13,10 @@ processes:
             data:
               - ./inssserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./inssserver
+              - console
       stop:
         procedures:
           - mode: exec

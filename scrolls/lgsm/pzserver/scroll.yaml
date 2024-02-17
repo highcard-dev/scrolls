@@ -13,12 +13,10 @@ processes:
             data:
               - ./pzserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./pzserver
+              - console
       stop:
         procedures:
           - mode: exec

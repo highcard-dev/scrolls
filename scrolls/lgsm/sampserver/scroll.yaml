@@ -13,12 +13,10 @@ processes:
             data:
               - ./sampserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./sampserver
+              - console
       stop:
         procedures:
           - mode: exec

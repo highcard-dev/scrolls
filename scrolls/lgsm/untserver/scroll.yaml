@@ -13,12 +13,10 @@ processes:
             data:
               - ./untserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./untserver
+              - console
       stop:
         procedures:
           - mode: exec

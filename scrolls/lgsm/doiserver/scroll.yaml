@@ -13,12 +13,10 @@ processes:
             data:
               - ./doiserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./doiserver
+              - console
       stop:
         procedures:
           - mode: exec

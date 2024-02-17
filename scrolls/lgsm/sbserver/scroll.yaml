@@ -13,12 +13,10 @@ processes:
             data:
               - ./sbserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./sbserver
+              - console
       stop:
         procedures:
           - mode: exec

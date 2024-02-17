@@ -13,12 +13,10 @@ processes:
             data:
               - ./nmrihserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./nmrihserver
+              - console
       stop:
         procedures:
           - mode: exec

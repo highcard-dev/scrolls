@@ -13,12 +13,10 @@ processes:
             data:
               - ./tuserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./tuserver
+              - console
       stop:
         procedures:
           - mode: exec

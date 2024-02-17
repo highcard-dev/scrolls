@@ -13,12 +13,10 @@ processes:
             data:
               - ./dodsserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./dodsserver
+              - console
       stop:
         procedures:
           - mode: exec

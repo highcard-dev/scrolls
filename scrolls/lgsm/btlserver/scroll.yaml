@@ -13,12 +13,10 @@ processes:
             data:
               - ./btlserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./btlserver
+              - console
       stop:
         procedures:
           - mode: exec

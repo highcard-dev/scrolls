@@ -13,12 +13,10 @@ processes:
             data:
               - ./squadserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./squadserver
+              - console
       stop:
         procedures:
           - mode: exec

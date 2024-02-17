@@ -13,12 +13,10 @@ processes:
             data:
               - ./bfvserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./bfvserver
+              - console
       stop:
         procedures:
           - mode: exec

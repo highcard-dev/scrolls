@@ -13,12 +13,10 @@ processes:
             data:
               - ./svenserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./svenserver
+              - console
       stop:
         procedures:
           - mode: exec

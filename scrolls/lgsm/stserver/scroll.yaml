@@ -13,12 +13,10 @@ processes:
             data:
               - ./stserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./stserver
+              - console
       stop:
         procedures:
           - mode: exec

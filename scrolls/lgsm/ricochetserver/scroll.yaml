@@ -13,12 +13,10 @@ processes:
             data:
               - ./ricochetserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ricochetserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./opforserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./opforserver
+              - console
       stop:
         procedures:
           - mode: exec

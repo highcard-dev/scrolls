@@ -13,12 +13,10 @@ processes:
             data:
               - ./mtaserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./mtaserver
+              - console
       stop:
         procedures:
           - mode: exec

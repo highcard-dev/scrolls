@@ -13,12 +13,10 @@ processes:
             data:
               - ./armarserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./armarserver
+              - console
       stop:
         procedures:
           - mode: exec

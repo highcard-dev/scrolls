@@ -13,12 +13,10 @@ processes:
             data:
               - ./wurmserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./wurmserver
+              - console
       stop:
         procedures:
           - mode: exec

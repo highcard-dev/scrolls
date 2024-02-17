@@ -13,12 +13,10 @@ processes:
             data:
               - ./codwawserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./codwawserver
+              - console
       stop:
         procedures:
           - mode: exec

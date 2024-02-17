@@ -13,12 +13,10 @@ processes:
             data:
               - ./hl2dmserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./hl2dmserver
+              - console
       stop:
         procedures:
           - mode: exec

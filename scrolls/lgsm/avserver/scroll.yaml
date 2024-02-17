@@ -13,12 +13,10 @@ processes:
             data:
               - ./avserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./avserver
+              - console
       stop:
         procedures:
           - mode: exec

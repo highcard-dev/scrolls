@@ -13,12 +13,10 @@ processes:
             data:
               - ./zmrserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./zmrserver
+              - console
       stop:
         procedures:
           - mode: exec

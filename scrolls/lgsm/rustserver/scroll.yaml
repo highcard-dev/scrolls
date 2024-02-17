@@ -13,12 +13,10 @@ processes:
             data:
               - ./rustserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./rustserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./rwserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./rwserver
+              - console
       stop:
         procedures:
           - mode: exec

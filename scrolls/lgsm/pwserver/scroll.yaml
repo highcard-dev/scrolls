@@ -13,12 +13,10 @@ processes:
             data:
               - ./pwserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./pwserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./vintsserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./vintsserver
+              - console
       stop:
         procedures:
           - mode: exec

@@ -13,12 +13,10 @@ processes:
             data:
               - ./cod4server
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./cod4server
+              - console
       stop:
         procedures:
           - mode: exec

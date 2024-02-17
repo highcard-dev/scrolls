@@ -13,12 +13,10 @@ processes:
             data:
               - ./jc2server
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./jc2server
+              - console
       stop:
         procedures:
           - mode: exec

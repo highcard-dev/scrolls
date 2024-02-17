@@ -13,12 +13,10 @@ processes:
             data:
               - ./sbotsserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./sbotsserver
+              - console
       stop:
         procedures:
           - mode: exec

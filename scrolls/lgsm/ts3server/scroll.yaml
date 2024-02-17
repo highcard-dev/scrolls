@@ -13,12 +13,10 @@ processes:
             data:
               - ./ts3server
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./ts3server
+              - console
       stop:
         procedures:
           - mode: exec

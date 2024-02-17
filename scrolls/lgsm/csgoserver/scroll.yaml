@@ -13,12 +13,10 @@ processes:
             data:
               - ./csgoserver
               - start
-      console:
-        procedures:
-          - mode: exec
+          - mode: exec-tty
             data:
-              - sh
-              - attach.sh
+              - ./csgoserver
+              - console
       stop:
         procedures:
           - mode: exec
