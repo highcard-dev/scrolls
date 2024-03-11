@@ -2,12 +2,13 @@ name: registry-1.docker.io/highcard/scroll-minecraft-vanilla
 desc: Minecraft Vanilla
 version: 0.0.1
 app_version: 1.19.4
-init: "main.install"
+init: "main.start"
 processes:
   main:
     commands:
       start:
-        should_change_status: start
+        need: [main.install]
+        run: restart
         procedures:
           - mode: exec
             data:
@@ -18,6 +19,7 @@ processes:
           - mode: rcon
             data: stop
       install:
+        run: once
         procedures:
           - mode: exec
             data:
@@ -31,8 +33,6 @@ processes:
               - bash
               - -c
               - echo eula=true > eula.txt
-          - mode: command
-            data: start
       update:
         procedures:
           - mode: exec

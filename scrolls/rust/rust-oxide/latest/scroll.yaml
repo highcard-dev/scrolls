@@ -2,12 +2,13 @@ name: registry-1.docker.io/highcard/scroll-rust-oxide
 desc: Rust Oxide
 version: 0.10.7
 app_version: latest
-init: "main.install"
+init: "main.start"
 processes:
   main:
     commands:
       start:
-        should_change_status: start
+        need: [main.install]
+        run: restart
         procedures:
           - mode: exec
             data:
@@ -19,6 +20,7 @@ processes:
           - mode: rcon_web_rust
             data: quit
       install:
+        run: once
         procedures:
           - mode: exec
             data:
@@ -47,7 +49,5 @@ processes:
             data:
               - rm
               - oxide.zip
-          - mode: command
-            data: start
 plugins:
   rcon_web_rust: {}

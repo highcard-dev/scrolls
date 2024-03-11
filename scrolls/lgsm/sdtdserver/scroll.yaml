@@ -2,12 +2,13 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: sdtdserver
 version: 0.0.2
 app_version: sdtdserver
-init: "main.install"
+init: "main.start"
 processes:
   main:
     commands:
       start:
-        should_change_status: start
+        need: [main.install]
+        run: restart
         procedures:
           - mode: exec
             data:
@@ -24,6 +25,7 @@ processes:
               - ./sdtdserver
               - stop
       install:
+        run: once
         procedures:
           - mode: exec
             data:
@@ -37,5 +39,3 @@ processes:
             data:
               - ./sdtdserver
               - auto-install
-          - mode: command
-            data: start

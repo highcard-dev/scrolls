@@ -4,7 +4,7 @@ on:
     branches: [master]
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
       SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}

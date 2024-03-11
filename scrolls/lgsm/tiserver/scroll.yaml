@@ -2,12 +2,13 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: tiserver
 version: 0.0.2
 app_version: tiserver
-init: "main.install"
+init: "main.start"
 processes:
   main:
     commands:
       start:
-        should_change_status: start
+        need: [main.install]
+        run: restart
         procedures:
           - mode: exec
             data:
@@ -24,6 +25,7 @@ processes:
               - ./tiserver
               - stop
       install:
+        run: once
         procedures:
           - mode: exec
             data:
@@ -37,5 +39,3 @@ processes:
             data:
               - ./tiserver
               - auto-install
-          - mode: command
-            data: start
