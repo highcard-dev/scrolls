@@ -7,7 +7,7 @@ processes:
   main:
     commands:
       start:
-        need: [main.install]
+        needs: [main.install]
         run: restart
         procedures:
           - mode: exec
