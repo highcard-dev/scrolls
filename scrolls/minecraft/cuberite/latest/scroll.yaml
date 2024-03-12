@@ -17,7 +17,9 @@ processes:
       stop:
         procedures:
           - mode: stdin
-            data: stop
+            data:
+              - main.start
+              - stop
       install:
         run: once
         procedures:
