@@ -35,6 +35,8 @@ jobs:
         if: env.BUILD_NUMBER == 'null'
       - run: wget -O paper-${{ matrix.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/paper-${{ matrix.version }}-${{ env.BUILD_NUMBER }}.jar
       - run: mkdir -p papermc && mv paper-${{ matrix.version }}.jar papermc/paper-${{ matrix.version }}.jar
+      - run: ls -la
+      - run: pwd
       - uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
