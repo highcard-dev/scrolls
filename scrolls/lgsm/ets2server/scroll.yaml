@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./ets2server
+              - update
+          - mode: exec
+            data:
+              - ./ets2server
               - start
           - mode: exec-tty
             data:

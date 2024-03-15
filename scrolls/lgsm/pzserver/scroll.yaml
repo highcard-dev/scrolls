@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./pzserver
+              - update
+          - mode: exec
+            data:
+              - ./pzserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./q3server
+              - update
+          - mode: exec
+            data:
+              - ./q3server
               - start
           - mode: exec-tty
             data:

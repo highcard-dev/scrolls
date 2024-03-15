@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./hwserver
+              - update
+          - mode: exec
+            data:
+              - ./hwserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./ndserver
+              - update
+          - mode: exec
+            data:
+              - ./ndserver
               - start
           - mode: exec-tty
             data:

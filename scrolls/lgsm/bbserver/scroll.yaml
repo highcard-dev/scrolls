@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./bbserver
+              - update
+          - mode: exec
+            data:
+              - ./bbserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./codwawserver
+              - update
+          - mode: exec
+            data:
+              - ./codwawserver
               - start
           - mode: exec-tty
             data:

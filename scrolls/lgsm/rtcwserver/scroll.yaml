@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./rtcwserver
+              - update
+          - mode: exec
+            data:
+              - ./rtcwserver
               - start
           - mode: exec-tty
             data:

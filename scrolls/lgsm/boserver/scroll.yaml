@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./boserver
+              - update
+          - mode: exec
+            data:
+              - ./boserver
               - start
           - mode: exec-tty
             data:

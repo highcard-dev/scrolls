@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./doiserver
+              - update
+          - mode: exec
+            data:
+              - ./doiserver
               - start
           - mode: exec-tty
             data:

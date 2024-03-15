@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./ut2k4server
+              - update
+          - mode: exec
+            data:
+              - ./ut2k4server
               - start
           - mode: exec-tty
             data:

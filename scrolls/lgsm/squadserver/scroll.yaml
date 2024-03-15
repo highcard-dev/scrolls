@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./squadserver
+              - update
+          - mode: exec
+            data:
+              - ./squadserver
               - start
           - mode: exec-tty
             data:

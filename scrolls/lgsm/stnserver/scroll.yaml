@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./stnserver
+              - update
+          - mode: exec
+            data:
+              - ./stnserver
               - start
           - mode: exec-tty
             data:

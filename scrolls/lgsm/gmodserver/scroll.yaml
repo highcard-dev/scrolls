@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./gmodserver
+              - update
+          - mode: exec
+            data:
+              - ./gmodserver
               - start
           - mode: exec-tty
             data:
