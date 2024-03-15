@@ -23,8 +23,9 @@ jobs:
             1.20.2,
             1.20.4,
           ]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Fetch latest builds
         run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds
       - name: Fetch latest stable
@@ -34,8 +35,6 @@ jobs:
         if: env.BUILD_NUMBER == 'null'
       - run: wget -O paper-${{ matrix.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/paper-${{ matrix.version }}-${{ env.BUILD_NUMBER }}.jar
       - run: mkdir -p papermc && mv paper-${{ matrix.version }}.jar papermc/paper-${{ matrix.version }}.jar
-      - run: ls -la
-      - run: pwd
       - uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
@@ -43,5 +42,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_ENDPOINT: https://s3.eu-central-1.wasabisys.com/
           AWS_REGION: "eu-central-1"
-          SOURCE_DIR: ./papermc
+          SOURCE_DIR: papermc
           DEST_DIR: minecraft/papermc

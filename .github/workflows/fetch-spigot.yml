@@ -1,4 +1,4 @@
-name: Build Spigot
+name: Fetch Spigot
 on:
   workflow_dispatch:
   schedule:
@@ -23,7 +23,7 @@ jobs:
             { java-version: "17", spigot-version: "1.20.2" },
             { java-version: "17", spigot-version: "1.20.4" },
           ]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup Go
