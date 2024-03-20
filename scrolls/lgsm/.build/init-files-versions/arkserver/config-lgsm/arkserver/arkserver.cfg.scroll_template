@@ -1,3 +1,3 @@
 port="{{ env "DRUID_PORT_MAIN_1" | default "7777" }}"
 queryport="{{ env "DRUID_PORT_QUERY_1" | default "27015" }}"
-rconport="{{ env "DRUID_PORT_RCON_1" | default "27020" }}"
+rconport="{{ .Config.rcon.port }}"

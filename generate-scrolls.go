@@ -91,10 +91,10 @@ func main() {
 		templateVars.Artifacts = GetArtifactsAbove(version, artifacts, true)
 		templateVars.ArtifactsUnescaped = GetArtifactsAbove(version, artifacts, false)
 		if varsBytes != nil && vars[version] == nil {
-			log.Fatalln("No vars found for version " + version + " in vars.json file. Please add vars for this version.")
-			return
+			log.Println("No vars found for version " + version + " in vars.json file. Please add vars for this version.")
+		} else {
+			templateVars.Vars = vars[version]
 		}
-		templateVars.Vars = vars[version]
 
 		//create scroll dir
 		dir := filepath.Join(basepath, version)
@@ -118,6 +118,11 @@ func main() {
 		cp.Copy(buildPath+"/meta/"+version, dir+"/.meta")
 		//copy version specific files
 		cp.Copy(buildPath+"/init-files-versions/"+version, dir+"/init-files", cp.Options{
+			OnDirExists: func(src, dest string) cp.DirExistsAction {
+				return cp.Merge
+			},
+		})
+		cp.Copy(buildPath+"/init-files-template-versions/"+version, dir+"/init-files-template", cp.Options{
 			OnDirExists: func(src, dest string) cp.DirExistsAction {
 				return cp.Merge
 			},

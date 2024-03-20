@@ -43,3 +43,5 @@ processes:
             data:
               - ./arkserver
               - auto-install
+plugins:
+  rcon: {}

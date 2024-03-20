@@ -43,3 +43,7 @@ processes:
             data:
               - ./{{ .Version }}
               - auto-install
+{{- if eq .Vars.rcon "enabled" }}
+plugins:
+  rcon: {}
+{{- end }}
