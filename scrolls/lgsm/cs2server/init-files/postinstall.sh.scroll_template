@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Define the file path
+file="serverfiles/game/csgo/cfg/server.cfg"
+
+# Define the value you want to replace/add
+new_value='rcon_password "{{ .Config.rcon.password }}"'
+
+# Check if the line exists in the file
+if grep -q '^rcon_password ".*"' "$file"; then
+    # Line exists, replace the value
+    sed -i '' 's/^rcon_password ".*"/'"$new_value"'/' "$file"
+else
+    # Line doesn't exist, append the value to the file
+    echo "$new_value" >> "$file"
+fi

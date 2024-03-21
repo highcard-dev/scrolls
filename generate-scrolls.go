@@ -117,12 +117,7 @@ func main() {
 		//copy metadata, this might copy nothing
 		cp.Copy(buildPath+"/meta/"+version, dir+"/.meta")
 		//copy version specific files
-		cp.Copy(buildPath+"/init-files-versions/"+version, dir+"/init-files", cp.Options{
-			OnDirExists: func(src, dest string) cp.DirExistsAction {
-				return cp.Merge
-			},
-		})
-		cp.Copy(buildPath+"/init-files-template-versions/"+version, dir+"/init-files-template", cp.Options{
+		cp.Copy(buildPath+"/versions/"+version, dir, cp.Options{
 			OnDirExists: func(src, dest string) cp.DirExistsAction {
 				return cp.Merge
 			},
