@@ -14,6 +14,3 @@ chmod -R +x lgsm/modules/
 
 rm -rf LinuxGSM-master
 rm lgsm.zip
-
-#self delete
-rm -- "$0"

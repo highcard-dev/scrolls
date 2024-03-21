@@ -18,5 +18,5 @@ if grep -q '^rcon_password ".*"' "$file"; then
     fi
 else
     # Line doesn't exist, append the value to the file
-    echo "$new_value" >> "$file"
+    echo -e "\n$new_value" >> "$file"
 fi
