@@ -43,5 +43,9 @@ processes:
             data:
               - ./cs2server
               - auto-install
+          - mode: exec
+            data:
+              - bash
+              - postinstall.sh
 plugins:
   rcon: {}

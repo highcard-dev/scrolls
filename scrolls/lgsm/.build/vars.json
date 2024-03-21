@@ -3,6 +3,7 @@
     "rcon": "enabled"
   },
   "cs2server": {
-    "rcon": "enabled"
+    "rcon": "enabled",
+    "postinstall": "enabled"
   }
 }
