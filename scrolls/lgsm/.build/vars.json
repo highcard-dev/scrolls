@@ -1,5 +1,8 @@
 {
   "arkserver": {
     "rcon": "enabled"
+  },
+  "cs2server": {
+    "rcon": "enabled"
   }
 }
