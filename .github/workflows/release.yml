@@ -19,7 +19,7 @@ jobs:
       - name: Get registry binary
         uses: robinraju/release-downloader@v1.7
         with:
-          repository: "highcard-dev/monorepo"
+          repository: "highcard-dev/druid-cli"
           latest: true
           fileName: "druid"
           token: ${{ secrets.GO_REPO_TOKEN }}
