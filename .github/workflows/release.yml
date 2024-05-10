@@ -42,6 +42,7 @@ jobs:
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.1 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.2 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.4 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
+          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.6 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17 -p main=25565 -p rcon=25575 -i highcard/druidd-java:16 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17.1 -p main=25565 -p rcon=25575 -i highcard/druidd-java:16 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
@@ -55,6 +56,7 @@ jobs:
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.1 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.2 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.4 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
+          ./druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.6 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/papermc/1.17 -p main=25565 -p rcon=25575 -i highcard/druidd-java:16 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/papermc/1.17.1 -p main=25565 -p rcon=25575 -i highcard/druidd-java:16 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/papermc/1.18.1 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
@@ -67,6 +69,7 @@ jobs:
           ./druid registry push ./scrolls/minecraft/papermc/1.20.1 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/papermc/1.20.2 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/papermc/1.20.4 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
+          ./druid registry push ./scrolls/minecraft/papermc/1.20.6 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/forge/1.17.1 -p main=25565 -p rcon=25575 -i highcard/druidd-java:16 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/forge/1.18 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/forge/1.18.1 -p main=25565 -p rcon=25575 -i highcard/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
@@ -81,6 +84,7 @@ jobs:
           ./druid registry push ./scrolls/minecraft/forge/1.20.2 -p main=25565 -p rcon=25575 -i highcard/druidd-java:20 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/forge/1.20.3 -p main=25565 -p rcon=25575 -i highcard/druidd-java:20 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/forge/1.20.4 -p main=25565 -p rcon=25575 -i highcard/druidd-java:20 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
+          ./druid registry push ./scrolls/minecraft/forge/1.20.6 -p main=25565 -p rcon=25575 -i highcard/druidd-java:20 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/minecraft/cuberite/latest -p main=25565 -p webpanel=8080 -i highcard/druidd-ubuntu --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
           ./druid registry push ./scrolls/rust/rust-oxide/latest -p main=28015/udp -p rcon -p rustplus -i highcard/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1
           ./druid registry push ./scrolls/rust/rust-vanilla/latest -p main=28015/udp -p rcon -p rustplus -i highcard/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1
