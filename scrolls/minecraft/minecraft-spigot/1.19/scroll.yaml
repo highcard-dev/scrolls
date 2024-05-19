@@ -102,5 +102,13 @@ processes:
               - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-20-4/scroll-switch.sh
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-spigot:1.20.4
+      registry-1.docker.io/highcard/scroll-minecraft-spigot:1.20.6:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - $SCROLL_DIR/scroll-switch/minecraft-spigot@1-20-6/scroll-switch.sh
+          - mode: scroll-switch
+            data: registry-1.docker.io/highcard/scroll-minecraft-spigot:1.20.6
 plugins:
   rcon: {}
