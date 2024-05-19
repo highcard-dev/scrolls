@@ -1,7 +1,7 @@
 name: registry-1.docker.io/highcard/scroll-minecraft-paper
 desc: PaperMC
 version: 0.0.1
-app_version: 1.20.2
+app_version: 1.20.6
 init: "main.start"
 processes:
   main:
@@ -27,7 +27,7 @@ processes:
               - -q
               - -O
               - paper.jar
-              - https://s3.eu-central-1.wasabisys.com/druid-scroll-artifacts/minecraft/papermc/paper-1.20.2.jar
+              - https://s3.eu-central-1.wasabisys.com/druid-scroll-artifacts/minecraft/papermc/paper-1.20.6.jar
           - mode: exec
             data:
               - bash
@@ -44,23 +44,5 @@ processes:
               - bash
               - -c
               - echo eula=true > eula.txt
-  scroll-switch:
-    commands:
-      registry-1.docker.io/highcard/scroll-minecraft-paper:1.20.4:
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-paper@1-20-4/scroll-switch.sh
-          - mode: scroll-switch
-            data: registry-1.docker.io/highcard/scroll-minecraft-paper:1.20.4
-      registry-1.docker.io/highcard/scroll-minecraft-paper:1.20.6:
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - $SCROLL_DIR/scroll-switch/minecraft-paper@1-20-6/scroll-switch.sh
-          - mode: scroll-switch
-            data: registry-1.docker.io/highcard/scroll-minecraft-paper:1.20.6
 plugins:
   rcon: {}
