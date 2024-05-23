@@ -1,2 +1,2 @@
 build-tree:
-	go run generate-scrolls.go ./scrolls/lgsm
+	go run generate-scrolls.go ./scrolls/minecraft/forge

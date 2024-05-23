@@ -69,5 +69,14 @@ processes:
               - "1.20.4"
           - mode: scroll-switch
             data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.4
+      registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.6:
+        procedures:
+          - mode: exec
+            data:
+              - sh
+              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
+              - "1.20.6"
+          - mode: scroll-switch
+            data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.6
 plugins:
   rcon: {}

@@ -1,7 +1,7 @@
 name: registry-1.docker.io/highcard/scroll-minecraft-forge
 desc: Minecraft Forge
 version: 0.0.1
-app_version: 1.20.2
+app_version: 1.20.6
 init: "main.start"
 processes:
   main:
@@ -31,7 +31,7 @@ processes:
               - -q
               - -O
               - forge-installer.jar
-              - https://s3.eu-central-1.wasabisys.com/druid-scroll-artifacts/minecraft/forge/forge-1.20.2.jar
+              - https://s3.eu-central-1.wasabisys.com/druid-scroll-artifacts/minecraft/forge/forge-1.20.6.jar
           - mode: exec
             data:
               - java
@@ -58,34 +58,5 @@ processes:
               - bash
               - -c
               - echo eula=true > eula.txt
-  scroll-switch:
-    commands:
-      registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.3:
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
-              - "1.20.3"
-          - mode: scroll-switch
-            data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.3
-      registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.4:
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
-              - "1.20.4"
-          - mode: scroll-switch
-            data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.4
-      registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.6:
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - $SCROLL_DIR/scroll-switch/scroll-switch.sh
-              - "1.20.6"
-          - mode: scroll-switch
-            data: registry-1.docker.io/highcard/scroll-minecraft-forge:1.20.6
 plugins:
   rcon: {}
