@@ -218,7 +218,7 @@ ConfigOverrideSupplyCrateItems=(SupplyCrateClassString="PrimalInventoryBP_Generi
 ConfigOverrideSupplyCrateItems=(SupplyCrateClassString="SupplyCrate_IceCaveTier3",MinItemSets=0,MaxItemSets=1,NumItemSetsPower=0,bSetsRandomWithoutReplacement=True,ItemSets=((SetName="Carcha Saddle",ItemEntries=((ItemEntryName="Blueprints: Saddles",Items=(BlueprintGeneratedClass'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_CarchaSaddle.PrimalItemArmor_CarchaSaddle_C'),MinQuantity=1.000000,MinQuality=1.000000,MaxQuality=1.200000,bForceBlueprint=False,ChanceToBeBlueprintOverride=0.500000,ChanceToActuallyGiveItem=0.900000)),SetWeight=0.023000,bItemsRandomWithoutReplacement=True)),bAppendItemSets=True,bAppendPreventIncreasingMinMaxItemSets=False)
 
 [SessionSettings]
-SessionName=SERVERNAME
+SessionName="Free Server by druid.gg"
 
 [/Script/Engine.GameSession]
 MaxPlayers=70
