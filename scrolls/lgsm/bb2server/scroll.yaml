@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./bb2server
-              - update
-          - mode: exec
-            data:
-              - ./bb2server
               - start
           - mode: exec-tty
             data:

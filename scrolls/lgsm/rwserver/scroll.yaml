@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./rwserver
-              - update
-          - mode: exec
-            data:
-              - ./rwserver
               - start
           - mode: exec-tty
             data:

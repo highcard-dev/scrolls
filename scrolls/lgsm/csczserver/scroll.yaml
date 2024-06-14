@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./csczserver
-              - update
-          - mode: exec
-            data:
-              - ./csczserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./nmrihserver
-              - update
-          - mode: exec
-            data:
-              - ./nmrihserver
               - start
           - mode: exec-tty
             data:

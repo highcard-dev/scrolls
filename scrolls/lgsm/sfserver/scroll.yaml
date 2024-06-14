@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./sfserver
-              - update
-          - mode: exec
-            data:
-              - ./sfserver
               - start
           - mode: exec-tty
             data:

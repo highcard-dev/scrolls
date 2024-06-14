@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./armarserver
-              - update
-          - mode: exec
-            data:
-              - ./armarserver
               - start
           - mode: exec-tty
             data:

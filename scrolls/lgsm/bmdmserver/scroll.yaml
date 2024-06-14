@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./bmdmserver
-              - update
-          - mode: exec
-            data:
-              - ./bmdmserver
               - start
           - mode: exec-tty
             data:

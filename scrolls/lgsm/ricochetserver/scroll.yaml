@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./ricochetserver
-              - update
-          - mode: exec
-            data:
-              - ./ricochetserver
               - start
           - mode: exec-tty
             data:

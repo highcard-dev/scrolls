@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./ccserver
-              - update
-          - mode: exec
-            data:
-              - ./ccserver
               - start
           - mode: exec-tty
             data:

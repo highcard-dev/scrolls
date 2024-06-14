@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./opforserver
-              - update
-          - mode: exec
-            data:
-              - ./opforserver
               - start
           - mode: exec-tty
             data:

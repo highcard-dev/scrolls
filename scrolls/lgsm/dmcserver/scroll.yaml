@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./dmcserver
-              - update
-          - mode: exec
-            data:
-              - ./dmcserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./dstserver
-              - update
-          - mode: exec
-            data:
-              - ./dstserver
               - start
           - mode: exec-tty
             data:

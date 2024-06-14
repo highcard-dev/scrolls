@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./sampserver
-              - update
-          - mode: exec
-            data:
-              - ./sampserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./codserver
-              - update
-          - mode: exec
-            data:
-              - ./codserver
               - start
           - mode: exec-tty
             data:

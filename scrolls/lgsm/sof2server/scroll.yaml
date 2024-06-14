@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./sof2server
-              - update
-          - mode: exec
-            data:
-              - ./sof2server
               - start
           - mode: exec-tty
             data:

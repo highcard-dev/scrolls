@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./sbserver
-              - update
-          - mode: exec
-            data:
-              - ./sbserver
               - start
           - mode: exec-tty
             data:

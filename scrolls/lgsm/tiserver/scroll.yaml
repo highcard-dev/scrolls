@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./tiserver
-              - update
-          - mode: exec
-            data:
-              - ./tiserver
               - start
           - mode: exec-tty
             data:

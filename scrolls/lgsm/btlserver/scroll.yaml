@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./btlserver
-              - update
-          - mode: exec
-            data:
-              - ./btlserver
               - start
           - mode: exec-tty
             data:

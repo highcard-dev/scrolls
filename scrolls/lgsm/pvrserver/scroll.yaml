@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./pvrserver
-              - update
-          - mode: exec
-            data:
-              - ./pvrserver
               - start
           - mode: exec-tty
             data:

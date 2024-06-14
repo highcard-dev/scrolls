@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./zmrserver
-              - update
-          - mode: exec
-            data:
-              - ./zmrserver
               - start
           - mode: exec-tty
             data:

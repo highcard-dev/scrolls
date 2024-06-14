@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./arkserver
-              - update
-          - mode: exec
-            data:
-              - ./arkserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./tuserver
-              - update
-          - mode: exec
-            data:
-              - ./tuserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./arma3server
-              - update
-          - mode: exec
-            data:
-              - ./arma3server
               - start
           - mode: exec-tty
             data:

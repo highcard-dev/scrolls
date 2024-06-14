@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./rustserver
-              - update
-          - mode: exec
-            data:
-              - ./rustserver
               - start
           - mode: exec-tty
             data:

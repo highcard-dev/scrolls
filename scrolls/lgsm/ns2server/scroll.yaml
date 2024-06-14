@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./ns2server
-              - update
-          - mode: exec
-            data:
-              - ./ns2server
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./dodrserver
-              - update
-          - mode: exec
-            data:
-              - ./dodrserver
               - start
           - mode: exec-tty
             data:

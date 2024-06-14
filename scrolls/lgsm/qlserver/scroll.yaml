@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./qlserver
-              - update
-          - mode: exec
-            data:
-              - ./qlserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./sbotsserver
-              - update
-          - mode: exec
-            data:
-              - ./sbotsserver
               - start
           - mode: exec-tty
             data:

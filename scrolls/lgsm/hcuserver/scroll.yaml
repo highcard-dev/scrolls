@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./hcuserver
-              - update
-          - mode: exec
-            data:
-              - ./hcuserver
               - start
           - mode: exec-tty
             data:

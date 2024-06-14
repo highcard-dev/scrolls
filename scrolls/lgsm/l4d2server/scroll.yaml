@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./l4d2server
-              - update
-          - mode: exec
-            data:
-              - ./l4d2server
               - start
           - mode: exec-tty
             data:

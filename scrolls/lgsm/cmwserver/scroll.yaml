@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./cmwserver
-              - update
-          - mode: exec
-            data:
-              - ./cmwserver
               - start
           - mode: exec-tty
             data:

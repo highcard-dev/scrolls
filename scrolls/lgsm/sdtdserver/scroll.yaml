@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./sdtdserver
-              - update
-          - mode: exec
-            data:
-              - ./sdtdserver
               - start
           - mode: exec-tty
             data:

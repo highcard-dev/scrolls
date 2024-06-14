@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./solserver
-              - update
-          - mode: exec
-            data:
-              - ./solserver
               - start
           - mode: exec-tty
             data:

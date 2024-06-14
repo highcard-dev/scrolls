@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./necserver
-              - update
-          - mode: exec
-            data:
-              - ./necserver
               - start
           - mode: exec-tty
             data:

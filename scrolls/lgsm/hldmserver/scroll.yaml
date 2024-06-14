@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./hldmserver
-              - update
-          - mode: exec
-            data:
-              - ./hldmserver
               - start
           - mode: exec-tty
             data:

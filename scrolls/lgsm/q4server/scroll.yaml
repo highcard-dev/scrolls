@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./q4server
-              - update
-          - mode: exec
-            data:
-              - ./q4server
               - start
           - mode: exec-tty
             data:

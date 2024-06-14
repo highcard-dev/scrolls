@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./mtaserver
-              - update
-          - mode: exec
-            data:
-              - ./mtaserver
               - start
           - mode: exec-tty
             data:

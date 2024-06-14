@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./coduoserver
-              - update
-          - mode: exec
-            data:
-              - ./coduoserver
               - start
           - mode: exec-tty
             data:

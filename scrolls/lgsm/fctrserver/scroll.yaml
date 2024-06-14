@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./fctrserver
-              - update
-          - mode: exec
-            data:
-              - ./fctrserver
               - start
           - mode: exec-tty
             data:

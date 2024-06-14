@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./bfvserver
-              - update
-          - mode: exec
-            data:
-              - ./bfvserver
               - start
           - mode: exec-tty
             data:

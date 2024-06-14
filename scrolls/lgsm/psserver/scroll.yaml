@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./psserver
-              - update
-          - mode: exec
-            data:
-              - ./psserver
               - start
           - mode: exec-tty
             data:

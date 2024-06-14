@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./qwserver
-              - update
-          - mode: exec
-            data:
-              - ./qwserver
               - start
           - mode: exec-tty
             data:

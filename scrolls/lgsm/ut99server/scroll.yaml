@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./ut99server
-              - update
-          - mode: exec
-            data:
-              - ./ut99server
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./jc3server
-              - update
-          - mode: exec
-            data:
-              - ./jc3server
               - start
           - mode: exec-tty
             data:

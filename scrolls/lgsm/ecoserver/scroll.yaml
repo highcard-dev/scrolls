@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./ecoserver
-              - update
-          - mode: exec
-            data:
-              - ./ecoserver
               - start
           - mode: exec-tty
             data:

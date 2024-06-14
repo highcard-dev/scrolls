@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./pmcserver
-              - update
-          - mode: exec
-            data:
-              - ./pmcserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./roserver
-              - update
-          - mode: exec
-            data:
-              - ./roserver
               - start
           - mode: exec-tty
             data:

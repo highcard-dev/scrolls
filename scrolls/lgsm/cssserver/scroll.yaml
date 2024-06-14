@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./cssserver
-              - update
-          - mode: exec
-            data:
-              - ./cssserver
               - start
           - mode: exec-tty
             data:

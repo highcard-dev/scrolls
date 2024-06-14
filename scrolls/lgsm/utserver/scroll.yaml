@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./utserver
-              - update
-          - mode: exec
-            data:
-              - ./utserver
               - start
           - mode: exec-tty
             data:

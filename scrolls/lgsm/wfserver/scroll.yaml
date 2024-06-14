@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./wfserver
-              - update
-          - mode: exec
-            data:
-              - ./wfserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./dodserver
-              - update
-          - mode: exec
-            data:
-              - ./dodserver
               - start
           - mode: exec-tty
             data:

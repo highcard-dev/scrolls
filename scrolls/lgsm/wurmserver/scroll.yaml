@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./wurmserver
-              - update
-          - mode: exec
-            data:
-              - ./wurmserver
               - start
           - mode: exec-tty
             data:

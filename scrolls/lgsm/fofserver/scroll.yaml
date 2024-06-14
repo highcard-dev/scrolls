@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./fofserver
-              - update
-          - mode: exec
-            data:
-              - ./fofserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./iosserver
-              - update
-          - mode: exec
-            data:
-              - ./iosserver
               - start
           - mode: exec-tty
             data:

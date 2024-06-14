@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./mhserver
-              - update
-          - mode: exec
-            data:
-              - ./mhserver
               - start
           - mode: exec-tty
             data:

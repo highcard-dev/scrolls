@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./jc2server
-              - update
-          - mode: exec
-            data:
-              - ./jc2server
               - start
           - mode: exec-tty
             data:

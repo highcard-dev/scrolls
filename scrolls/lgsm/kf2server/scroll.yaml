@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./kf2server
-              - update
-          - mode: exec
-            data:
-              - ./kf2server
               - start
           - mode: exec-tty
             data:

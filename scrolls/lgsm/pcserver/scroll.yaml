@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./pcserver
-              - update
-          - mode: exec
-            data:
-              - ./pcserver
               - start
           - mode: exec-tty
             data:

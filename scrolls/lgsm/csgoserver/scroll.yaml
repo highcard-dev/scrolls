@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./csgoserver
-              - update
-          - mode: exec
-            data:
-              - ./csgoserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./emserver
-              - update
-          - mode: exec
-            data:
-              - ./emserver
               - start
           - mode: exec-tty
             data:

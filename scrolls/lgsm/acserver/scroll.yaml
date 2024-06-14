@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./acserver
-              - update
-          - mode: exec
-            data:
-              - ./acserver
               - start
           - mode: exec-tty
             data:

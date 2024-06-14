@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./dabserver
-              - update
-          - mode: exec
-            data:
-              - ./dabserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./etlserver
-              - update
-          - mode: exec
-            data:
-              - ./etlserver
               - start
           - mode: exec-tty
             data:

@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./tf2server
-              - update
-          - mode: exec
-            data:
-              - ./tf2server
               - start
           - mode: exec-tty
             data:

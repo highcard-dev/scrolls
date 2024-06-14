@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./zpsserver
-              - update
-          - mode: exec
-            data:
-              - ./zpsserver
               - start
           - mode: exec-tty
             data:

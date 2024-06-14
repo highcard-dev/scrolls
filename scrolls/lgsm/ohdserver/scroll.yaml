@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./ohdserver
-              - update
-          - mode: exec
-            data:
-              - ./ohdserver
               - start
           - mode: exec-tty
             data:

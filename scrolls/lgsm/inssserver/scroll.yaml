@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./inssserver
-              - update
-          - mode: exec
-            data:
-              - ./inssserver
               - start
           - mode: exec-tty
             data:

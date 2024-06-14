@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./vhserver
-              - update
-          - mode: exec
-            data:
-              - ./vhserver
               - start
           - mode: exec-tty
             data:

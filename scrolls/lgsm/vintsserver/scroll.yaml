@@ -13,10 +13,6 @@ processes:
           - mode: exec
             data:
               - ./vintsserver
-              - update
-          - mode: exec
-            data:
-              - ./vintsserver
               - start
           - mode: exec-tty
             data:
