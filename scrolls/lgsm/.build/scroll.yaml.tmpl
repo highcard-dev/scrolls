@@ -6,6 +6,17 @@ init: "main.start"
 processes:
   main:
     commands:
+      console:
+        needs: [main.install]
+        run: console
+        procedures:
+          - mode: exec-tty
+            data:
+              - ./{{ .Version }}
+              - console
+          - mode: stdin
+            wait: 5
+            data: 'Y\n'
       start:
         needs: [main.install]
         run: restart
@@ -14,16 +25,26 @@ processes:
             data:
               - ./{{ .Version }}
               - start
-          - mode: exec-tty
-            data:
-              - ./{{ .Version }}
-              - console
+          - mode: command
+            data: console
       stop:
         procedures:
           - mode: exec
             data:
               - ./{{ .Version }}
               - stop
+      restart:
+        procedures:
+          - mode: exec
+            data:
+              - echo
+              - "Restarting server..."
+          - mode: exec
+            data:
+              - ./{{ .Version }}
+              - restart
+          - mode: command
+            data: console
       install:
         run: once
         procedures:
@@ -45,6 +66,10 @@ processes:
               - bash
               - postinstall.sh
 {{- end }}
+cronjobs:
+  - name: Restart every 6 hours
+    schedule: "0 */6 * * *"
+    command: main.restart
 {{- if eq .Vars.rcon "enabled" }}
 plugins:
   rcon: {}

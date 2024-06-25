@@ -6,6 +6,17 @@ init: "main.start"
 processes:
   main:
     commands:
+      console:
+        needs: [main.install]
+        run: console
+        procedures:
+          - mode: exec-tty
+            data:
+              - ./ahl2server
+              - console
+          - mode: stdin
+            wait: 5
+            data: 'Y\n'
       start:
         needs: [main.install]
         run: restart
@@ -14,16 +25,26 @@ processes:
             data:
               - ./ahl2server
               - start
-          - mode: exec-tty
-            data:
-              - ./ahl2server
-              - console
+          - mode: command
+            data: console
       stop:
         procedures:
           - mode: exec
             data:
               - ./ahl2server
               - stop
+      restart:
+        procedures:
+          - mode: exec
+            data:
+              - echo
+              - "Restarting server..."
+          - mode: exec
+            data:
+              - ./ahl2server
+              - restart
+          - mode: command
+            data: console
       install:
         run: once
         procedures:
@@ -39,3 +60,7 @@ processes:
             data:
               - ./ahl2server
               - auto-install
+cronjobs:
+  - name: Restart every 6 hours
+    schedule: "0 */6 * * *"
+    command: main.restart
