@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./bdserver
+              - update
+          - mode: exec
+            data:
+              - ./bdserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./wetserver
+              - update
+          - mode: exec
+            data:
+              - ./wetserver
               - start
           - mode: exec-tty
             data:

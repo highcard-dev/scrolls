@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./colserver
+              - update
+          - mode: exec
+            data:
+              - ./colserver
               - start
           - mode: exec-tty
             data:

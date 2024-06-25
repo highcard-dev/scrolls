@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./cs2server
+              - update
+          - mode: exec
+            data:
+              - ./cs2server
               - start
           - mode: exec-tty
             data:

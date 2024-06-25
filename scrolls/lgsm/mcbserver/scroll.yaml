@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./mcbserver
+              - update
+          - mode: exec
+            data:
+              - ./mcbserver
               - start
           - mode: exec-tty
             data:

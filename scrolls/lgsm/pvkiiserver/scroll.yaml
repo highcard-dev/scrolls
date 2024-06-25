@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./pvkiiserver
+              - update
+          - mode: exec
+            data:
+              - ./pvkiiserver
               - start
           - mode: exec-tty
             data:

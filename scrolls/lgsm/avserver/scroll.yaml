@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./avserver
+              - update
+          - mode: exec
+            data:
+              - ./avserver
               - start
           - mode: exec-tty
             data:

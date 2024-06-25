@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./atsserver
+              - update
+          - mode: exec
+            data:
+              - ./atsserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./ckserver
+              - update
+          - mode: exec
+            data:
+              - ./ckserver
               - start
           - mode: exec-tty
             data:

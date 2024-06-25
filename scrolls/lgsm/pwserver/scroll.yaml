@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./pwserver
+              - update
+          - mode: exec
+            data:
+              - ./pwserver
               - start
           - mode: exec-tty
             data:

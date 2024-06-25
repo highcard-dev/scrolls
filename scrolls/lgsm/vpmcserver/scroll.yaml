@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./vpmcserver
+              - update
+          - mode: exec
+            data:
+              - ./vpmcserver
               - start
           - mode: exec-tty
             data:

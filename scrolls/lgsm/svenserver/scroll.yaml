@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./svenserver
+              - update
+          - mode: exec
+            data:
+              - ./svenserver
               - start
           - mode: exec-tty
             data:

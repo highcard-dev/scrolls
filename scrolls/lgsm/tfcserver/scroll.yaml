@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./tfcserver
+              - update
+          - mode: exec
+            data:
+              - ./tfcserver
               - start
           - mode: exec-tty
             data:

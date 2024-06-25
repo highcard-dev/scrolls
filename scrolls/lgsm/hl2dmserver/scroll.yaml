@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./hl2dmserver
+              - update
+          - mode: exec
+            data:
+              - ./hl2dmserver
               - start
           - mode: exec-tty
             data:

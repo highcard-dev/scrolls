@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./onsetserver
+              - update
+          - mode: exec
+            data:
+              - ./onsetserver
               - start
           - mode: exec-tty
             data:

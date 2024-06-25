@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./scpslsmserver
+              - update
+          - mode: exec
+            data:
+              - ./scpslsmserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./nsserver
+              - update
+          - mode: exec
+            data:
+              - ./nsserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./dysserver
+              - update
+          - mode: exec
+            data:
+              - ./dysserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./vsserver
+              - update
+          - mode: exec
+            data:
+              - ./vsserver
               - start
           - mode: exec-tty
             data:

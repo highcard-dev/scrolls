@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./{{ .Version }}
+              - update
+          - mode: exec
+            data:
+              - ./{{ .Version }}
               - start
           - mode: exec-tty
             data:

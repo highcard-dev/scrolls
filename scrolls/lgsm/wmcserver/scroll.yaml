@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./wmcserver
+              - update
+          - mode: exec
+            data:
+              - ./wmcserver
               - start
           - mode: exec-tty
             data:

@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./ts3server
+              - update
+          - mode: exec
+            data:
+              - ./ts3server
               - start
           - mode: exec-tty
             data:

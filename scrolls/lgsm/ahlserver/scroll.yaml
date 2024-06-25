@@ -13,6 +13,10 @@ processes:
           - mode: exec
             data:
               - ./ahlserver
+              - update
+          - mode: exec
+            data:
+              - ./ahlserver
               - start
           - mode: exec-tty
             data:
