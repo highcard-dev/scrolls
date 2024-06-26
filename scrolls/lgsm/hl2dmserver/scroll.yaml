@@ -6,6 +6,19 @@ init: "main.start"
 processes:
   main:
     commands:
+      console:
+        needs: [main.install]
+        run: console
+        procedures:
+          - mode: stdin
+            wait: 5
+            data:
+              - 'main.console'
+              - "\r"
+          - mode: exec-tty
+            data:
+              - ./hl2dmserver
+              - console
       start:
         needs: [main.install]
         run: restart
@@ -18,16 +31,26 @@ processes:
             data:
               - ./hl2dmserver
               - start
-          - mode: exec-tty
-            data:
-              - ./hl2dmserver
-              - console
+          - mode: command
+            data: console
       stop:
         procedures:
           - mode: exec
             data:
               - ./hl2dmserver
               - stop
+      restart:
+        procedures:
+          - mode: exec
+            data:
+              - echo
+              - "Restarting server..."
+          - mode: exec
+            data:
+              - ./hl2dmserver
+              - restart
+          - mode: command
+            data: console
       install:
         run: once
         procedures:
@@ -43,3 +66,7 @@ processes:
             data:
               - ./hl2dmserver
               - auto-install
+cronjobs:
+  - name: Restart every 6 hours
+    schedule: "0 */6 * * *"
+    command: main.restart

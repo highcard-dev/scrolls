@@ -6,6 +6,19 @@ init: "main.start"
 processes:
   main:
     commands:
+      console:
+        needs: [main.install]
+        run: console
+        procedures:
+          - mode: stdin
+            wait: 5
+            data:
+              - 'main.console'
+              - "\r"
+          - mode: exec-tty
+            data:
+              - ./bfvserver
+              - console
       start:
         needs: [main.install]
         run: restart
@@ -18,16 +31,26 @@ processes:
             data:
               - ./bfvserver
               - start
-          - mode: exec-tty
-            data:
-              - ./bfvserver
-              - console
+          - mode: command
+            data: console
       stop:
         procedures:
           - mode: exec
             data:
               - ./bfvserver
               - stop
+      restart:
+        procedures:
+          - mode: exec
+            data:
+              - echo
+              - "Restarting server..."
+          - mode: exec
+            data:
+              - ./bfvserver
+              - restart
+          - mode: command
+            data: console
       install:
         run: once
         procedures:
@@ -43,3 +66,7 @@ processes:
             data:
               - ./bfvserver
               - auto-install
+cronjobs:
+  - name: Restart every 6 hours
+    schedule: "0 */6 * * *"
+    command: main.restart
