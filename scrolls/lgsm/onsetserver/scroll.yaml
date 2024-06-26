@@ -10,13 +10,15 @@ processes:
         needs: [main.install]
         run: console
         procedures:
+          - mode: stdin
+            wait: 5
+            data:
+              - 'main.console'
+              - "\r"
           - mode: exec-tty
             data:
               - ./onsetserver
               - console
-          - mode: stdin
-            wait: 5
-            data: 'Y\n'
       start:
         needs: [main.install]
         run: restart
