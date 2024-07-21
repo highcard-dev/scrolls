@@ -1,4 +1,3 @@
-FROM highcard/druidd-base:latest as base
 FROM ubuntu:20.04
 
 RUN dpkg --add-architecture i386
@@ -23,7 +22,14 @@ RUN wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
 RUN cd /home/druid/.steam/steamcmd/ && tar zxvf steamcmd_linux.tar.gz
 WORKDIR /app
 
-COPY --from=base /usr/bin/druid* /usr/bin
-COPY --from=base /entrypoint.sh /entrypoint.sh
+RUN wget -O /usr/bin/druid https://github.com/highcard-dev/druid-cli/releases/latest/download/druid
+RUN wget -O /usr/bin/druid_rcon https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon
+RUN wget -O /usr/bin/druid_rcon_web_rust https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon_web_rust
+RUN wget -O /entrypoint.sh https://github.com/highcard-dev/druid-cli/releases/latest/download/entrypoint.sh
+
+RUN chmod +x /usr/bin/druid
+RUN chmod +x /usr/bin/druid_rcon
+RUN chmod +x /usr/bin/druid_rcon_web_rust
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]

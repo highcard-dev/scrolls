@@ -1,5 +1,4 @@
 ARG SHORTNAME
-FROM highcard/druidd-base:latest as base
 FROM gameservermanagers/gameserver:${SHORTNAME}
 
 RUN apt-get update \
@@ -12,8 +11,15 @@ RUN apt-get update \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/*
 
-COPY --from=base /usr/bin/druid* /usr/bin
-COPY --from=base /entrypoint.sh /entrypoint.sh
+RUN wget -O /usr/bin/druid https://github.com/highcard-dev/druid-cli/releases/latest/download/druid
+RUN wget -O /usr/bin/druid_rcon https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon
+RUN wget -O /usr/bin/druid_rcon_web_rust https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon_web_rust
+RUN wget -O /entrypoint.sh https://github.com/highcard-dev/druid-cli/releases/latest/download/entrypoint.sh
+
+RUN chmod +x /usr/bin/druid
+RUN chmod +x /usr/bin/druid_rcon
+RUN chmod +x /usr/bin/druid_rcon_web_rust
+RUN chmod +x /entrypoint.sh
 
 ENV LGSM_SERVERFILES=/app/resources/deployment/serverfiles
 ENV LGSM_CONFIG=/app/resources/deployment/config-lgsm

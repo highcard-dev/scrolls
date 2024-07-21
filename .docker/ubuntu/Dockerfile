@@ -1,6 +1,5 @@
 #Dockerhub does not allow for setting of build args :/
 ARG IMAGE=ubuntu:22.04
-FROM highcard/druidd-base:latest as base
 FROM $IMAGE
 WORKDIR /app
 
@@ -15,7 +14,14 @@ RUN chmod +x /usr/bin/yq
 RUN useradd -ms /bin/bash druid
 USER druid
 
-COPY --from=base /usr/bin/druid* /usr/bin
-COPY --from=base /entrypoint.sh /entrypoint.sh
+RUN wget -O /usr/bin/druid https://github.com/highcard-dev/druid-cli/releases/latest/download/druid
+RUN wget -O /usr/bin/druid_rcon https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon
+RUN wget -O /usr/bin/druid_rcon_web_rust https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon_web_rust
+RUN wget -O /entrypoint.sh https://github.com/highcard-dev/druid-cli/releases/latest/download/entrypoint.sh
+
+RUN chmod +x /usr/bin/druid
+RUN chmod +x /usr/bin/druid_rcon
+RUN chmod +x /usr/bin/druid_rcon_web_rust
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]
