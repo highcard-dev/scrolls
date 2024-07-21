@@ -28,8 +28,6 @@ commands:
         data:
           - ./q4server
           - start
-      - mode: command
-        data: console
   stop:
     procedures:
       - mode: exec

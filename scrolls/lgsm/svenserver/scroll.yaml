@@ -28,8 +28,6 @@ commands:
         data:
           - ./svenserver
           - start
-      - mode: command
-        data: console
   stop:
     procedures:
       - mode: exec

@@ -28,8 +28,6 @@ commands:
         data:
           - ./bbserver
           - start
-      - mode: command
-        data: console
   stop:
     procedures:
       - mode: exec

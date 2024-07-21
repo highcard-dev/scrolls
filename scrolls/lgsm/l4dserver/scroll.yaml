@@ -28,8 +28,6 @@ commands:
         data:
           - ./l4dserver
           - start
-      - mode: command
-        data: console
   stop:
     procedures:
       - mode: exec

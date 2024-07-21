@@ -28,8 +28,6 @@ commands:
         data:
           - ./pc2server
           - start
-      - mode: command
-        data: console
   stop:
     procedures:
       - mode: exec

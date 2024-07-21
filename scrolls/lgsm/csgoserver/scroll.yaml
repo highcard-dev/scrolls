@@ -28,8 +28,6 @@ commands:
         data:
           - ./csgoserver
           - start
-      - mode: command
-        data: console
   stop:
     procedures:
       - mode: exec

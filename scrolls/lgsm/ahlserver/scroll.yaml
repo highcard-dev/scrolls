@@ -28,8 +28,6 @@ commands:
         data:
           - ./ahlserver
           - start
-      - mode: command
-        data: console
   stop:
     procedures:
       - mode: exec
