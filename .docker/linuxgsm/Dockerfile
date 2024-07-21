@@ -11,6 +11,7 @@ RUN apt-get update \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/*
 
+ARG CACHEBUST=1 
 RUN wget -O /usr/bin/druid https://github.com/highcard-dev/druid-cli/releases/latest/download/druid
 RUN wget -O /usr/bin/druid_rcon https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon
 RUN wget -O /usr/bin/druid_rcon_web_rust https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon_web_rust
