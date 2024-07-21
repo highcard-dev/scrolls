@@ -2,7 +2,7 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: codserver
 version: 0.0.2
 app_version: codserver
-init: "start"
+init: "console"
 commands:
   console:
     needs: [start]

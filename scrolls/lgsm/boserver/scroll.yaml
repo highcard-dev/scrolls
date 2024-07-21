@@ -2,7 +2,7 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: boserver
 version: 0.0.2
 app_version: boserver
-init: "start"
+init: "console"
 commands:
   console:
     needs: [start]

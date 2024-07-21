@@ -2,7 +2,7 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: arma3server
 version: 0.0.2
 app_version: arma3server
-init: "start"
+init: "console"
 commands:
   console:
     needs: [start]

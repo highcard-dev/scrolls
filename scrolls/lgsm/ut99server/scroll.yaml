@@ -2,7 +2,7 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: ut99server
 version: 0.0.2
 app_version: ut99server
-init: "start"
+init: "console"
 commands:
   console:
     needs: [start]
