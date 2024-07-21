@@ -17,7 +17,7 @@ while read line; do
 
   echo "Generating Dockerfile.${shortname} (${gamename})"
   echo "shortname ${shortname}"
-  docker build -f Dockerfile . --build-arg SHORTNAME="${shortname}" --build-arg SERVERNAME="${servername}" --build-arg GAMENAME="${gamename}" --build-arg DISTRO="${distro}" -t "highcard/druidd-lgsm:${shortname}"
+  docker build -f Dockerfile . --build-arg SHORTNAME="${shortname}" --build-arg SERVERNAME="${servername}" --build-arg GAMENAME="${gamename}" --build-arg DISTRO="${distro}" -t "highcard/druidd-lgsm:${shortname}" --no-cache
   echo "Pushing highcard/druidd-lgsm:${shortname}"
   docker push "highcard/druidd-lgsm:${shortname}"
 done < <(tail -n +2 serverlist.csv)
