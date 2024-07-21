@@ -15,8 +15,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: ">=1.19.3"
-          cache: true
-          cache-dependency-path: scrolls-registry
       - name: Get registry binary
         uses: robinraju/release-downloader@v1.7
         with:
