@@ -2,71 +2,69 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: dysserver
 version: 0.0.2
 app_version: dysserver
-init: "main.start"
-processes:
-  main:
-    commands:
-      console:
-        needs: [main.install]
-        run: console
-        procedures:
-          - mode: stdin
-            wait: 5
-            data:
-              - 'main.console'
-              - "\r"
-          - mode: exec-tty
-            data:
-              - ./dysserver
-              - console
-      start:
-        needs: [main.install]
-        run: restart
-        procedures:
-          - mode: exec
-            data:
-              - ./dysserver
-              - update
-          - mode: exec
-            data:
-              - ./dysserver
-              - start
-          - mode: command
-            data: console
-      stop:
-        procedures:
-          - mode: exec
-            data:
-              - ./dysserver
-              - stop
-      restart:
-        procedures:
-          - mode: exec
-            data:
-              - echo
-              - "Restarting server..."
-          - mode: exec
-            data:
-              - ./dysserver
-              - restart
-          - mode: command
-            data: console
-      install:
-        run: once
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - install-lgsm.sh
-          - mode: exec
-            data:
-              - ./linuxgsm.sh
-              - dysserver
-          - mode: exec
-            data:
-              - ./dysserver
-              - auto-install
+init: "start"
+commands:
+  console:
+    needs: [install]
+    run: console
+    procedures:
+      - mode: stdin
+        wait: 5
+        data:
+          - "console"
+          - "\r"
+      - mode: exec-tty
+        data:
+          - ./dysserver
+          - console
+  start:
+    needs: [install]
+    run: restart
+    procedures:
+      - mode: exec
+        data:
+          - ./dysserver
+          - update
+      - mode: exec
+        data:
+          - ./dysserver
+          - start
+      - mode: command
+        data: console
+  stop:
+    procedures:
+      - mode: exec
+        data:
+          - ./dysserver
+          - stop
+  restart:
+    procedures:
+      - mode: exec
+        data:
+          - echo
+          - "Restarting server..."
+      - mode: exec
+        data:
+          - ./dysserver
+          - restart
+      - mode: command
+        data: console
+  install:
+    run: once
+    procedures:
+      - mode: exec
+        data:
+          - sh
+          - install-lgsm.sh
+      - mode: exec
+        data:
+          - ./linuxgsm.sh
+          - dysserver
+      - mode: exec
+        data:
+          - ./dysserver
+          - auto-install
 cronjobs:
   - name: Restart every 6 hours
     schedule: "0 */6 * * *"
-    command: main.restart
+    command: restart

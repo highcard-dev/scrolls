@@ -2,71 +2,69 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: scpslsmserver
 version: 0.0.2
 app_version: scpslsmserver
-init: "main.start"
-processes:
-  main:
-    commands:
-      console:
-        needs: [main.install]
-        run: console
-        procedures:
-          - mode: stdin
-            wait: 5
-            data:
-              - 'main.console'
-              - "\r"
-          - mode: exec-tty
-            data:
-              - ./scpslsmserver
-              - console
-      start:
-        needs: [main.install]
-        run: restart
-        procedures:
-          - mode: exec
-            data:
-              - ./scpslsmserver
-              - update
-          - mode: exec
-            data:
-              - ./scpslsmserver
-              - start
-          - mode: command
-            data: console
-      stop:
-        procedures:
-          - mode: exec
-            data:
-              - ./scpslsmserver
-              - stop
-      restart:
-        procedures:
-          - mode: exec
-            data:
-              - echo
-              - "Restarting server..."
-          - mode: exec
-            data:
-              - ./scpslsmserver
-              - restart
-          - mode: command
-            data: console
-      install:
-        run: once
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - install-lgsm.sh
-          - mode: exec
-            data:
-              - ./linuxgsm.sh
-              - scpslsmserver
-          - mode: exec
-            data:
-              - ./scpslsmserver
-              - auto-install
+init: "start"
+commands:
+  console:
+    needs: [install]
+    run: console
+    procedures:
+      - mode: stdin
+        wait: 5
+        data:
+          - "console"
+          - "\r"
+      - mode: exec-tty
+        data:
+          - ./scpslsmserver
+          - console
+  start:
+    needs: [install]
+    run: restart
+    procedures:
+      - mode: exec
+        data:
+          - ./scpslsmserver
+          - update
+      - mode: exec
+        data:
+          - ./scpslsmserver
+          - start
+      - mode: command
+        data: console
+  stop:
+    procedures:
+      - mode: exec
+        data:
+          - ./scpslsmserver
+          - stop
+  restart:
+    procedures:
+      - mode: exec
+        data:
+          - echo
+          - "Restarting server..."
+      - mode: exec
+        data:
+          - ./scpslsmserver
+          - restart
+      - mode: command
+        data: console
+  install:
+    run: once
+    procedures:
+      - mode: exec
+        data:
+          - sh
+          - install-lgsm.sh
+      - mode: exec
+        data:
+          - ./linuxgsm.sh
+          - scpslsmserver
+      - mode: exec
+        data:
+          - ./scpslsmserver
+          - auto-install
 cronjobs:
   - name: Restart every 6 hours
     schedule: "0 */6 * * *"
-    command: main.restart
+    command: restart

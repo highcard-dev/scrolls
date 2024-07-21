@@ -2,71 +2,69 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: sbserver
 version: 0.0.2
 app_version: sbserver
-init: "main.start"
-processes:
-  main:
-    commands:
-      console:
-        needs: [main.install]
-        run: console
-        procedures:
-          - mode: stdin
-            wait: 5
-            data:
-              - 'main.console'
-              - "\r"
-          - mode: exec-tty
-            data:
-              - ./sbserver
-              - console
-      start:
-        needs: [main.install]
-        run: restart
-        procedures:
-          - mode: exec
-            data:
-              - ./sbserver
-              - update
-          - mode: exec
-            data:
-              - ./sbserver
-              - start
-          - mode: command
-            data: console
-      stop:
-        procedures:
-          - mode: exec
-            data:
-              - ./sbserver
-              - stop
-      restart:
-        procedures:
-          - mode: exec
-            data:
-              - echo
-              - "Restarting server..."
-          - mode: exec
-            data:
-              - ./sbserver
-              - restart
-          - mode: command
-            data: console
-      install:
-        run: once
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - install-lgsm.sh
-          - mode: exec
-            data:
-              - ./linuxgsm.sh
-              - sbserver
-          - mode: exec
-            data:
-              - ./sbserver
-              - auto-install
+init: "start"
+commands:
+  console:
+    needs: [install]
+    run: console
+    procedures:
+      - mode: stdin
+        wait: 5
+        data:
+          - "console"
+          - "\r"
+      - mode: exec-tty
+        data:
+          - ./sbserver
+          - console
+  start:
+    needs: [install]
+    run: restart
+    procedures:
+      - mode: exec
+        data:
+          - ./sbserver
+          - update
+      - mode: exec
+        data:
+          - ./sbserver
+          - start
+      - mode: command
+        data: console
+  stop:
+    procedures:
+      - mode: exec
+        data:
+          - ./sbserver
+          - stop
+  restart:
+    procedures:
+      - mode: exec
+        data:
+          - echo
+          - "Restarting server..."
+      - mode: exec
+        data:
+          - ./sbserver
+          - restart
+      - mode: command
+        data: console
+  install:
+    run: once
+    procedures:
+      - mode: exec
+        data:
+          - sh
+          - install-lgsm.sh
+      - mode: exec
+        data:
+          - ./linuxgsm.sh
+          - sbserver
+      - mode: exec
+        data:
+          - ./sbserver
+          - auto-install
 cronjobs:
   - name: Restart every 6 hours
     schedule: "0 */6 * * *"
-    command: main.restart
+    command: restart

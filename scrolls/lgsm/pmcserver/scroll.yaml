@@ -2,71 +2,69 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: pmcserver
 version: 0.0.2
 app_version: pmcserver
-init: "main.start"
-processes:
-  main:
-    commands:
-      console:
-        needs: [main.install]
-        run: console
-        procedures:
-          - mode: stdin
-            wait: 5
-            data:
-              - 'main.console'
-              - "\r"
-          - mode: exec-tty
-            data:
-              - ./pmcserver
-              - console
-      start:
-        needs: [main.install]
-        run: restart
-        procedures:
-          - mode: exec
-            data:
-              - ./pmcserver
-              - update
-          - mode: exec
-            data:
-              - ./pmcserver
-              - start
-          - mode: command
-            data: console
-      stop:
-        procedures:
-          - mode: exec
-            data:
-              - ./pmcserver
-              - stop
-      restart:
-        procedures:
-          - mode: exec
-            data:
-              - echo
-              - "Restarting server..."
-          - mode: exec
-            data:
-              - ./pmcserver
-              - restart
-          - mode: command
-            data: console
-      install:
-        run: once
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - install-lgsm.sh
-          - mode: exec
-            data:
-              - ./linuxgsm.sh
-              - pmcserver
-          - mode: exec
-            data:
-              - ./pmcserver
-              - auto-install
+init: "start"
+commands:
+  console:
+    needs: [install]
+    run: console
+    procedures:
+      - mode: stdin
+        wait: 5
+        data:
+          - "console"
+          - "\r"
+      - mode: exec-tty
+        data:
+          - ./pmcserver
+          - console
+  start:
+    needs: [install]
+    run: restart
+    procedures:
+      - mode: exec
+        data:
+          - ./pmcserver
+          - update
+      - mode: exec
+        data:
+          - ./pmcserver
+          - start
+      - mode: command
+        data: console
+  stop:
+    procedures:
+      - mode: exec
+        data:
+          - ./pmcserver
+          - stop
+  restart:
+    procedures:
+      - mode: exec
+        data:
+          - echo
+          - "Restarting server..."
+      - mode: exec
+        data:
+          - ./pmcserver
+          - restart
+      - mode: command
+        data: console
+  install:
+    run: once
+    procedures:
+      - mode: exec
+        data:
+          - sh
+          - install-lgsm.sh
+      - mode: exec
+        data:
+          - ./linuxgsm.sh
+          - pmcserver
+      - mode: exec
+        data:
+          - ./pmcserver
+          - auto-install
 cronjobs:
   - name: Restart every 6 hours
     schedule: "0 */6 * * *"
-    command: main.restart
+    command: restart

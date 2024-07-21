@@ -2,77 +2,75 @@ name: registry-1.docker.io/highcard/scroll-lgsm
 desc: cs2server
 version: 0.0.2
 app_version: cs2server
-init: "main.start"
-processes:
-  main:
-    commands:
-      console:
-        needs: [main.install]
-        run: console
-        procedures:
-          - mode: stdin
-            wait: 5
-            data:
-              - 'main.console'
-              - "\r"
-          - mode: exec-tty
-            data:
-              - ./cs2server
-              - console
-      start:
-        needs: [main.install]
-        run: restart
-        procedures:
-          - mode: exec
-            data:
-              - ./cs2server
-              - update
-          - mode: exec
-            data:
-              - ./cs2server
-              - start
-          - mode: command
-            data: console
-      stop:
-        procedures:
-          - mode: exec
-            data:
-              - ./cs2server
-              - stop
-      restart:
-        procedures:
-          - mode: exec
-            data:
-              - echo
-              - "Restarting server..."
-          - mode: exec
-            data:
-              - ./cs2server
-              - restart
-          - mode: command
-            data: console
-      install:
-        run: once
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - install-lgsm.sh
-          - mode: exec
-            data:
-              - ./linuxgsm.sh
-              - cs2server
-          - mode: exec
-            data:
-              - ./cs2server
-              - auto-install
-          - mode: exec
-            data:
-              - bash
-              - postinstall.sh
+init: "start"
+commands:
+  console:
+    needs: [install]
+    run: console
+    procedures:
+      - mode: stdin
+        wait: 5
+        data:
+          - "console"
+          - "\r"
+      - mode: exec-tty
+        data:
+          - ./cs2server
+          - console
+  start:
+    needs: [install]
+    run: restart
+    procedures:
+      - mode: exec
+        data:
+          - ./cs2server
+          - update
+      - mode: exec
+        data:
+          - ./cs2server
+          - start
+      - mode: command
+        data: console
+  stop:
+    procedures:
+      - mode: exec
+        data:
+          - ./cs2server
+          - stop
+  restart:
+    procedures:
+      - mode: exec
+        data:
+          - echo
+          - "Restarting server..."
+      - mode: exec
+        data:
+          - ./cs2server
+          - restart
+      - mode: command
+        data: console
+  install:
+    run: once
+    procedures:
+      - mode: exec
+        data:
+          - sh
+          - install-lgsm.sh
+      - mode: exec
+        data:
+          - ./linuxgsm.sh
+          - cs2server
+      - mode: exec
+        data:
+          - ./cs2server
+          - auto-install
+      - mode: exec
+        data:
+          - bash
+          - postinstall.sh
 cronjobs:
   - name: Restart every 6 hours
     schedule: "0 */6 * * *"
-    command: main.restart
+    command: restart
 plugins:
   rcon: {}

@@ -15,23 +15,15 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: ">=1.19.3"
-          cache: true
-          cache-dependency-path: scrolls-registry
+      - run: make build-tree
       - name: Get registry binary
         uses: robinraju/release-downloader@v1.7
         with:
-          repository: "highcard-dev/backend-monorepo-go"
+          repository: "highcard-dev/druid-cli"
           latest: true
-          fileName: "scrolls-registry"
+          fileName: "druid"
           token: ${{ secrets.GO_REPO_TOKEN }}
       - run: chmod +x ./druid
-      - name: Login to registry
-        run: ./druid registry login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user ${{ secrets.SCROLL_REGISTRY_USER }} --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
-      - name: Pushing new scrolls
-        shell: bash
-        run: |
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.17
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.18
-          ./druid registry push ./scrolls/minecraft/minecraft-spigot/1.19
-          ./druid registry push ./scrolls/rust/rust-oxide/latest
-          ./druid registry push ./scrolls/rust/rust-vanilla/latest
+      - name: Install druid
+        run: sudo mv ./druid /usr/local/bin/druid
+      - run: ./scripts/validate_all_scrolls.sh

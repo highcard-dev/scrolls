@@ -2,52 +2,50 @@ name: registry-1.docker.io/highcard/scroll-rust-oxide
 desc: Rust Oxide
 version: 0.10.7
 app_version: latest
-init: "main.start"
-processes:
-  main:
-    commands:
-      start:
-        needs: [main.install]
-        run: restart
-        procedures:
-          - mode: exec
-            data:
-              - sh
-              - ./start.sh
-      stop:
-        type: stop
-        procedures:
-          - mode: rcon_web_rust
-            data: quit
-      install:
-        run: once
-        procedures:
-          - mode: exec
-            data:
-              - steamcmd
-              - +force_install_dir
-              - /app/resources/deployment
-              - +login
-              - anonymous
-              - +app_update
-              - "258550"
-              - +quit
-          - mode: exec
-            data:
-              - wget
-              - -O
-              - oxide.zip
-              - https://umod.org/games/rust/download/develop
-          - mode: exec
-            data:
-              - unzip
-              - -o
-              - oxide.zip
-              - -d
-              - /app/resources/deployment
-          - mode: exec
-            data:
-              - rm
-              - oxide.zip
+init: "start"
+commands:
+  start:
+    needs: [install]
+    run: restart
+    procedures:
+      - mode: exec
+        data:
+          - sh
+          - ./start.sh
+  stop:
+    type: stop
+    procedures:
+      - mode: rcon_web_rust
+        data: quit
+  install:
+    run: once
+    procedures:
+      - mode: exec
+        data:
+          - steamcmd
+          - +force_install_dir
+          - /app/resources/deployment
+          - +login
+          - anonymous
+          - +app_update
+          - "258550"
+          - +quit
+      - mode: exec
+        data:
+          - wget
+          - -O
+          - oxide.zip
+          - https://umod.org/games/rust/download/develop
+      - mode: exec
+        data:
+          - unzip
+          - -o
+          - oxide.zip
+          - -d
+          - /app/resources/deployment
+      - mode: exec
+        data:
+          - rm
+          - oxide.zip
 plugins:
   rcon_web_rust: {}
