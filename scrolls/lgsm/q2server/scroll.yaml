@@ -5,13 +5,13 @@ app_version: q2server
 init: "start"
 commands:
   console:
-    needs: [install]
-    run: console
+    needs: [start]
+    run: restart
     procedures:
       - mode: stdin
         wait: 5
         data:
-          - "console"
+          - 'console'
           - "\r"
       - mode: exec-tty
         data:
@@ -19,7 +19,6 @@ commands:
           - console
   start:
     needs: [install]
-    run: restart
     procedures:
       - mode: exec
         data:
