@@ -12,7 +12,6 @@ RUN chmod +x /usr/bin/yq
 #RUN apt install ./druidd.deb
 
 RUN useradd -ms /bin/bash druid
-USER druid
 
 ARG CACHEBUST=1 
 RUN wget -O /usr/bin/druid https://github.com/highcard-dev/druid-cli/releases/latest/download/druid
@@ -24,5 +23,7 @@ RUN chmod +x /usr/bin/druid
 RUN chmod +x /usr/bin/druid_rcon
 RUN chmod +x /usr/bin/druid_rcon_web_rust
 RUN chmod +x /entrypoint.sh
+
+USER druid
 
 ENTRYPOINT [ "/entrypoint.sh" ]
