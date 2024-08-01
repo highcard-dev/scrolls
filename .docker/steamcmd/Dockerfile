@@ -6,6 +6,17 @@ RUN apt install -y lib32gcc1 ca-certificates wget curl libgcc1 vim net-tools jq 
 RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
 RUN chmod +x /usr/bin/yq
 
+ARG CACHEBUST=1 
+RUN wget -O /usr/bin/druid https://github.com/highcard-dev/druid-cli/releases/latest/download/druid
+RUN wget -O /usr/bin/druid_rcon https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon
+RUN wget -O /usr/bin/druid_rcon_web_rust https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon_web_rust
+RUN wget -O /entrypoint.sh https://github.com/highcard-dev/druid-cli/releases/latest/download/entrypoint.sh
+
+RUN chmod +x /usr/bin/druid
+RUN chmod +x /usr/bin/druid_rcon
+RUN chmod +x /usr/bin/druid_rcon_web_rust
+RUN chmod +x /entrypoint.sh
+
 #RUN wget "https://github.com/highcard-dev/druidd/releases/download/latest/druid_linux_386.deb" -O "druidd.deb"
 #RUN apt install ./druidd.deb
 RUN useradd -ms /bin/bash druid
@@ -22,15 +33,5 @@ RUN wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
 RUN cd /home/druid/.steam/steamcmd/ && tar zxvf steamcmd_linux.tar.gz
 WORKDIR /app
 
-ARG CACHEBUST=1 
-RUN wget -O /usr/bin/druid https://github.com/highcard-dev/druid-cli/releases/latest/download/druid
-RUN wget -O /usr/bin/druid_rcon https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon
-RUN wget -O /usr/bin/druid_rcon_web_rust https://github.com/highcard-dev/druid-cli/releases/latest/download/druid_rcon_web_rust
-RUN wget -O /entrypoint.sh https://github.com/highcard-dev/druid-cli/releases/latest/download/entrypoint.sh
-
-RUN chmod +x /usr/bin/druid
-RUN chmod +x /usr/bin/druid_rcon
-RUN chmod +x /usr/bin/druid_rcon_web_rust
-RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]
