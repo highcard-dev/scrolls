@@ -11,7 +11,7 @@ commands:
       - mode: stdin
         wait: 5
         data:
-          - 'console'
+          - 'console.1'
           - "\r"
       - mode: exec-tty
         data:
