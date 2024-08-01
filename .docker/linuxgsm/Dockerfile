@@ -1,6 +1,16 @@
 ARG SHORTNAME
 FROM gameservermanagers/gameserver:${SHORTNAME}
 
+# install apt-transport-https
+RUN apt-get update \
+    && apt-get install -y \
+    apt-transport-https \
+    && apt-get -y autoremove \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
+
 RUN apt-get update \
     && apt-get install -y \
     net-tools \
