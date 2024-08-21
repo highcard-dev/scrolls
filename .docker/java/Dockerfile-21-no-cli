@@ -1,0 +1,12 @@
+#Dockerhub does not allow for setting of build args :/
+ARG IMAGE=openjdk:21-slim-bullseye
+FROM $IMAGE
+WORKDIR /app
+
+RUN apt update
+RUN apt install -y ca-certificates wget jq moreutils htop procps nano net-tools
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN useradd -ms /bin/bash druid
+
+USER druid
