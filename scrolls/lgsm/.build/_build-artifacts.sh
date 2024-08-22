@@ -10,7 +10,7 @@ while read line; do
   export gamename=$(echo "$line" | awk -F, '{ print $3 }')
   export distro=$(echo "$line" | awk -F, '{ print $4 }')
   echo "Generating ${shortname} ${servername} (${gamename})"
-  echo "\"${servername}\":\"registry-1.docker.io/highcard/scroll-lgsm:${servername}\"," >> artifacts.json
+  echo "\"${servername}\":\"artifacts.druid.gg/druid-team/scroll-lgsm:${servername}\"," >> artifacts.json
 done < <(tail -n +2 serverlist.csv)
 truncate -s -2 artifacts.json
 echo "}" >> artifacts.json

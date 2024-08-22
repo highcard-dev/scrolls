@@ -108,10 +108,10 @@ jobs:
           druid registry push ./scrolls/lgsm/csgoserver -p query=27005/udp -p main=27015/udp -p sourcetv=27020/udp -p steam=27015 -i highcard/druidd-lgsm:csgo -m
       - name: Push Meta
         run: |
-          druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot/.meta
-          druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-vanilla ./scrolls/minecraft/minecraft-vanilla/.meta
-          druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-paper ./scrolls/minecraft/papermc/.meta
-          druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-forge ./scrolls/minecraft/forge/.meta
-          druid registry push meta registry-1.docker.io/highcard/scroll-minecraft-cuberite ./scrolls/minecraft/cuberite/.meta
-          druid registry push meta registry-1.docker.io/highcard/scroll-rust-oxide ./scrolls/rust/rust-oxide/.meta
-          druid registry push meta registry-1.docker.io/highcard/scroll-rust-vanilla ./scrolls/rust/rust-vanilla/.meta
+          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot/.meta
+          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-vanilla ./scrolls/minecraft/minecraft-vanilla/.meta
+          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-paper ./scrolls/minecraft/papermc/.meta
+          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-forge ./scrolls/minecraft/forge/.meta
+          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-cuberite ./scrolls/minecraft/cuberite/.meta
+          druid registry push meta artifacts.druid.gg/druid-team/scroll-rust-oxide ./scrolls/rust/rust-oxide/.meta
+          druid registry push meta artifacts.druid.gg/druid-team/scroll-rust-vanilla ./scrolls/rust/rust-vanilla/.meta

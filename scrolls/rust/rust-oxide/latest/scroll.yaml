@@ -1,4 +1,4 @@
-name: registry-1.docker.io/highcard/scroll-rust-oxide
+name: artifacts.druid.gg/druid-team/scroll-rust-oxide
 desc: Rust Oxide
 version: 0.10.7
 app_version: latest

@@ -1,4 +1,4 @@
-name: registry-1.docker.io/highcard/scroll-rust-vanilla
+name: artifacts.druid.gg/druid-team/scroll-rust-vanilla
 desc: Rust Vanilla
 version: 0.0.3
 app_version: latest

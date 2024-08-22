@@ -1,4 +1,4 @@
-name: registry-1.docker.io/highcard/scroll-lgsm
+name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: zmrserver
 version: 0.0.2
 app_version: zmrserver
