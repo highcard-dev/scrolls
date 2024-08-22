@@ -28,7 +28,7 @@ jobs:
         run: sudo mv druid /usr/local/bin/druid
       - run: ./scripts/validate_all_scrolls.sh
       - name: Login to registry
-        run: druid registry login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user ${{ secrets.SCROLL_REGISTRY_USER }} --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+        run: druid registry login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
       - name: Pushing new scrolls
         shell: bash
         run: |
