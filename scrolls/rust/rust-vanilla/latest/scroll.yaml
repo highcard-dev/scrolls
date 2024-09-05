@@ -2,6 +2,15 @@ name: artifacts.druid.gg/druid-team/scroll-rust-vanilla
 desc: Rust Vanilla
 version: 0.0.3
 app_version: latest
+ports:
+  - name: main
+    protocol: udp
+    port: 28015
+    sleep_handler: packet_handler/minecraft.lua
+  - name: rustplus
+    protocol: tcp
+  - name: rcon
+    protocol: tcp
 init: "start"
 commands:
   start:

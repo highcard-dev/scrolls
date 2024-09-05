@@ -1,9 +1,35 @@
 {
   "arkserver": {
-    "rcon": "enabled"
+    "rcon": "enabled",
+    "port": "main=/udp;query=/udp;rcon"
   },
   "cs2server": {
     "rcon": "enabled",
-    "postinstall": "enabled"
+    "postinstall": "enabled",
+    "port": "main=27015/udp;rcon=27015"
+  },
+  "pwserver": {
+    "port": "main=8211/udp;rcon=25575"
+  },
+  "gmodserver": {
+    "port": "query=27005/udp;main=/udp;sourcetv=27020/udp;steam=27015"
+  },
+  "sdtdserver": {
+    "port": "main=26900/udp;main2=26902/udp;maintcp=26900"
+  },
+  "dayzserver": {
+    "port": "main=2302/udp;battle-eye=2304/udp;query=27016/udp"
+  },
+  "untserver": {
+    "port": "main=27015/udp;mainv6=27016"
+  },
+  "csgoserver": {
+    "port": "query=27005/udp;main=27015/udp;sourcetv=27020/udp;steam=27015"
+  },
+  "terrariaserver": {
+    "port": "todo=8211/udp"
+  },
+  "pzserver": {
+    "port": "main=26900/udp;main2=26902/udp;maintcp=26900"
   }
 }

@@ -2,6 +2,15 @@ name: artifacts.druid.gg/druid-team/scroll-rust-oxide
 desc: Rust Oxide
 version: 0.10.7
 app_version: latest
+ports:
+  - name: main
+    protocol: udp
+    port: 28015
+    sleep_handler: packet_handler/minecraft.lua
+  - name: rustplus
+    protocol: tcp
+  - name: rcon
+    protocol: tcp
 init: "start"
 commands:
   start:

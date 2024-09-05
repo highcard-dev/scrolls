@@ -2,6 +2,14 @@ name: artifacts.druid.gg/druid-team/scroll-minecraft-forge
 desc: Minecraft Forge
 version: 0.0.1
 app_version: 1.18.2
+ports:
+  - name: main
+    protocol: tcp
+    port: 25565
+    sleep_handler: packet_handler/minecraft.lua
+  - name: rcon
+    protocol: tcp
+    port: 25575
 init: "start"
 commands:
   start:

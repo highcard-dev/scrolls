@@ -2,6 +2,14 @@ name: artifacts.druid.gg/druid-team/scroll-minecraft-cuberite
 desc: PaperMC
 version: 0.0.1
 app_version: latest
+ports:
+  - name: main
+    protocol: tcp
+    port: 25565
+    sleep_handler: packet_handler/minecraft.lua
+  - name: webpanel
+    protocol: tcp
+    port: 8080
 init: "start"
 commands:
   start:
