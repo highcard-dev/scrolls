@@ -113,6 +113,8 @@ func main() {
 
 		cp.Copy(buildPath+"/init-files", dir+"/init-files")
 		cp.Copy(buildPath+"/init-files-template", dir+"/init-files-template")
+		cp.Copy(buildPath+"/packet_handler", dir+"/packet_handler")
+
 		cp.Copy(buildPath+"/update", dir+"/update")
 		//copy metadata, this might copy nothing
 		cp.Copy(buildPath+"/meta/"+version, dir+"/.meta")
