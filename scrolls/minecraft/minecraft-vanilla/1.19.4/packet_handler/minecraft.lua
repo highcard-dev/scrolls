@@ -1,4 +1,4 @@
-json = require("json")
+json = require("packet_handler/json")
 
 function string.fromhex(str)
     return (str:gsub('..', function(cc)
