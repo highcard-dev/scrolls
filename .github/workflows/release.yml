@@ -26,6 +26,8 @@ jobs:
       - run: chmod +x druid
       - name: Install druid
         run: sudo mv druid /usr/local/bin/druid
+      - name: druid version
+        run: druid version
       - run: ./scripts/validate_all_scrolls.sh
       - name: Login to registry
         run: druid registry login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
