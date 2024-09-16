@@ -73,6 +73,8 @@ function handle(data)
 
     hex = string.tohex(data)
 
+    debug_print("Received Packet: " .. hex)
+
     -- check if hex starts with 0x01 0x00
     if hex:sub(1, 4) == "FE01" then
         debug_print("Received Legacy Ping Packet")
