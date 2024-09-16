@@ -90,8 +90,8 @@ function handle(data)
         -- send same packet back
         close(data)
         return
-        -- login packet 0x20 0x00
-    elseif hex:sub(3, 4) == "00" then
+        -- login packet id 0x00 with last to be 0x02
+    elseif hex:sub(3, 4) == "00" and hex:sub(-2) == "02" then
         debug_print("Received Login Packet")
 
         sendData(disconnectResponse())
