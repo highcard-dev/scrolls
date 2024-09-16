@@ -89,7 +89,7 @@ function handle(data)
         close(data)
         return
         -- login packet 0x20 0x00
-    elseif hex:sub(1, 4) == "2000" then
+    elseif hex:sub(3, 4) == "00" then
         debug_print("Received Login Packet")
 
         sendData(disconnectResponse())
