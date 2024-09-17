@@ -101,17 +101,23 @@ function handle(data)
 
     local packetNo = 0
 
-    local closedSend = false
+    local maxLoops = 2
+
+    restBytes = data
 
     while hex ~= "" do
+
+        hex = string.tohex(restBytes)
+
+        debug_print("Remaining Bytes: " .. hex)
         packetNo = packetNo + 1
         debug_print("Packet No: " .. packetNo)
 
-        packetLength, bytesConsumed = decodeLEB128({string.byte(data, 1, 1)})
+        packetLength, bytesConsumed = decodeLEB128({string.byte(restBytes, 1, 1)})
         debug_print("Packet Length: " .. packetLength)
 
         -- cut of consumedBytes and read untul packetLength
-        packetWithLength = string.sub(data, bytesConsumed + 1, packetLength + bytesConsumed)
+        packetWithLength = string.sub(restBytes, bytesConsumed + 1, packetLength + bytesConsumed)
 
         -- next varint is the packetid
         packetId, bytesConsumed = decodeLEB128({string.byte(packetWithLength, 1, 1)})
@@ -123,8 +129,9 @@ function handle(data)
         debug_print("Trimmed Packet: " .. packetWithLengthHex)
 
         -- make hex to the rest of the data
-        restBytes = string.sub(data, packetLength + bytesConsumed + 1)
-        hex = string.tohex(restBytes)
+        restBytes = string.sub(restBytes, packetLength + bytesConsumed + 1)
+
+        debug_print("Rest Bytes: " .. string.tohex(restBytes))
 
         if packetLength == 1 and packetId == 0 then
             debug_print("Received Status Packet " .. packetWithLengthHex)
@@ -135,7 +142,6 @@ function handle(data)
             debug_print("Received Ping Packet " .. packetWithLengthHex)
             -- send same packet back
             close(data)
-            closedSend = true
             -- login packet 0x20 0x00
         elseif packetId == 0 and packetWithLengthHex:sub(-2) == "02" then -- check for enum at the end
             debug_print("Received Login Packet " .. packetWithLengthHex)
@@ -148,10 +154,8 @@ function handle(data)
             -- return
         else
             debug_print("Received unknown packet " .. packetWithLengthHex)
+            -- close("")
         end
-    end
-    if not closedSend then
-        close()
     end
 end
 
