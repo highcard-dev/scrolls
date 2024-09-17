@@ -101,6 +101,8 @@ function handle(data)
 
     local packetNo = 0
 
+    local closedSend = false
+
     while hex ~= "" do
         packetNo = packetNo + 1
         debug_print("Packet No: " .. packetNo)
@@ -133,6 +135,7 @@ function handle(data)
             debug_print("Received Ping Packet " .. packetWithLengthHex)
             -- send same packet back
             close(data)
+            closedSend = true
             -- login packet 0x20 0x00
         elseif packetId == 0 and packetWithLengthHex:sub(-2) == "02" then -- check for enum at the end
             debug_print("Received Login Packet " .. packetWithLengthHex)
@@ -146,6 +149,9 @@ function handle(data)
         else
             debug_print("Received unknown packet " .. packetWithLengthHex)
         end
+    end
+    if not closedSend then
+        close()
     end
 end
 
