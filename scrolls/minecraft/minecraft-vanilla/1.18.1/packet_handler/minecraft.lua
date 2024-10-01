@@ -87,7 +87,7 @@ function decodeLEB128(bytes)
     return result, bytesConsumed -- Return both the result and the number of bytes consumed
 end
 
-function handle(data)
+function handle(ctx, data)
     hex = string.tohex(data)
 
     debug_print("Received Packet: " .. hex)
