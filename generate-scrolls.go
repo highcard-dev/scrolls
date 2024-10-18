@@ -113,7 +113,6 @@ func main() {
 
 		cp.Copy(buildPath+"/init-files", dir+"/init-files")
 		cp.Copy(buildPath+"/init-files-template", dir+"/init-files-template")
-		cp.Copy(buildPath+"/packet_handler", dir+"/packet_handler")
 
 		cp.Copy(buildPath+"/update", dir+"/update")
 		//copy metadata, this might copy nothing
@@ -159,7 +158,7 @@ func main() {
 
 				os.MkdirAll(switchScrollDir, os.ModePerm)
 
-				RenderFile(switchScrollDir, "scroll-switch.sh", string(filecontent), artifact, version)
+				RenderScrollSwitch(switchScrollDir, "scroll-switch.sh", string(filecontent), artifact, version)
 			}
 
 		}
@@ -168,9 +167,33 @@ func main() {
 
 }
 
-func RenderFile(dir string, filename string, filecontent string, artifact string, version string) {
+func RenderScrollSwitch(dir string, filename string, filecontent string, artifact string, version string) {
 
 	escapedVersion := strings.Replace(version, ".", "-", -1)
+	templateVars := TemplateVars{Artifact: artifact, Version: version, VersionEscaped: escapedVersion}
+	RenderFile(dir, filename, filecontent, templateVars)
+}
+
+func RenderFolder(dir string, targetFolder string, data any) {
+	// Create a new file for the rendered output
+	outputFile, err := os.Create(filepath.Join(dir, targetFolder))
+	if err != nil {
+		log.Println("create file: ", err)
+		return
+	}
+	defer outputFile.Close()
+
+	templ, err := template.New(dir).Parse(string(targetFolder))
+	// Capture any error
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// Print out scroll switch template
+	templ.Execute(outputFile, data)
+}
+
+func RenderFile(dir string, filename string, filecontent string, data any) {
+
 	// Create a new file for the rendered output
 	outputFile, err := os.Create(filepath.Join(dir, filename))
 	if err != nil {
@@ -184,9 +207,8 @@ func RenderFile(dir string, filename string, filecontent string, artifact string
 	if err != nil {
 		log.Fatalln(err)
 	}
-	templateVars := TemplateVars{Artifact: artifact, Version: version, VersionEscaped: escapedVersion}
 	// Print out scroll switch template
-	templ.Execute(outputFile, templateVars)
+	templ.Execute(outputFile, data)
 }
 
 func GetArtifactsAbove(version string, artifacts map[string]string, escaped bool) map[string]string {
