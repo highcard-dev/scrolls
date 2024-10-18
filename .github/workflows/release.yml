@@ -98,7 +98,7 @@ jobs:
           druid registry push ./scrolls/rust/rust-oxide/latest -p main=28015/udp -p rcon -p rustplus -i highcard/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1
           druid registry push ./scrolls/rust/rust-vanilla/latest -p main=28015/udp -p rcon -p rustplus -i highcard/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1
           druid registry push ./scrolls/lgsm/pwserver -p main=8211/udp -p rcon=25575 -i highcard/druidd-lgsm:pw -m --min-disk 7Gi --min-ram 2Gi --min-cpu 0.5
-          druid registry push ./scrolls/lgsm/arkserver -p main=/udp  -p query=/udp -p rcon -i highcard/druidd-lgsm:ark -m --min-disk 25Gi --min-ram 5Gi --min-cpu 0.5
+          druid registry push ./scrolls/lgsm/arkserver -p main=/udp  -p query=/udp -p rcon -i highcard/druidd-lgsm:ark -m --min-disk 25Gi --min-ram 5Gi --min-cpu 0.5 --smart
           druid registry push ./scrolls/lgsm/untserver -p main=27015/udp -p mainv6=27016 -i highcard/druidd-lgsm:unt -m  --min-disk 7Gi --min-ram 1Gi --min-cpu 0.5
           druid registry push ./scrolls/lgsm/dayzserver -p main=2302/udp -p battle-eye=2304/udp -p query=27016/udp -i highcard/druidd-lgsm:dayz -m --min-disk 7Gi --min-ram 5Gi --min-cpu 1
           druid registry push ./scrolls/lgsm/sdtdserver -p main=26900/udp -p main2=26902/udp -p maintcp=26900 -i highcard/druidd-lgsm:sdtd -m --min-disk 20Gi --min-ram 2Gi --min-cpu 0.5

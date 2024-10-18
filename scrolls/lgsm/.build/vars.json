@@ -1,7 +1,12 @@
 {
   "arkserver": {
     "rcon": "enabled",
-    "port": "main=/udp;query=/udp;rcon"
+    "port": "main=/udp;query=/udp;rcon",
+    "lua_query_game_name": "ARK: Survival Evolved",
+    "lua_query_folder": "ark_survival_evolved",
+    "lua_query_map": "TheIsland",
+    "lua_query_servername": "Coldstarter is cool (server is idle, join to start)",
+    "main_port_protocol": "udp"
   },
   "cs2server": {
     "rcon": "enabled",
