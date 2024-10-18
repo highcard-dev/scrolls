@@ -5,7 +5,6 @@ app_version: arkserver
 ports:
   - name: query
     protocol: udp
-    port: 2556
     sleep_handler: packet_handler/query.lua
     vars:
       - name: GameName
