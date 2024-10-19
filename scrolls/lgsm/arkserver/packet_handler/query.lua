@@ -102,8 +102,8 @@ function handle(ctx, data)
 
         gameHex = string.tohex(gameName)
 
-        maxPlayerHex = "50"
-        playerHex = "01"
+        maxPlayerHex = "00"
+        playerHex = "00"
         botHex = "00"
 
         serverTypeHex = "64" -- dedicated

@@ -16,7 +16,7 @@ ports:
       - name: MapName
         value: TheIsland
       - name: ServerListName
-        value: "Coldstarter is cool (server is idle, join to start)"
+        value: "Druid Gameserver (idle) - Start server by joining"
   - name: main
     protocol: udp
 init: "console"
