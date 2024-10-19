@@ -2,8 +2,9 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: {{ .Version }}
 version: 0.0.2
 app_version: {{ .Version }}
-{{- if .Vars.lua_query_game_name }}
+{{- if or .Vars.lua_query_game_name .Vars.main_port_protocol }}
 ports:
+{{- if .Vars.lua_query_game_name }}
   - name: query
     protocol: udp
     sleep_handler: packet_handler/query.lua
@@ -18,8 +19,11 @@ ports:
         value: {{ .Vars.lua_query_map }}
       - name: ServerListName
         value: "{{ .Vars.lua_query_servername }}"
+{{- end }}
+{{- if .Vars.main_port_protocol }}
   - name: main
     protocol: {{ .Vars.main_port_protocol }}
+{{- end }}
 {{- end }}
 init: "console"
 commands:

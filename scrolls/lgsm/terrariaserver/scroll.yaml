@@ -2,6 +2,23 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: terrariaserver
 version: 0.0.2
 app_version: terrariaserver
+ports:
+  - name: query
+    protocol: udp
+    sleep_handler: packet_handler/query.lua
+    vars:
+      - name: GameName
+        value: "Terraria Server"
+      - name: GameSteamFolder
+        value: terraria
+      - name: GameSteamId
+        value: "0"
+      - name: MapName
+        value: server idle
+      - name: ServerListName
+        value: "Druid Gameserver (idle) - Start server by joining"
+  - name: main
+    protocol: udp
 init: "console"
 commands:
   console:

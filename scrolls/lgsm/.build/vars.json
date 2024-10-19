@@ -11,30 +11,67 @@
   "cs2server": {
     "rcon": "enabled",
     "postinstall": "enabled",
-    "port": "main=27015/udp;rcon=27015"
+    "port": "main=27015/udp;rcon=27015",
+    "lua_query_game_name": "CS2: Druid Server",
+    "lua_query_folder": "csgo",
+    "lua_query_map": "server idle",
+    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "main_port_protocol": "udp"
   },
   "pwserver": {
-    "port": "main=8211/udp;rcon=25575"
+    "port": "main=8211/udp;rcon=25575",
+    "main_port_protocol": "udp"
   },
   "gmodserver": {
-    "port": "query=27005/udp;main=/udp;sourcetv=27020/udp;steam=27015"
+    "port": "query=27005/udp;main=/udp;sourcetv=27020/udp;steam=27015",
+    "lua_query_game_name": "GMod Server",
+    "lua_query_folder": "garrysmod",
+    "lua_query_map": "server idle",
+    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "main_port_protocol": "udp"
   },
   "sdtdserver": {
-    "port": "main=26900/udp;main2=26902/udp;maintcp=26900"
+    "port": "main=26900/udp;main2=26902/udp;maintcp=26900",
+    "lua_query_game_name": "7 Days To Die",
+    "lua_query_folder": "7DTD",
+    "lua_query_map": "server idle",
+    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "main_port_protocol": "udp"
   },
   "dayzserver": {
-    "port": "main=2302/udp;battle-eye=2304/udp;query=27016/udp"
+    "port": "main=2302/udp;battle-eye=2304/udp;query=27016/udp",
+    "main_port_protocol": "udp"
   },
   "untserver": {
-    "port": "main=27015/udp;mainv6=27016"
+    "port": "main=27015/udp;mainv6=27016",
+    "lua_query_game_name": "Unturned Server",
+    "lua_query_folder": "Unturned",
+    "lua_query_map": "server idle",
+    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "main_port_protocol": "udp"
   },
   "csgoserver": {
-    "port": "query=27005/udp;main=27015/udp;sourcetv=27020/udp;steam=27015"
+    "port": "query=27005/udp;main=27015/udp;sourcetv=27020/udp;steam=27015",
+    "lua_query_game_name": "Counter-Strike: Global Offensive",
+    "lua_query_folder": "csgo",
+    "lua_query_map": "server idle",
+    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "main_port_protocol": "udp"
   },
   "terrariaserver": {
-    "port": "todo=8211/udp"
+    "port": "todo=8211/udp",
+    "lua_query_game_name": "Terraria Server",
+    "lua_query_folder": "terraria",
+    "lua_query_map": "server idle",
+    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "main_port_protocol": "udp"
   },
   "pzserver": {
-    "port": "main=26900/udp;main2=26902/udp;maintcp=26900"
+    "port": "main=26900/udp;main2=26902/udp;maintcp=26900",
+    "lua_query_game_name": "Project Zomboid",
+    "lua_query_folder": "zomboid",
+    "lua_query_map": "server idle",
+    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "main_port_protocol": "udp"
   }
 }

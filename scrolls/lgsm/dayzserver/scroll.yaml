@@ -2,6 +2,9 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: dayzserver
 version: 0.0.2
 app_version: dayzserver
+ports:
+  - name: main
+    protocol: udp
 init: "console"
 commands:
   console:
