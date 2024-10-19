@@ -4,7 +4,7 @@
     "port": "main=/udp;query=/udp;rcon",
     "lua_query_game_name": "ARK: Survival Evolved",
     "lua_query_folder": "ark_survival_evolved",
-    "lua_query_map": "TheIsland",
+    "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
     "main_port_protocol": "udp"
   },

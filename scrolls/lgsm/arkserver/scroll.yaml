@@ -14,7 +14,7 @@ ports:
       - name: GameSteamId
         value: "0"
       - name: MapName
-        value: TheIsland
+        value: server idle
       - name: ServerListName
         value: "Druid Gameserver (idle) - Start server by joining"
   - name: main
