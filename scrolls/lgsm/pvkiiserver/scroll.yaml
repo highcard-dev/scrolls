@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: pvkiiserver
 version: 0.0.2
 app_version: pvkiiserver
+keepAlivePPM: 5
 init: "console"
 commands:
   console:

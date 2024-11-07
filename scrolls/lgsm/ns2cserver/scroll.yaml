@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: ns2cserver
 version: 0.0.2
 app_version: ns2cserver
+keepAlivePPM: 5
 init: "console"
 commands:
   console:

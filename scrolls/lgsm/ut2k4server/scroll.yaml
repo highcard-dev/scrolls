@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: ut2k4server
 version: 0.0.2
 app_version: ut2k4server
+keepAlivePPM: 5
 init: "console"
 commands:
   console:

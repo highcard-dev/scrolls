@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: arkserver
 version: 0.0.2
 app_version: arkserver
+keepAlivePPM: 5
 ports:
   - name: query
     protocol: udp

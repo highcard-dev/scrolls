@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: fctrserver
 version: 0.0.2
 app_version: fctrserver
+keepAlivePPM: 5
 init: "console"
 commands:
   console:

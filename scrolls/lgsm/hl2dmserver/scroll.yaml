@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: hl2dmserver
 version: 0.0.2
 app_version: hl2dmserver
+keepAlivePPM: 5
 init: "console"
 commands:
   console:

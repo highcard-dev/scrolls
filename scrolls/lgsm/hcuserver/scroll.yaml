@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: hcuserver
 version: 0.0.2
 app_version: hcuserver
+keepAlivePPM: 5
 init: "console"
 commands:
   console:

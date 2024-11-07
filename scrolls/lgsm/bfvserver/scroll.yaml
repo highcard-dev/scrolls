@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: bfvserver
 version: 0.0.2
 app_version: bfvserver
+keepAlivePPM: 5
 init: "console"
 commands:
   console:

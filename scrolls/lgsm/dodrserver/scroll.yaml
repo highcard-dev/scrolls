@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: dodrserver
 version: 0.0.2
 app_version: dodrserver
+keepAlivePPM: 5
 init: "console"
 commands:
   console:
