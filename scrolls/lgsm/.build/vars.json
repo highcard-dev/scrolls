@@ -6,7 +6,8 @@
     "lua_query_folder": "ark_survival_evolved",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
-    "main_port_protocol": "udp"
+    "main_port_protocol": "udp",
+    "start_delay": "90"
   },
   "cs2server": {
     "rcon": "enabled",
