@@ -6,6 +6,8 @@ keepAlivePPM: 5
 ports:
   - name: main
     protocol: udp
+    start_delay: 10
+    finish_after_command: install
 init: "console"
 commands:
   console:

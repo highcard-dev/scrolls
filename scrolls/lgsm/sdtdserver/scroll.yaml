@@ -6,6 +6,8 @@ keepAlivePPM: 5
 ports:
   - name: query
     protocol: udp
+    start_delay: 10
+    finish_after_command: install
     sleep_handler: packet_handler/query.lua
     vars:
       - name: GameName
@@ -20,6 +22,8 @@ ports:
         value: "Druid Gameserver (idle) - Start server by joining"
   - name: main
     protocol: udp
+    start_delay: 10
+    finish_after_command: install
 init: "console"
 commands:
   console:

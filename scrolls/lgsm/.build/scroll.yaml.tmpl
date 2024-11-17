@@ -8,6 +8,8 @@ ports:
 {{- if .Vars.lua_query_game_name }}
   - name: query
     protocol: udp
+    start_delay: 10
+    finish_after_command: install
     sleep_handler: packet_handler/query.lua
     vars:
       - name: GameName
@@ -24,6 +26,8 @@ ports:
 {{- if .Vars.main_port_protocol }}
   - name: main
     protocol: {{ .Vars.main_port_protocol }}
+    start_delay: 10
+    finish_after_command: install
 {{- end }}
 {{- end }}
 init: "console"

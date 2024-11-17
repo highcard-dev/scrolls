@@ -7,6 +7,8 @@ ports:
     protocol: tcp
     port: 25565
     sleep_handler: packet_handler/minecraft.lua
+    start_delay: 10
+    finish_after_command: install
   - name: webpanel
     protocol: tcp
     port: 8080

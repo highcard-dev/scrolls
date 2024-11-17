@@ -6,7 +6,6 @@ ports:
   - name: main
     protocol: udp
     port: 28015
-    sleep_handler: packet_handler/minecraft.lua
   - name: rustplus
     protocol: tcp
   - name: rcon
