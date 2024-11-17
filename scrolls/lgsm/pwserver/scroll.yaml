@@ -27,6 +27,7 @@ commands:
     needs: [install]
     procedures:
       - mode: exec
+        ignore_failure: true
         data:
           - ./pwserver
           - update
