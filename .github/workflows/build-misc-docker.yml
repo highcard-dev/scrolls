@@ -21,8 +21,6 @@ jobs:
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:16 -f .docker/java/Dockerfile-16 .
       - name: Build Java 17
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:17 -f .docker/java/Dockerfile-17 .
-      - name: Build Java 18
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:18 -f .docker/java/Dockerfile-18 .
       - name: Build Java 19
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:19 -f .docker/java/Dockerfile-19 .
       - name: Build Java 20
