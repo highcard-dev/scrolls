@@ -31,3 +31,15 @@ jobs:
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21-no-cli -f .docker/java/Dockerfile-21-no-cli .
       - name: Build Ubuntu
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21-no-cli -f .docker/ubuntu/Dockerfile .
+      - name: Push Java 16
+        run: docker push artifacts.druid.gg/druid-team/druidd-java:16
+      - name: Push Java 17
+        run: docker push artifacts.druid.gg/druid-team/druidd-java:17
+      - name: Push Java 19
+        run: docker push artifacts.druid.gg/druid-team/druidd-java:19
+      - name: Push Java 20
+        run: docker push artifacts.druid.gg/druid-team/druidd-java:20
+      - name: Push Java 21
+        run: docker push artifacts.druid.gg/druid-team/druidd-java:21
+      - name: Push Java 21 no CLI
+        run: docker push artifacts.druid.gg/druid-team/druidd-java:21-no-cli
