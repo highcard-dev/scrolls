@@ -1,4 +1,4 @@
-name: Build single LinuxGSM images
+name: Build java images
 on:
   workflow_dispatch:
   push:
@@ -18,16 +18,18 @@ jobs:
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
       - name: Build Java 16
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:16 -f .docker/Dockerfile-16 .
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:16 -f .docker/java/Dockerfile-16 .
       - name: Build Java 17
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:17 -f .docker/Dockerfile-17 .
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:17 -f .docker/java/Dockerfile-17 .
       - name: Build Java 18
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:18 -f .docker/Dockerfile-18 .
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:18 -f .docker/java/Dockerfile-18 .
       - name: Build Java 19
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:19 -f .docker/Dockerfile-19 .
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:19 -f .docker/java/Dockerfile-19 .
       - name: Build Java 20
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:20 -f .docker/Dockerfile-20 .
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:20 -f .docker/java/Dockerfile-20 .
       - name: Build Java 21
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21 -f .docker/Dockerfile-21 .
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21 -f .docker/java/Dockerfile-21 .
       - name: Build Java 21 no CLI
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21-no-cli -f .docker/Dockerfile-21-no-cli .
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21-no-cli -f .docker/java/Dockerfile-21-no-cli .
+      - name: Build Ubuntu
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21-no-cli -f .docker/ubuntu/Dockerfile .
