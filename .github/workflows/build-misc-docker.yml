@@ -21,8 +21,8 @@ jobs:
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:16 -f .docker/java/Dockerfile-16 .
       - name: Build Java 17
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:17 -f .docker/java/Dockerfile-17 .
-      - name: Build Java 19
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:19 -f .docker/java/Dockerfile-19 .
+      - name: Build Java 18
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:18 -f .docker/java/Dockerfile-18 .
       - name: Build Java 20
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:20 -f .docker/java/Dockerfile-20 .
       - name: Build Java 21
@@ -35,8 +35,8 @@ jobs:
         run: docker push artifacts.druid.gg/druid-team/druidd-java:16
       - name: Push Java 17
         run: docker push artifacts.druid.gg/druid-team/druidd-java:17
-      - name: Push Java 19
-        run: docker push artifacts.druid.gg/druid-team/druidd-java:19
+      - name: Push Java 18
+        run: docker push artifacts.druid.gg/druid-team/druidd-java:18
       - name: Push Java 20
         run: docker push artifacts.druid.gg/druid-team/druidd-java:20
       - name: Push Java 21
