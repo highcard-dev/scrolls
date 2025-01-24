@@ -43,3 +43,5 @@ jobs:
         run: docker push artifacts.druid.gg/druid-team/druidd-java:21
       - name: Push Java 21 no CLI
         run: docker push artifacts.druid.gg/druid-team/druidd-java:21-no-cli
+      - name: Push Ubuntu
+        run: docker push artifacts.druid.gg/druid-team/druidd-ubuntu
