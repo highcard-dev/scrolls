@@ -1,4 +1,4 @@
-name: Build single LinuxGSM images
+name: Prebuild LGSM
 on:
   workflow_dispatch:
     inputs:
