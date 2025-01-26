@@ -1,4 +1,4 @@
-name: Build single LinuxGSM images
+name: Prebuild LGSM
 on:
   workflow_dispatch:
     inputs:
@@ -17,4 +17,4 @@ jobs:
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
       - name: Build all LGSM games
-        run: ./scripts/build-push-docker-images.sh ${{ github.event.inputs.image }}
+        run: ./scripts/prebuild/prebuild.sh ${{ github.event.inputs.image }}
