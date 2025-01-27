@@ -41,10 +41,10 @@ jobs:
       - run: mkdir -p spigot && mv spigot-${{ matrix.version.spigot-version }}.jar spigot/spigot-${{ matrix.version.spigot-version }}.jar
       - uses: jakejarvis/s3-sync-action@master
         env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_ENDPOINT: https://s3.eu-central-1.wasabisys.com/
-          AWS_REGION: "eu-central-1"
+          AWS_S3_BUCKET: ${{ secrets.PRESIGN_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PRESIGN_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
+          AWS_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
+          AWS_REGION: "fsn1"
           SOURCE_DIR: spigot
           DEST_DIR: minecraft/spigot
