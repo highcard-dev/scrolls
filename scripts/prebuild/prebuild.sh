@@ -4,7 +4,7 @@ set -e
 TAG=$1
 echo "Tag: $TAG"
 
-PRESIGN_OBJECT_KEY=lgsm/${TAG}-snapshot-latest.tar.gz
+export PRESIGN_OBJECT_KEY=lgsm/${TAG}-snapshot-latest.tar.gz
 
 PRESIGNED_URL=$(cd scripts/presign/ && go run main.go)
 
@@ -34,4 +34,3 @@ echo "Prebuild uploaded"
 
 
 rm -rf tmp-prebuild
-
