@@ -39,7 +39,7 @@ commands:
           - -q
           - -O
           - forge-installer.jar
-          - https://s3.eu-central-1.wasabisys.com/druid-scroll-artifacts/minecraft/forge/forge-1.17.1.jar
+          - https://fsn1.your-objectstorage.com/druid-deployment-assets/minecraft/forge/forge-1.17.1.jar
       - mode: exec
         data:
           - java

@@ -36,7 +36,7 @@ commands:
           - -q
           - -O
           - spigot.jar
-          - https://s3.eu-central-1.wasabisys.com/druid-scroll-artifacts/minecraft/spigot/spigot-1.19.1.jar
+          - https://fsn1.your-objectstorage.com/druid-deployment-assets/minecraft/spigot/spigot-1.19.1.jar
       - mode: exec
         data:
           - bash
