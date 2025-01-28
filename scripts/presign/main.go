@@ -25,7 +25,7 @@ func main() {
 	if region == "" {
 		region = "us-east-1"
 	}
-	expiration := 3600
+	expiration := 3600 * 4
 
 	// Create AWS config
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
