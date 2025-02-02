@@ -76,6 +76,12 @@ function handle(ctx, data)
 
     if packetId == "54" then
 
+
+
+        local snapshotMode = get_snapshot_mode()
+        local snapshotPercentage = get_snapshot_percentage()
+
+
         queue = get_queue()
         name = get_var("ServerListName") or "Coldstarter is cool (server is idle, join to start)"
 
@@ -87,7 +93,23 @@ function handle(ctx, data)
             finishSec = math.ceil(finishSec)
         end
 
-        if queue ~= nil and queue["install"] == "running" then
+        if snapshotMode ~= "noop" then
+            if snapshotMode == "restore" then
+                if snapshotPercentage == nil or snapshotPercentage == 100 then
+                    name = get_var("ServerListNameRestoring") or "EXTRACTING snapshot, this might take a moment"
+                else
+                    name = get_var("ServerListNameRestoring") or "DOWNLOADING snapshot, this might take a moment " .. string.format("%.2f", snapshotPercentage) .. "%"
+                end
+                map = get_var("MapNameRestoring") or "restoring server"
+            else 
+                if snapshotPercentage == nil or snapshotPercentage == 100 then
+                    name = get_var("ServerListNameBackingUp") or "BACKING UP, this might take a moment"
+                else
+                    name = get_var("ServerListNameBackingUp") or "BACKING UP, this might take a moment " .. string.format("%.2f", snapshotPercentage) .. "%"
+                end
+                map = get_var("MapNameBackingUp") or "backing up server"
+            end
+        elseif queue ~= nil and queue["install"] == "running" then
             if finishSec ~= nil then
                 -- finish sec is not necissary applicable, but it's better to show something I guess
                 name = get_var("ServerListNameInstalling") or
@@ -131,7 +153,7 @@ function handle(ctx, data)
 
         osHex = "6C" -- l (6C) for linux, w (77) for windows
 
-        vacHex = "01" -- 01 for secure, 00 for insecure
+        visibility = "00" -- 01 for private, 00 for public
 
         version = string.tohex("1.0.0.0")
 
@@ -155,12 +177,8 @@ function handle(ctx, data)
 
         edfHex = gamePortHex .. steamId .. tagsHex .. "00" .. "FE47050000000000"
 
-        res =
-            "FFFFFFFF4911" .. nameHex .. "00" .. mapHex .. "00" .. folderHex .. "00" .. gameHex .. "00" .. steamIdHex ..
-                playerHex .. maxPlayerHex .. botHex .. serverTypeHex .. osHex .. vacHex .. version .. "00" .. edfFlagHex ..
-                edfHex
-
-        debug_print("Response length: " .. string.len(tags))
+        res = "FFFFFFFF4911" .. nameHex .."00" .. mapHex .."00".. folderHex .."00" .. gameHex .."00" .. steamIdHex .. playerHex .. maxPlayerHex .. botHex .. serverTypeHex .. 
+            osHex .. visibility .. version .."00" .. edfFlagHex .. edfHex
 
         resHex = string.fromhex(res)
 
