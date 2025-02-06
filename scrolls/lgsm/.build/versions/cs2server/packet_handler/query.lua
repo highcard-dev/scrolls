@@ -97,10 +97,11 @@ function handle(ctx, data)
             if snapshotMode == "restore" then
                 if snapshotPercentage == nil or snapshotPercentage == 100 then
                     name = get_var("ServerListNameRestoring") or "EXTRACTING snapshot, this might take a moment"
+                    map = get_var("MapNameRestoring") or "extracting snapshot"
                 else
                     name = get_var("ServerListNameRestoring") or "DOWNLOADING snapshot - " .. string.format("%.2f", snapshotPercentage) .. "%"
+                    map = get_var("MapNameRestoring") or "downloading snapshot"
                 end
-                map = get_var("MapNameRestoring") or "restoring server"
             else 
                 if snapshotPercentage == nil or snapshotPercentage == 100 then
                     name = get_var("ServerListNameBackingUp") or "BACKING UP, this might take a moment"
