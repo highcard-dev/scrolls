@@ -17,6 +17,7 @@ jobs:
           registry: artifacts.druid.gg
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
+
       - name: Build Java 16
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:16 -f .docker/java/Dockerfile-16 .
       - name: Build Java 17
@@ -31,6 +32,8 @@ jobs:
         run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21-no-cli -f .docker/java/Dockerfile-21-no-cli .
       - name: Build Ubuntu
         run: docker build -t artifacts.druid.gg/druid-team/druidd-ubuntu -f .docker/ubuntu/Dockerfile .
+      - name: Build SteamCMD
+        run: docker build -t artifacts.druid.gg/druid-team/druidd-steamcmd -f .docker/steamcmd/Dockerfile .
       - name: Push Java 16
         run: docker push artifacts.druid.gg/druid-team/druidd-java:16
       - name: Push Java 17
@@ -45,3 +48,5 @@ jobs:
         run: docker push artifacts.druid.gg/druid-team/druidd-java:21-no-cli
       - name: Push Ubuntu
         run: docker push artifacts.druid.gg/druid-team/druidd-ubuntu
+      - name: Push Ubuntu
+        run: docker push artifacts.druid.gg/druid-team/druidd-steamcmd
