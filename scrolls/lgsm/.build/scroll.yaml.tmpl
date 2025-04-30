@@ -3,7 +3,7 @@ desc: {{ .Version }}
 version: 0.0.2
 app_version: {{ .Version }}
 keepAlivePPM: 5
-{{- if or .Vars.lua_query_game_name .Vars.main_port_protocol }}
+{{- if or .Vars.lua_query_game_name .Vars.main_port_protocol .Vars.rcon_port }}
 ports:
 {{- if .Vars.lua_query_game_name }}
   - name: query
@@ -28,6 +28,10 @@ ports:
     protocol: {{ .Vars.main_port_protocol }}
     start_delay: {{ or .Vars.start_delay 0 }}
     finish_after_command: install
+{{- end }}
+{{- if .Vars.rcon_port }}
+  - name: rcon
+    protocol: tcp
 {{- end }}
 {{- end }}
 init: "console"

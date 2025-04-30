@@ -24,6 +24,8 @@ ports:
     protocol: udp
     start_delay: 0
     finish_after_command: install
+  - name: rcon
+    protocol: tcp
 init: "console"
 commands:
   console:
@@ -72,6 +74,10 @@ commands:
   install:
     run: once
     procedures:
+      - mode: exec
+        data:
+          - echo
+          - "Installing LGSM..."
       - mode: exec
         data:
           - sh

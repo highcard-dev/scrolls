@@ -53,6 +53,10 @@ commands:
     procedures:
       - mode: exec
         data:
+          - echo
+          - "Installing LGSM..."
+      - mode: exec
+        data:
           - sh
           - install-lgsm.sh
       - mode: exec

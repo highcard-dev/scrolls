@@ -7,7 +7,8 @@
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
     "main_port_protocol": "udp",
-    "start_delay": "0"
+    "start_delay": "0",
+    "rcon_port": "true"
   },
   "cs2server": {
     "rcon": "enabled",
