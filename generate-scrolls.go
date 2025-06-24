@@ -29,9 +29,6 @@ func replace(input, from, to string) string {
 }
 
 func main() {
-	//	funcMap := template.FuncMap{
-	//		"replace": replace,
-	//	}
 
 	if len(os.Args) < 2 {
 		fmt.Println("Please enter a path.")
