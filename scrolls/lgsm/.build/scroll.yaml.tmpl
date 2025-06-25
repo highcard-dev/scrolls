@@ -28,6 +28,7 @@ ports:
     protocol: {{ .Vars.main_port_protocol }}
     start_delay: {{ or .Vars.start_delay 0 }}
     finish_after_command: install
+    sleep_handler: generic
 {{- end }}
 {{- if .Vars.rcon_port }}
   - name: rcon

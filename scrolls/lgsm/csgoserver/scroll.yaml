@@ -24,6 +24,7 @@ ports:
     protocol: udp
     start_delay: 0
     finish_after_command: install
+    sleep_handler: generic
 init: "console"
 commands:
   console:
