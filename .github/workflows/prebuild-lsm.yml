@@ -20,14 +20,14 @@ jobs:
         with:
           go-version: ">=1.22.3"
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        env:
-          PRESIGN_ACCESS_KEY: ${{ secrets.PRESIGN_ACCESS_KEY }}
-          PRESIGN_BUCKET_NAME: ${{ secrets.PRESIGN_BUCKET_NAME }}
-          PRESIGN_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
-          PRESIGN_SECRET_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
-          BACKUP_ADDITIONAL_ARGS: "--insecure"
+      #      - name: Setup tmate session
+      #        uses: mxschmitt/action-tmate@v3
+      #        env:
+      #          PRESIGN_ACCESS_KEY: ${{ secrets.PRESIGN_ACCESS_KEY }}
+      #          PRESIGN_BUCKET_NAME: ${{ secrets.PRESIGN_BUCKET_NAME }}
+      #          PRESIGN_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
+      #          PRESIGN_SECRET_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
+      #          BACKUP_ADDITIONAL_ARGS: "--insecure"
       - name: Prebuild and upload Image ${{ github.event.inputs.image }}
         run: ./scripts/prebuild/prebuild.sh ${{ github.event.inputs.image }}
         env:
