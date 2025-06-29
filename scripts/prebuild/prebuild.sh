@@ -24,7 +24,7 @@ echo "Running scroll install script"
 docker run --entrypoint $DOCKER_ENTRYPOINT --rm -v $TMP_VOLUME_NAME:/app/resources --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druidd-lgsm:$TAG run install
 
 echo "Creating archive and uploading to s3"
-docker run --entrypoint $DOCKER_ENTRYPOINT --rm -v $TMP_VOLUME_NAME:/app/resources --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druidd-lgsm:$TAG backup $PRESIGN_OBJECT_KEY --s3-access-key $PRESIGN_ACCESS_KEY --s3-secret-key $PRESIGN_SECRET_KEY --s3-bucket $PRESIGN_BUCKET_NAME --s3-endpoint $PRESIGN_S3_ENDPOINT
+docker run --entrypoint $DOCKER_ENTRYPOINT --rm -v $TMP_VOLUME_NAME:/app/resources --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druidd-lgsm:$TAG backup $PRESIGN_OBJECT_KEY --s3-access-key $PRESIGN_ACCESS_KEY --s3-secret-key $PRESIGN_SECRET_KEY --s3-bucket $PRESIGN_BUCKET_NAME --s3-endpoint $PRESIGN_S3_ENDPOINT $BACKUP_ADDITIONAL_ARGS
 echo "Prebuild uploaded"
 
 
