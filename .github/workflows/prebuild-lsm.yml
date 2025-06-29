@@ -27,6 +27,7 @@ jobs:
           PRESIGN_BUCKET_NAME: ${{ secrets.PRESIGN_BUCKET_NAME }}
           PRESIGN_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
           PRESIGN_SECRET_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
+          BACKUP_ADDITIONAL_ARGS: "--insecure"
       - name: Prebuild and upload Image ${{ github.event.inputs.image }}
         run: ./scripts/prebuild/prebuild.sh ${{ github.event.inputs.image }}
         env:
