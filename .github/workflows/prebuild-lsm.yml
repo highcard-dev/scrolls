@@ -19,6 +19,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: ">=1.22.3"
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Prebuild and upload Image ${{ github.event.inputs.image }}
         run: ./scripts/prebuild/prebuild.sh ${{ github.event.inputs.image }}
         env:
