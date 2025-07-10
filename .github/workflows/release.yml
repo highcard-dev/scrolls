@@ -51,6 +51,9 @@ jobs:
           druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.5 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:16 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:16 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
@@ -68,6 +71,9 @@ jobs:
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.5 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/papermc/1.17 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/papermc/1.17.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/papermc/1.18.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
@@ -84,6 +90,9 @@ jobs:
           druid registry push ./scrolls/minecraft/papermc/1.21.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/papermc/1.21.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/papermc/1.21.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/papermc/1.21.5 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/papermc/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/papermc/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/forge/1.17.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:16 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/forge/1.18 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/forge/1.18.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:17 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
@@ -102,6 +111,9 @@ jobs:
           druid registry push ./scrolls/minecraft/forge/1.21.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/forge/1.21.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/forge/1.21.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/forge/1.21.5 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/forge/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/forge/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/cuberite/latest -p main=25565 -p webpanel=8080 -i artifacts.druid.gg/druid-team/druidd-ubuntu --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/rust/rust-oxide/latest -p main=28015/udp -p rcon -p rustplus -i artifacts.druid.gg/druid-team/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1
           druid registry push ./scrolls/rust/rust-vanilla/latest -p main=28015/udp -p rcon -p rustplus -i artifacts.druid.gg/druid-team/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1
