@@ -47,7 +47,7 @@ jobs:
           AWS_S3_BUCKET: ${{ secrets.PRESIGN_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.PRESIGN_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
-          AWS_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
+          AWS_S3_ENDPOINT: http://${{ secrets.PRESIGN_S3_ENDPOINT }}
           AWS_REGION: "fsn1"
           SOURCE_DIR: papermc
           DEST_DIR: minecraft/papermc

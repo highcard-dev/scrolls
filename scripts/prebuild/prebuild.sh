@@ -15,8 +15,6 @@ docker run --rm -v $TMP_VOLUME_NAME:/app/resources bash sh -c 'wget -O /app/reso
 DOCKER_ENTRYPOINT=/app/resources/druid-install-command.sh
 
 
-S3_ENDPOINT=fsn1.your-objectstorage.com
-
 echo "Pulling scroll"
 docker run --entrypoint $DOCKER_ENTRYPOINT --rm -v $TMP_VOLUME_NAME:/app/resources --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druidd-lgsm:$TAG registry pull artifacts.druid.gg/druid-team/scroll-lgsm:${TAG}server
 
