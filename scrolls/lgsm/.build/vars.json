@@ -58,7 +58,8 @@
     "lua_query_folder": "csgo",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
-    "main_port_protocol": "udp"
+    "main_port_protocol": "udp",
+    "ppm": "600"
   },
   "terrariaserver": {
     "port": "todo=8211/udp",
