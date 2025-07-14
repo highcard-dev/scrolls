@@ -5,7 +5,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
    -app.port $DRUID_PORT_RUSTPLUS_1 \
    -app.publicip $DRUID_IP_1 \
    -server.ip "0.0.0.0" \
-   -server.port 28015 \
+   -server.port $DRUID_PORT_MAIN_1 \
+   -server.queryport $DRUID_PORT_QUERY_1 \
    -rcon.ip "0.0.0.0" \
    -rcon.port {{ .Config.rcon_web_rust.port }} \
    -rcon.password {{ .Config.rcon_web_rust.password }} \

@@ -115,8 +115,8 @@ jobs:
           druid registry push ./scrolls/minecraft/forge/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/forge/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-java:21 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/cuberite/latest -p main=25565 -p webpanel=8080 -i artifacts.druid.gg/druid-team/druidd-ubuntu --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/rust/rust-oxide/latest -p main=28015/udp -p rcon -p rustplus -i artifacts.druid.gg/druid-team/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1
-          druid registry push ./scrolls/rust/rust-vanilla/latest -p main=28015/udp -p rcon -p rustplus -i artifacts.druid.gg/druid-team/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1
+          druid registry push ./scrolls/rust/rust-oxide/latest -p main=/udp -p query=/udp -p rcon -p rustplus -i artifacts.druid.gg/druid-team/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1 --smart
+          druid registry push ./scrolls/rust/rust-vanilla/latest -p main=/udp -p query=/udp -p rcon -p rustplus -i artifacts.druid.gg/druid-team/druidd-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1 --smart
           druid registry push ./scrolls/lgsm/pwserver -p main=8211/udp -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-lgsm:pw -m --min-disk 7Gi --min-ram 2Gi --min-cpu 0.5 --smart
           druid registry push ./scrolls/lgsm/arkserver -p main=/udp  -p query=/udp -p rcon -i artifacts.druid.gg/druid-team/druidd-lgsm:ark -m --min-disk 25Gi --min-ram 7Gi --min-cpu 0.5 --smart
           druid registry push ./scrolls/lgsm/untserver -p main=27015/udp -p mainv6=27016 -i artifacts.druid.gg/druid-team/druidd-lgsm:unt -m  --min-disk 7Gi --min-ram 1Gi --min-cpu 0.5
