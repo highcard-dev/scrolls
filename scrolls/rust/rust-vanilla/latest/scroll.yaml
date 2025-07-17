@@ -13,7 +13,7 @@ ports:
     sleep_handler: packet_handler/query.lua
     vars:
       - name: GameName
-        value: "Rust"
+        value: Rust
       - name: GameSteamFolder
         value: rust
       - name: GameSteamId
@@ -22,6 +22,10 @@ ports:
         value: Procedual Map
       - name: ServerListName
         value: "Druid Gameserver (idle) - Start server by joining"
+      - name: GameVersion
+        value: "1337"
+      - name: GameKeywords
+        value: mp0,cp0,ptrak,qp0,$r?,v2592,born0,gmrust,cs1337420
   - name: rustplus
     protocol: tcp
   - name: rcon

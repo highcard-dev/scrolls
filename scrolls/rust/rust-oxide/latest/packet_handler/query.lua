@@ -130,60 +130,50 @@ function handle(ctx, data)
         gameName = get_var("GameName") or "ARK: Survival Evolved"
 
         steamIdString = get_var("GameSteamId") or "0"
+        gameVersion = get_var("GameVersion") or "1.0.0"
 
         steamId = tonumber(steamIdString)
+        steamIdNum = tonumber(steamIdString)
 
         serverPort = get_port("main")
-
-        -- hex
-        nameHex = string.tohex(name)
-
-        mapHex = string.tohex(map)
-
-        folderHex = string.tohex(folder) -- ark: ark_survival_evolved
-
-        steamIdHex = number_to_little_endian_short(steamId)
-
-        gameHex = string.tohex(gameName)
-
-        maxPlayerHex = "00"
-        playerHex = "00"
-        botHex = "00"
-
-        serverTypeHex = "64" -- dedicated
-
-        osHex = "6C" -- l (6C) for linux, w (77) for windows
-
-        visibility = "00" -- 01 for private, 00 for public
-
-        version = string.tohex("1.0.0.0")
 
         -- EDF & 0x80: Port
         -- EDF & 0x10: SteamID
         -- EDF & 0x20 Keywords
         -- EDF & 0x01 GameID
 
-        edfFlagHex = "B1"
+        edfSteamId = "01D075C44C764001"
+        
 
-        -- short as hex
-        gamePortHex = number_to_little_endian_short(serverPort)
-
-        steamId = "01D075C44C764001"
-
-        tags =
-            ",OWNINGID:90202064633057281,OWNINGNAME:90202064633057281,NUMOPENPUBCONN:50,P2PADDR:90202064633057281,P2PPORT:" ..
+        ---rust: "mp0,cp0,ptrak,qp0,$r?,v2592,born0,gmrust,cs1337420" 
+        edfKeywords = get_var("GameKeywords") or ",OWNINGID:90202064633057281,OWNINGNAME:90202064633057281,NUMOPENPUBCONN:50,P2PADDR:90202064633057281,P2PPORT:" ..
                 serverPort .. ",LEGACY_i:0"
 
-        tagsHex = string.tohex(tags)
+        edfGameId = "4ADA030000000000"
 
-        edfHex = gamePortHex .. steamId .. tagsHex .. "00" .. "FE47050000000000"
+        serverinfopacket = ServeInfoPacket:new()
+        serverinfopacket.name = name
+        serverinfopacket.map = map
+        serverinfopacket.folder = folder
+        serverinfopacket.gameName = gameName
+        serverinfopacket.steamId = steamIdNum
+        serverinfopacket.player = 0x00
+        serverinfopacket.maxPlayer = 0x00
+        serverinfopacket.bot = 0x00
+        serverinfopacket.serverType = 0x64 -- 64 for dedicated server
+        serverinfopacket.os = 0x6C -- 6C for linux, 77 for windows
+        serverinfopacket.visibility = 0x00
+        serverinfopacket.version = gameVersion
 
-        res = "FFFFFFFF4911" .. nameHex .."00" .. mapHex .."00".. folderHex .."00" .. gameHex .."00" .. steamIdHex .. playerHex .. maxPlayerHex .. botHex .. serverTypeHex .. 
-            osHex .. visibility .. version .."00" .. edfFlagHex .. edfHex
+        serverinfopacket.edfPort = serverPort
+        serverinfopacket.edfSteamId = edfSteamId
+        serverinfopacket.edfKeywords = edfKeywords
+        serverinfopacket.edfGameId = edfGameId
 
-        resHex = string.fromhex(res)
 
-        ctx.sendData(resHex)
+        b = serverinfopacket:GetRawPacket()
+
+        ctx.sendData(b)
         return
     end
 
@@ -203,4 +193,118 @@ function number_to_little_endian_short(num)
 
     -- Format as hexadecimal string
     return string.format("%02X%02X", low_byte, high_byte)
+end
+
+Packet = {
+  bytes = ""
+}
+
+
+function Packet:new (packetId)
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    o.bytes = string.fromhex("FFFFFFFF") .. packetId -- 0xFFFFFFFF + packetId
+    return o
+end
+
+function Packet:appendString(data)
+    self.bytes = self.bytes .. data .. string.char(0)
+end
+
+function Packet:appendByte(data)
+    self.bytes = self.bytes .. string.char(data)
+end
+
+function Packet:appendShort(num)
+    self.bytes = self.bytes .. string.fromhex(number_to_little_endian_short(num))
+end
+
+function Packet:appendHex(hex)
+    print("Appending hex: " .. hex)
+    self.bytes = self.bytes .. string.fromhex(hex)
+end
+
+ServeInfoPacket = {
+    name = "",
+    map = "",
+    folder = "",
+    gameName = "",
+    steamId = 0,
+    player = 0x00,
+    maxPlayer = 0x00,
+    bot = 0x00,
+    serverType = 0x64,
+    os = 0x6C, -- 6C for linux, 77 for windows
+    visibility = 0x00, -- 01 for private, 00 for public
+    version = "1.0.0",
+    edfPort = nil,
+    edfSteamId = nil,
+    edfSourceTv = nil,
+    edfKeywords = nil,
+    edfGameId = nil
+}
+
+function ServeInfoPacket:new ()
+   o = {}
+   setmetatable(o, self)
+   self.__index = self
+   return o
+end
+
+
+function ServeInfoPacket:GetRawPacket()
+
+    p = Packet:new(string.fromhex("4911")) -- 0x49 0x11 is the packet id for server info
+    p:appendString(self.name)
+    p:appendString(self.map)
+    p:appendString(self.folder)
+    p:appendString(self.gameName)
+    p:appendShort(self.steamId)
+    p:appendByte(self.player)
+    p:appendByte(self.maxPlayer)
+    p:appendByte(self.bot)
+    p:appendByte(self.serverType)
+    p:appendByte(self.os)
+    p:appendByte(self.visibility) -- 01 for private, 00 for public
+    p:appendString(self.version)
+
+    edfByte = 0x00
+
+    if self.edfPort ~= nil then
+        edfByte = edfByte + 0x80
+    end
+    if self.edfSteamId ~= nil then
+        edfByte = edfByte + 0x10
+    end
+    if self.edfSourceTv ~= nil then
+        edfByte = edfByte + 0x40
+    end
+    if self.edfKeywords ~= nil then
+        edfByte = edfByte + 0x20
+    end
+    if self.edfGameId ~= nil then
+        edfByte = edfByte + 0x01
+    end
+
+
+    p:appendByte(edfByte)
+
+    if self.edfPort ~= nil then
+        p:appendShort(self.edfPort)
+    end
+    if self.edfSteamId ~= nil then
+        p:appendHex(self.edfSteamId)
+    end
+    if self.edfSourceTv ~= nil then
+        p:appendHex(self.edfSourceTv)
+    end
+    if self.edfKeywords ~= nil then
+        p:appendString(self.edfKeywords)
+    end
+    if self.edfGameId ~= nil then
+        p:appendHex(self.edfGameId)
+    end
+
+    return p.bytes
 end
