@@ -6,7 +6,7 @@ keepAlivePPM: {{ or .Vars.ppm 5 }}
 {{- if or .Vars.lua_query_game_name .Vars.main_port_protocol .Vars.rcon_port }}
 ports:
 {{- if .Vars.lua_query_game_name }}
-  - name: query
+  - name: {{ or .Vars.lua_query_port  "query" }}
     protocol: udp
     description: Steam Query Port. Use this to connect via the Steam client.
     start_delay: {{ or .Vars.start_delay 0 }}
@@ -36,6 +36,7 @@ ports:
         value: "{{ .Vars.lua_query_version_prefix }}"
 {{- end }}
 {{- end }}
+
 {{- if .Vars.main_port_protocol }}
   - name: main
     description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.

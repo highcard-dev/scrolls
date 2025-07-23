@@ -33,7 +33,7 @@
     "lua_query_version_prefix": "01",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
-    "main_port_protocol": "udp"
+    "lua_query_port": "main"
   },
   "sdtdserver": {
     "port": "main=26900/udp;main2=26902/udp;maintcp=26900",
