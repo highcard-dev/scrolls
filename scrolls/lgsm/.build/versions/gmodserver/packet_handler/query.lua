@@ -182,7 +182,12 @@ function handle(ctx, data)
         return
     end
 
-    debug_print("Unknown Packet: " .. hex)
+    print("Unknown Packet: " .. hex)
+    startOnUnknownPacket = get_var("StartOnUnknownPacket")
+    if startOnUnknownPacket == "yes" then
+        print("Starting server on unknown packet: " .. hex)
+        finish()
+    end
 
 end
 
@@ -226,7 +231,6 @@ function Packet:appendShort(num)
 end
 
 function Packet:appendHex(hex)
-    print("Appending hex: " .. hex)
     self.bytes = self.bytes .. string.fromhex(hex)
 end
 

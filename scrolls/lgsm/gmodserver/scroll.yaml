@@ -27,6 +27,8 @@ ports:
         value: "2025.03.26"
       - name: GameVersionPrefix
         value: "01"
+      - name: StartOnUnknownPacket
+        value: "yes"
 init: "console"
 commands:
   console:

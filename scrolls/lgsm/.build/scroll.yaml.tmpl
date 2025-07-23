@@ -35,8 +35,11 @@ ports:
       - name: GameVersionPrefix
         value: "{{ .Vars.lua_query_version_prefix }}"
 {{- end }}
+{{- if .Vars.lua_query_start_on_unknown_packet }}
+      - name: StartOnUnknownPacket
+        value: "{{ .Vars.lua_query_start_on_unknown_packet }}"
 {{- end }}
-
+{{- end }}
 {{- if .Vars.main_port_protocol }}
   - name: main
     description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
