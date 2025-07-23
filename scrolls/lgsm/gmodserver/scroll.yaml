@@ -12,7 +12,7 @@ ports:
     sleep_handler: packet_handler/query.lua
     vars:
       - name: GameName
-        value: "GMod Server"
+        value: "Idle Druid Server"
       - name: GameSteamFolder
         value: garrysmod
       - name: GameSteamId
@@ -21,6 +21,12 @@ ports:
         value: server idle
       - name: ServerListName
         value: "Druid Gameserver (idle) - Start server by joining"
+      - name: GameKeywords
+        value: " ver:250717"
+      - name: GameVersion
+        value: "2025.03.26"
+      - name: GameVersionPrefix
+        value: "01"
   - name: main
     description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
     protocol: udp

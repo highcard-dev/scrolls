@@ -26,8 +26,11 @@
   },
   "gmodserver": {
     "port": "query=27005/udp;main=/udp;sourcetv=27020/udp;steam=27015",
-    "lua_query_game_name": "GMod Server",
+    "lua_query_game_name": "Idle Druid Server",
     "lua_query_folder": "garrysmod",
+    "lua_query_keywords": " ver:250717",
+    "lua_query_version": "2025.03.26",
+    "lua_query_version_prefix": "01",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
     "main_port_protocol": "udp"

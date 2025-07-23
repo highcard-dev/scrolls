@@ -23,6 +23,18 @@ ports:
         value: {{ .Vars.lua_query_map }}
       - name: ServerListName
         value: "{{ .Vars.lua_query_servername }}"
+{{- if .Vars.lua_query_keywords }}
+      - name: GameKeywords
+        value: "{{ .Vars.lua_query_keywords }}"
+{{- end }}
+{{- if .Vars.lua_query_version }}
+      - name: GameVersion
+        value: "{{ .Vars.lua_query_version }}"
+{{- end }}
+{{- if .Vars.lua_query_version_prefix }}
+      - name: GameVersionPrefix
+        value: "{{ .Vars.lua_query_version_prefix }}"
+{{- end }}
 {{- end }}
 {{- if .Vars.main_port_protocol }}
   - name: main
