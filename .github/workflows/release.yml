@@ -120,7 +120,7 @@ jobs:
           druid registry push ./scrolls/lgsm/pwserver -p main=8211/udp -p rcon=25575 -i artifacts.druid.gg/druid-team/druidd-lgsm:pw -m --min-disk 7Gi --min-ram 2Gi --min-cpu 0.5 --smart
           druid registry push ./scrolls/lgsm/arkserver -p main=/udp  -p query=/udp -p rcon -i artifacts.druid.gg/druid-team/druidd-lgsm:ark -m --min-disk 25Gi --min-ram 7Gi --min-cpu 0.5 --smart
           druid registry push ./scrolls/lgsm/untserver -p main=27015/udp -p mainv6=27016 -i artifacts.druid.gg/druid-team/druidd-lgsm:unt -m  --min-disk 7Gi --min-ram 1Gi --min-cpu 0.5
-          druid registry push ./scrolls/lgsm/dayzserver -p main=2302/udp -p battle-eye=2304/udp -p query=27016/udp -i artifacts.druid.gg/druid-team/druidd-lgsm:dayz -m --min-disk 7Gi --min-ram 5Gi --min-cpu 1
+          druid registry push ./scrolls/lgsm/dayzserver -p main=/udp -p battle-eye=2304/udp -p query=27016/udp -i artifacts.druid.gg/druid-team/druidd-lgsm:dayz -m --min-disk 7Gi --min-ram 5Gi --min-cpu 1
           druid registry push ./scrolls/lgsm/sdtdserver -p main=26900/udp -p main2=26902/udp -p maintcp=26900 -i artifacts.druid.gg/druid-team/druidd-lgsm:sdtd -m --min-disk 20Gi --min-ram 2Gi --min-cpu 0.5
           druid registry push ./scrolls/lgsm/gmodserver -p query=27005/udp -p main=/udp -p sourcetv=27020/udp -p steam=27015 -i artifacts.druid.gg/druid-team/druidd-lgsm:gmod -m --min-disk 8Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/lgsm/cs2server -p main=27015/udp -p rcon=27015 -i artifacts.druid.gg/druid-team/druidd-lgsm:cs2 -m --min-disk 38Gi --min-ram 1Gi --min-cpu 0.5
