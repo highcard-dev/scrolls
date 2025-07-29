@@ -21,6 +21,8 @@ ports:
         value: server idle
       - name: ServerListName
         value: "Druid Gameserver (idle) - Start server by joining"
+      - name: StartOnUnknownPacket
+        value: "yes"
 init: "console"
 commands:
   console:
