@@ -124,7 +124,7 @@ jobs:
           druid registry push ./scrolls/lgsm/sdtdserver -p main=26900/udp -p main2=26902/udp -p maintcp=26900 -i artifacts.druid.gg/druid-team/druidd-lgsm:sdtd -m --min-disk 20Gi --min-ram 2Gi --min-cpu 0.5
           druid registry push ./scrolls/lgsm/gmodserver -p query=27005/udp -p main=/udp -p sourcetv=27020/udp -p steam=27015 -i artifacts.druid.gg/druid-team/druidd-lgsm:gmod -m --min-disk 8Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/lgsm/cs2server -p main=/udp -p rcon=27015 -i artifacts.druid.gg/druid-team/druidd-lgsm:cs2 -m --min-disk 38Gi --min-ram 1Gi --min-cpu 0.5 --smart
-          druid registry push ./scrolls/lgsm/pzserver -p main=16261/udp -p main2=16262/udp  -i artifacts.druid.gg/druid-team/druidd-lgsm:pz -m --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
+          druid registry push ./scrolls/lgsm/pzserver -p main=/udp -p main2=/udp  -i artifacts.druid.gg/druid-team/druidd-lgsm:pz -m --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25
 
           druid registry push ./scrolls/lgsm/terrariaserver -p todo=8211/udp -i artifacts.druid.gg/druid-team/druidd-lgsm:terraria -m
           druid registry push ./scrolls/lgsm/csgoserver -p query=27005/udp -p main=27015/udp -p sourcetv=27020/udp -p steam=27015 -i artifacts.druid.gg/druid-team/druidd-lgsm:csgo -m --smart
