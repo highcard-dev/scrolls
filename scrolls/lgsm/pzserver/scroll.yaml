@@ -87,6 +87,10 @@ commands:
         data:
           - ./pzserver
           - auto-install
+      - mode: exec
+        data:
+          - bash
+          - postinstall.sh
 cronjobs:
   - name: Restart every 6 hours
     schedule: "0 */6 * * *"
