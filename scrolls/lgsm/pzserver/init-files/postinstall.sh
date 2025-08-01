@@ -35,3 +35,7 @@ set_config_value() {
 
 set_config_value "$file" "DefaultPort" "$DRUID_PORT_MAIN_1"
 set_config_value "$file" "UDPPort" "$DRUID_PORT_MAIN2_1"
+
+source lgsm/config-default/config-lgsm/pzserver/_default.cfg
+
+echo "cp -f $file $servercfgfullpath"
