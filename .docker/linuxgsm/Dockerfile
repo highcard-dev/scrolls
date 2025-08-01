@@ -22,6 +22,8 @@ RUN chmod +x /usr/bin/druid_rcon
 RUN chmod +x /usr/bin/druid_rcon_web_rust
 RUN chmod +x /entrypoint.sh
 
+RUN sudo usermod -d /app/resources/deployment linuxgsm
+
 ENV LGSM_SERVERFILES=/app/resources/deployment/serverfiles
 ENV LGSM_CONFIG=/app/resources/deployment/config-lgsm
 ENV LGSM_LOGDIR=/app/resources/deployment/log

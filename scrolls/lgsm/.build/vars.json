@@ -81,7 +81,6 @@
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
     "lua_query_port": "main",
-    "lua_query_start_on_unknown_packet": "yes",
-    "postinstall": "enabled"
+    "lua_query_start_on_unknown_packet": "yes"
   }
 }
