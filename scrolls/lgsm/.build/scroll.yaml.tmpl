@@ -39,6 +39,10 @@ ports:
       - name: StartOnUnknownPacket
         value: "{{ .Vars.lua_query_start_on_unknown_packet }}"
 {{- end }}
+{{- if .Vars.lua_steam_app_id }}
+      - name: SteamAppId
+        value: "{{ .Vars.lua_steam_app_id }}"
+{{- end }}
 {{- end }}
 {{- if .Vars.main_port_protocol }}
   - name: main

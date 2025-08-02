@@ -10,6 +10,15 @@ function string.tohex(str)
     end))
 end
 
+function pack_uint64_le(n)
+    local bytes = {}
+    for i = 1, 8 do
+        bytes[i] = string.char(n % 256)
+        n = math.floor(n / 256)
+    end
+    return table.concat(bytes)
+end
+
 function handle(ctx, data)
 
     -- prtocol begins with FFFFFFFF and the packedid
@@ -137,6 +146,14 @@ function handle(ctx, data)
         versionPrefix = get_var("GameVersionPrefix")
         serverPort = get_port("main")
 
+
+        edfGameIdStr = get_var("SteamAppId")
+        edfGameId = nil
+        if edfGameIdStr ~= nil then
+            edfGameId = tonumber(edfGameIdStr)
+        end
+
+
         -- EDF & 0x80: Port
         -- EDF & 0x10: SteamID
         -- EDF & 0x20 Keywords
@@ -149,7 +166,6 @@ function handle(ctx, data)
         edfKeywords = get_var("GameKeywords") or ",OWNINGID:90202064633057281,OWNINGNAME:90202064633057281,NUMOPENPUBCONN:50,P2PADDR:90202064633057281,P2PPORT:" ..
                 serverPort .. ",LEGACY_i:0"
 
-        edfGameId = "a00f000000000000"
 
         serverinfopacket = ServeInfoPacket:new()
         serverinfopacket.name = name
@@ -224,6 +240,10 @@ end
 
 function Packet:appendByte(data)
     self.bytes = self.bytes .. string.char(data)
+end
+
+function Packet:appendRawBytes(data)
+    self.bytes = self.bytes .. data
 end
 
 function Packet:appendShort(num)
@@ -318,7 +338,8 @@ function ServeInfoPacket:GetRawPacket()
         p:appendString(self.edfKeywords)
     end
     if self.edfGameId ~= nil then
-        p:appendHex(self.edfGameId)
+        local bytes = pack_uint64_le(self.edfGameId)
+        p:appendRawBytes(bytes)
     end
 
     

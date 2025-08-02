@@ -23,6 +23,8 @@ ports:
         value: "Druid Gameserver (idle) - Start server by joining"
       - name: StartOnUnknownPacket
         value: "yes"
+      - name: SteamAppId
+        value: "108600"
 init: "console"
 commands:
   console:
