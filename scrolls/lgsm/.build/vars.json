@@ -5,7 +5,7 @@
     "lua_query_game_name": "ARK: Survival Evolved",
     "lua_query_folder": "ark_survival_evolved",
     "lua_query_map": "server idle",
-    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "main_port_protocol": "udp",
     "start_delay": "0",
     "rcon_port": "true",
@@ -18,7 +18,7 @@
     "lua_query_game_name": "CS2: Druid Server",
     "lua_query_folder": "csgo",
     "lua_query_map": "server idle",
-    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "lua_query_port": "main",
     "lua_query_start_on_unknown_packet": "yes",
     "lua_steam_app_id": "730"
@@ -36,7 +36,7 @@
     "lua_query_version": "2025.03.26",
     "lua_query_version_prefix": "01",
     "lua_query_map": "server idle",
-    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "lua_query_port": "main",
     "lua_query_start_on_unknown_packet": "yes",
     "lua_steam_app_id": "4000"
@@ -46,7 +46,7 @@
     "lua_query_game_name": "7 Days To Die",
     "lua_query_folder": "7DTD",
     "lua_query_map": "server idle",
-    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "main_port_protocol": "udp",
     "lua_steam_app_id": "251570"
   },
@@ -60,8 +60,9 @@
     "lua_query_game_name": "Unturned Server",
     "lua_query_folder": "Unturned",
     "lua_query_map": "server idle",
-    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
-    "main_port_protocol": "udp",
+    "lua_query_servername": "Druid.gg Server (idle) - join to start",
+    "lua_query_port": "main",
+    "lua_query_start_on_unknown_packet": "yes",
     "lua_steam_app_id": "304930"
   },
   "csgoserver": {
@@ -69,7 +70,7 @@
     "lua_query_game_name": "Counter-Strike: Global Offensive",
     "lua_query_folder": "csgo",
     "lua_query_map": "server idle",
-    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "main_port_protocol": "udp",
     "ppm": "600",
     "lua_steam_app_id": "730"
@@ -79,7 +80,7 @@
     "lua_query_game_name": "Terraria Server",
     "lua_query_folder": "terraria",
     "lua_query_map": "server idle",
-    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "main_port_protocol": "udp",
     "lua_steam_app_id": "105600"
   },
@@ -88,7 +89,7 @@
     "lua_query_game_name": "Project Zomboid",
     "lua_query_folder": "zomboid",
     "lua_query_map": "server idle",
-    "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
+    "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "lua_query_port": "main",
     "lua_query_start_on_unknown_packet": "yes",
     "lua_steam_app_id": "108600"

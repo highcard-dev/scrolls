@@ -20,7 +20,7 @@ ports:
       - name: MapName
         value: server idle
       - name: ServerListName
-        value: "Druid Gameserver (idle) - Start server by joining"
+        value: "Druid.gg Server (idle) - join to start"
       - name: StartOnUnknownPacket
         value: "yes"
       - name: SteamAppId
