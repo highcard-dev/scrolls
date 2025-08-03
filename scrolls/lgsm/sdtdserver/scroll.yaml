@@ -21,6 +21,8 @@ ports:
         value: server idle
       - name: ServerListName
         value: "Druid Gameserver (idle) - Start server by joining"
+      - name: SteamAppId
+        value: "251570"
   - name: main
     description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
     protocol: udp

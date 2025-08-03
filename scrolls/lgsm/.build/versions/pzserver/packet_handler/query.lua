@@ -29,8 +29,14 @@ function handle(ctx, data)
 
     hex = string.tohex(data)
 
+    startOnUnknownPacket = get_var("StartOnUnknownPacket")
     if string.sub(hex, 1, 8) ~= "FFFFFFFF" then
         debug_print("Invalid Packet " .. hex)
+
+        if startOnUnknownPacket == "yes" then
+            print("Starting server on invalid packet: " .. hex)
+            finish()
+        end
         return
     end
 
@@ -199,7 +205,6 @@ function handle(ctx, data)
     end
 
     print("Unknown Packet: " .. hex)
-    startOnUnknownPacket = get_var("StartOnUnknownPacket")
     if startOnUnknownPacket == "yes" then
         print("Starting server on unknown packet: " .. hex)
         finish()

@@ -8,7 +8,8 @@
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
     "main_port_protocol": "udp",
     "start_delay": "0",
-    "rcon_port": "true"
+    "rcon_port": "true",
+    "lua_steam_app_id": "346110"
   },
   "cs2server": {
     "rcon": "enabled",
@@ -19,11 +20,13 @@
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
     "lua_query_port": "main",
-    "lua_query_start_on_unknown_packet": "yes"
+    "lua_query_start_on_unknown_packet": "yes",
+    "lua_steam_app_id": "730"
   },
   "pwserver": {
     "port": "main=8211/udp;rcon=25575",
-    "main_port_protocol": "udp"
+    "main_port_protocol": "udp",
+    "lua_steam_app_id": "1623730"
   },
   "gmodserver": {
     "port": "query=27005/udp;main=/udp;sourcetv=27020/udp;steam=27015",
@@ -35,7 +38,8 @@
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
     "lua_query_port": "main",
-    "lua_query_start_on_unknown_packet": "yes"
+    "lua_query_start_on_unknown_packet": "yes",
+    "lua_steam_app_id": "4000"
   },
   "sdtdserver": {
     "port": "main=26900/udp;main2=26902/udp;maintcp=26900",
@@ -43,11 +47,13 @@
     "lua_query_folder": "7DTD",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
-    "main_port_protocol": "udp"
+    "main_port_protocol": "udp",
+    "lua_steam_app_id": "251570"
   },
   "dayzserver": {
     "port": "main=2302/udp;battle-eye=2304/udp;query=27016/udp",
-    "main_port_protocol": "udp"
+    "main_port_protocol": "udp",
+    "lua_steam_app_id": "221100"
   },
   "untserver": {
     "port": "main=27015/udp;mainv6=27016",
@@ -55,7 +61,8 @@
     "lua_query_folder": "Unturned",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
-    "main_port_protocol": "udp"
+    "main_port_protocol": "udp",
+    "lua_steam_app_id": "304930"
   },
   "csgoserver": {
     "port": "query=27005/udp;main=27015/udp;sourcetv=27020/udp;steam=27015",
@@ -64,7 +71,8 @@
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
     "main_port_protocol": "udp",
-    "ppm": "600"
+    "ppm": "600",
+    "lua_steam_app_id": "730"
   },
   "terrariaserver": {
     "port": "todo=8211/udp",
@@ -72,7 +80,8 @@
     "lua_query_folder": "terraria",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid Gameserver (idle) - Start server by joining",
-    "main_port_protocol": "udp"
+    "main_port_protocol": "udp",
+    "lua_steam_app_id": "105600"
   },
   "pzserver": {
     "port": "main=26900/udp;main2=26902/udp;maintcp=26900",

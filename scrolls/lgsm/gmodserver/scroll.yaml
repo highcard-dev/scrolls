@@ -29,6 +29,8 @@ ports:
         value: "01"
       - name: StartOnUnknownPacket
         value: "yes"
+      - name: SteamAppId
+        value: "4000"
 init: "console"
 commands:
   console:
