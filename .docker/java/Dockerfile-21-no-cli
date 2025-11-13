@@ -1,5 +1,5 @@
 #Dockerhub does not allow for setting of build args :/
-ARG IMAGE=openjdk:21-slim-bullseye
+ARG IMAGE=openjdk:26-ea-21-slim
 FROM $IMAGE
 WORKDIR /app
 
