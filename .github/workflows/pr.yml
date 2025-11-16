@@ -11,6 +11,10 @@ jobs:
       SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
       SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
     steps:
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        env:
+          PASS: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
