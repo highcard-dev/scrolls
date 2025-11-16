@@ -1,5 +1,5 @@
 name: artifacts.druid.gg/druid-team/scroll-minecraft-cuberite
-desc: PaperMC
+desc: Cuberite
 version: 0.0.1
 app_version: latest
 ports:
@@ -30,6 +30,7 @@ commands:
           - stop
   install:
     run: once
+    dependencies: [wget]
     procedures:
       - mode: exec
         data:

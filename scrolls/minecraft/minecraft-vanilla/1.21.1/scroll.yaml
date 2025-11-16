@@ -16,6 +16,7 @@ init: "start"
 commands:
   start:
     needs: [install]
+    dependencies: [jdk21]
     run: restart
     procedures:
       - mode: exec
@@ -28,6 +29,7 @@ commands:
         data: stop
   install:
     run: once
+    dependencies: [wget]
     procedures:
       - mode: exec
         data:

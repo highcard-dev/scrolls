@@ -17,6 +17,7 @@ commands:
   start:
     needs: [install]
     run: restart
+    dependencies: [jdk{{ .Vars.jdkVersion }}]
     procedures:
       - mode: exec
         data:
@@ -32,6 +33,7 @@ commands:
         data: stop
   install:
     run: once
+    dependencies: [wget, jdk{{ .Vars.jdkVersion }}]
     procedures:
       - mode: exec
         data:

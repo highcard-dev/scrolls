@@ -24,10 +24,6 @@ type TemplateVars struct {
 	Vars               map[string]string
 }
 
-func replace(input, from, to string) string {
-	return strings.Replace(input, from, to, -1)
-}
-
 func main() {
 
 	if len(os.Args) < 2 {
@@ -41,7 +37,6 @@ func main() {
 	switchScrollDir := buildPath + "/scroll-switch"
 	scrollYamlTemplate := buildPath + "/scroll.yaml.tmpl"
 	varsFile := buildPath + "/vars.json"
-
 	println("Path: " + buildPath)
 	println("Artifacts Path: " + artifactsPath)
 	println("Switch Scroll Dir: " + switchScrollDir)
@@ -49,8 +44,7 @@ func main() {
 	println("Vars File: " + varsFile)
 
 	//parse vars json file, if exists
-	var vars map[string]map[string]string
-	vars = make(map[string]map[string]string)
+	vars := make(map[string]map[string]string)
 	varsBytes, err := ioutil.ReadFile(varsFile)
 	if err != nil {
 		fmt.Printf("Error reading vars.json file. %s", err.Error())
@@ -61,8 +55,7 @@ func main() {
 	}
 
 	//parse artifacs json file
-	var artifacts map[string]string
-	artifacts = make(map[string]string)
+	artifacts := make(map[string]string)
 	artifactBytes, err := ioutil.ReadFile(artifactsPath)
 	if err != nil {
 		fmt.Printf("Error reading artifacts.json file. %s", err.Error())

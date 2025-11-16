@@ -1,0 +1,62 @@
+{
+  "1.17.1": {
+    "jdkVersion": "16"
+  },
+  "1.18": {
+    "jdkVersion": "17"
+  },
+  "1.18.1": {
+    "jdkVersion": "17"
+  },
+  "1.18.2": {
+    "jdkVersion": "17"
+  },
+  "1.19": {
+    "jdkVersion": "17"
+  },
+  "1.19.1": {
+    "jdkVersion": "17"
+  },
+  "1.19.2": {
+    "jdkVersion": "17"
+  },
+  "1.19.3": {
+    "jdkVersion": "17"
+  },
+  "1.19.4": {
+    "jdkVersion": "17"
+  },
+  "1.20.1": {
+    "jdkVersion": "17"
+  },
+  "1.20.2": {
+    "jdkVersion": "17"
+  },
+  "1.20.4": {
+    "jdkVersion": "17"
+  },
+  "1.20.6": {
+    "jdkVersion": "17"
+  },
+  "1.21.1": {
+    "jdkVersion": "21"
+  },
+  "1.21.2": {
+    "jdkVersion": "21"
+  },
+  "1.21.3": {
+    "jdkVersion": "21"
+  },
+  "1.21.4": {
+    "jdkVersion": "21"
+  },
+  "1.21.5": {
+    "jdkVersion": "21"
+  },
+  "1.21.6": {
+    "jdkVersion": "21"
+  },
+  "1.21.7": {
+    "jdkVersion": "21"
+  }
+}

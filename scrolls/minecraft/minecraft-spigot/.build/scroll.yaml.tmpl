@@ -17,6 +17,7 @@ init: "start"
 commands:
   start:
     needs: [install]
+    dependencies: [jdk{{ .Vars.jdkVersion }}]
     run: restart
     procedures:
       - mode: exec
@@ -29,6 +30,7 @@ commands:
         data: stop
   install:
     run: once
+    dependencies: [wget]
     procedures:
       - mode: exec
         data:
