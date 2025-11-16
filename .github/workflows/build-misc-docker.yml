@@ -18,35 +18,7 @@ jobs:
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
 
-      - name: Build Java 16
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:16 -f .docker/java/Dockerfile-16 .
-      - name: Build Java 17
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:17 -f .docker/java/Dockerfile-17 .
-      - name: Build Java 18
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:18 -f .docker/java/Dockerfile-18 .
-      - name: Build Java 20
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:20 -f .docker/java/Dockerfile-20 .
-      - name: Build Java 21
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21 -f .docker/java/Dockerfile-21 .
-      - name: Build Java 21 no CLI
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-java:21-no-cli -f .docker/java/Dockerfile-21-no-cli .
-      - name: Build Ubuntu
-        run: docker build -t artifacts.druid.gg/druid-team/druidd-ubuntu -f .docker/ubuntu/Dockerfile .
       - name: Build SteamCMD
         run: docker build -t artifacts.druid.gg/druid-team/druidd-steamcmd -f .docker/steamcmd/Dockerfile .
-      - name: Push Java 16
-        run: docker push artifacts.druid.gg/druid-team/druidd-java:16
-      - name: Push Java 17
-        run: docker push artifacts.druid.gg/druid-team/druidd-java:17
-      - name: Push Java 18
-        run: docker push artifacts.druid.gg/druid-team/druidd-java:18
-      - name: Push Java 20
-        run: docker push artifacts.druid.gg/druid-team/druidd-java:20
-      - name: Push Java 21
-        run: docker push artifacts.druid.gg/druid-team/druidd-java:21
-      - name: Push Java 21 no CLI
-        run: docker push artifacts.druid.gg/druid-team/druidd-java:21-no-cli
-      - name: Push Ubuntu
-        run: docker push artifacts.druid.gg/druid-team/druidd-ubuntu
-      - name: Push Ubuntu
+      - name: Push SteamCMD
         run: docker push artifacts.druid.gg/druid-team/druidd-steamcmd

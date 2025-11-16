@@ -48,12 +48,12 @@ jobs:
           druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.2 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-spigot/1.20.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.5 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.5 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-spigot/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.17.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.18 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
@@ -68,12 +68,12 @@ jobs:
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.2 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/minecraft-vanilla/1.20.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.5 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
-          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix-no-cli --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.4 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.5 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.6 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
+          druid registry push ./scrolls/minecraft/minecraft-vanilla/1.21.7 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/papermc/1.17 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/papermc/1.17.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
           druid registry push ./scrolls/minecraft/papermc/1.18.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
