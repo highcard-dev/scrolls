@@ -29,7 +29,7 @@ commands:
         data: stop
   install:
     run: once
-    dependencies: [wget]
+    dependencies: [wget, cacert]
     procedures:
       - mode: exec
         data:

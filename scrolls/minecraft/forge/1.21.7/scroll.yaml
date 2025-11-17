@@ -33,7 +33,7 @@ commands:
         data: stop
   install:
     run: once
-    dependencies: [wget, jdk21]
+    dependencies: [wget, cacert, jdk21]
     procedures:
       - mode: exec
         data:

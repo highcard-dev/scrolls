@@ -33,7 +33,7 @@ commands:
         data: stop
   install:
     run: once
-    dependencies: [wget, jdk{{ .Vars.jdkVersion }}]
+    dependencies: [wget, cacert, jdk{{ .Vars.jdkVersion }}]
     procedures:
       - mode: exec
         data:
