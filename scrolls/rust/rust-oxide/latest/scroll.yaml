@@ -47,6 +47,7 @@ commands:
         data: quit
   install:
     run: once
+    dependencies: [wget, cacert, unzip]
     procedures:
       - mode: exec
         data:
