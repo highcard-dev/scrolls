@@ -1,3 +1,2 @@
 RCONEnabled=True
 RCONPort={{ env "DRUID_PORT_RCON_1" | default "27020" }}
-branch="preaquatica"
