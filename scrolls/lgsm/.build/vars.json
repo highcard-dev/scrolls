@@ -10,7 +10,7 @@
     "start_delay": "0",
     "rcon_port": "true",
     "lua_steam_app_id": "346110",
-    "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat-openbsd;pigz;python3;tmux;unzip;util-linux;moreutils"
+    "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat-openbsd;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   },
   "cs2server": {
     "rcon": "enabled",
@@ -22,12 +22,14 @@
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "lua_query_port": "main",
     "lua_query_start_on_unknown_packet": "yes",
-    "lua_steam_app_id": "730"
+    "lua_steam_app_id": "730",
+    "dependencies": "tmux;unzip;iproute2"
   },
   "pwserver": {
     "port": "main=8211/udp;rcon=25575",
     "main_port_protocol": "udp",
-    "lua_steam_app_id": "1623730"
+    "lua_steam_app_id": "1623730",
+    "dependencies": "tmux;unzip;iproute2"
   },
   "gmodserver": {
     "port": "query=27005/udp;main=/udp;sourcetv=27020/udp;steam=27015",
@@ -40,7 +42,8 @@
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "lua_query_port": "main",
     "lua_query_start_on_unknown_packet": "yes",
-    "lua_steam_app_id": "4000"
+    "lua_steam_app_id": "4000",
+    "dependencies": "tmux;unzip;iproute2"
   },
   "sdtdserver": {
     "port": "main=26900/udp;main2=26902/udp;maintcp=26900",
@@ -49,12 +52,14 @@
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "main_port_protocol": "udp",
-    "lua_steam_app_id": "251570"
+    "lua_steam_app_id": "251570",
+    "dependencies": "tmux;unzip;iproute2"
   },
   "dayzserver": {
     "port": "main=2302/udp;battle-eye=2304/udp;query=27016/udp",
     "main_port_protocol": "udp",
-    "lua_steam_app_id": "221100"
+    "lua_steam_app_id": "221100",
+    "dependencies": "tmux;unzip;iproute2"
   },
   "untserver": {
     "port": "main=27015/udp;mainv6=27016",
@@ -64,7 +69,8 @@
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "lua_query_port": "main",
     "lua_query_start_on_unknown_packet": "yes",
-    "lua_steam_app_id": "304930"
+    "lua_steam_app_id": "304930",
+    "dependencies": "tmux;unzip;iproute2"
   },
   "csgoserver": {
     "port": "query=27005/udp;main=27015/udp;sourcetv=27020/udp;steam=27015",
@@ -74,7 +80,8 @@
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "main_port_protocol": "udp",
     "ppm": "600",
-    "lua_steam_app_id": "730"
+    "lua_steam_app_id": "730",
+    "dependencies": "tmux;unzip;iproute2"
   },
   "terrariaserver": {
     "port": "todo=8211/udp",
@@ -83,7 +90,8 @@
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "main_port_protocol": "udp",
-    "lua_steam_app_id": "105600"
+    "lua_steam_app_id": "105600",
+    "dependencies": "tmux;unzip;iproute2"
   },
   "pzserver": {
     "port": "main=26900/udp;main2=26902/udp;maintcp=26900",
@@ -93,6 +101,7 @@
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "lua_query_port": "main",
     "lua_query_start_on_unknown_packet": "yes",
-    "lua_steam_app_id": "108600"
+    "lua_steam_app_id": "108600",
+    "dependencies": "tmux;unzip;iproute2"
   }
 }

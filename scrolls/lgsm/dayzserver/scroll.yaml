@@ -16,6 +16,9 @@ commands:
   console:
     needs: [start]
     run: restart
+    dependencies:
+      - tmux
+      - unzip
     procedures:
       - mode: stdin
         wait: 5
@@ -28,6 +31,9 @@ commands:
           - console
   start:
     needs: [install]
+    dependencies:
+      - tmux
+      - unzip
     procedures:
       - mode: exec
         ignore_failure: true
@@ -45,6 +51,9 @@ commands:
           - ./dayzserver
           - stop
   restart:
+    dependencies:
+      - tmux
+      - unzip
     procedures:
       - mode: exec
         data:
@@ -57,6 +66,9 @@ commands:
       - mode: command
         data: console
   install:
+    dependencies:
+      - tmux
+      - unzip
     run: once
     procedures:
       - mode: exec
