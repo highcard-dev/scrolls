@@ -9,7 +9,8 @@
     "main_port_protocol": "udp",
     "start_delay": "0",
     "rcon_port": "true",
-    "lua_steam_app_id": "346110"
+    "lua_steam_app_id": "346110",
+    "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat-openbsd;pigz;python3;tmux;unzip;util-linux;moreutils"
   },
   "cs2server": {
     "rcon": "enabled",

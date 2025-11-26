@@ -63,7 +63,13 @@ func main() {
 	}
 	json.Unmarshal(artifactBytes, &artifacts)
 
-	scollYamltemplate, err := template.ParseFiles(scrollYamlTemplate)
+	// Create template with custom functions
+	funcMap := template.FuncMap{
+		"split": func(sep, s string) []string {
+			return strings.Split(s, sep)
+		},
+	}
+	scollYamltemplate, err := template.New(filepath.Base(scrollYamlTemplate)).Funcs(funcMap).ParseFiles(scrollYamlTemplate)
 	// Capture any error
 	if err != nil {
 		log.Fatalln(err)

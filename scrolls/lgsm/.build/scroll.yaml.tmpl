@@ -63,6 +63,12 @@ commands:
   console:
     needs: [start]
     run: restart
+{{- if index .Vars "dependencies" }}
+    dependencies:
+{{- range split ";" (index .Vars "dependencies") }}
+      - {{ . }}
+{{- end }}
+{{- end }}
     procedures:
       - mode: stdin
         wait: 5
@@ -75,6 +81,12 @@ commands:
           - console
   start:
     needs: [install]
+{{- if index .Vars "dependencies" }}
+    dependencies:
+{{- range split ";" (index .Vars "dependencies") }}
+      - {{ . }}
+{{- end }}
+{{- end }}
     procedures:
       - mode: exec
         ignore_failure: true
@@ -92,6 +104,12 @@ commands:
           - ./{{ .Version }}
           - stop
   restart:
+{{- if index .Vars "dependencies" }}
+    dependencies:
+{{- range split ";" (index .Vars "dependencies") }}
+      - {{ . }}
+{{- end }}
+{{- end }}
     procedures:
       - mode: exec
         data:
@@ -104,6 +122,12 @@ commands:
       - mode: command
         data: console
   install:
+{{- if index .Vars "dependencies" }}
+    dependencies:
+{{- range split ";" (index .Vars "dependencies") }}
+      - {{ . }}
+{{- end }}
+{{- end }}
     run: once
     procedures:
       - mode: exec

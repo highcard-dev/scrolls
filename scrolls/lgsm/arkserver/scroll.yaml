@@ -37,6 +37,21 @@ commands:
   console:
     needs: [start]
     run: restart
+    dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat-openbsd
+      - pigz
+      - python3
+      - tmux
+      - unzip
+      - util-linux
+      - moreutils
     procedures:
       - mode: stdin
         wait: 5
@@ -49,6 +64,21 @@ commands:
           - console
   start:
     needs: [install]
+    dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat-openbsd
+      - pigz
+      - python3
+      - tmux
+      - unzip
+      - util-linux
+      - moreutils
     procedures:
       - mode: exec
         ignore_failure: true
@@ -66,6 +96,21 @@ commands:
           - ./arkserver
           - stop
   restart:
+    dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat-openbsd
+      - pigz
+      - python3
+      - tmux
+      - unzip
+      - util-linux
+      - moreutils
     procedures:
       - mode: exec
         data:
@@ -78,6 +123,21 @@ commands:
       - mode: command
         data: console
   install:
+    dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat-openbsd
+      - pigz
+      - python3
+      - tmux
+      - unzip
+      - util-linux
+      - moreutils
     run: once
     procedures:
       - mode: exec
