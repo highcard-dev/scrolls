@@ -52,6 +52,7 @@ commands:
       - unzip
       - util-linux
       - moreutils
+      - iproute2
     procedures:
       - mode: stdin
         wait: 5
@@ -79,6 +80,7 @@ commands:
       - unzip
       - util-linux
       - moreutils
+      - iproute2
     procedures:
       - mode: exec
         ignore_failure: true
@@ -111,6 +113,7 @@ commands:
       - unzip
       - util-linux
       - moreutils
+      - iproute2
     procedures:
       - mode: exec
         data:
@@ -138,6 +141,7 @@ commands:
       - unzip
       - util-linux
       - moreutils
+      - iproute2
     run: once
     procedures:
       - mode: exec

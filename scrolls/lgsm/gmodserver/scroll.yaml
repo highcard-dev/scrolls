@@ -37,8 +37,21 @@ commands:
     needs: [start]
     run: restart
     dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat-openbsd
+      - pigz
+      - python3
       - tmux
       - unzip
+      - util-linux
+      - moreutils
+      - iproute2
     procedures:
       - mode: stdin
         wait: 5
@@ -52,8 +65,21 @@ commands:
   start:
     needs: [install]
     dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat-openbsd
+      - pigz
+      - python3
       - tmux
       - unzip
+      - util-linux
+      - moreutils
+      - iproute2
     procedures:
       - mode: exec
         ignore_failure: true
@@ -72,8 +98,21 @@ commands:
           - stop
   restart:
     dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat-openbsd
+      - pigz
+      - python3
       - tmux
       - unzip
+      - util-linux
+      - moreutils
+      - iproute2
     procedures:
       - mode: exec
         data:
@@ -87,8 +126,21 @@ commands:
         data: console
   install:
     dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat-openbsd
+      - pigz
+      - python3
       - tmux
       - unzip
+      - util-linux
+      - moreutils
+      - iproute2
     run: once
     procedures:
       - mode: exec
