@@ -4,10 +4,20 @@ on:
     inputs:
       image:
         description: "Image"
-        required: true
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 3 * * *"
 jobs:
   build-lgsm:
     runs-on: self-hosted
+    strategy:
+      matrix:
+        image: ${{ fromJson(
+          github.event_name == 'workflow_dispatch' && github.event.inputs.image != ''
+            ? format('["{0}"]', github.event.inputs.image)
+            : '["ark"]'
+        ) }}
     steps:
       - uses: actions/checkout@v3
       - name: Login to Docker Hub
@@ -28,8 +38,8 @@ jobs:
       #          PRESIGN_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
       #          PRESIGN_SECRET_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
       #          BACKUP_ADDITIONAL_ARGS: "--insecure"
-      - name: Prebuild and upload Image ${{ github.event.inputs.image }}
-        run: ./scripts/prebuild/prebuild.sh ${{ github.event.inputs.image }}
+      - name: Prebuild and upload Image ${{ matrix.image }}
+        run: ./scripts/prebuild/prebuild.sh ${{ matrix.image }}
         env:
           PRESIGN_ACCESS_KEY: ${{ secrets.PRESIGN_ACCESS_KEY }}
           PRESIGN_BUCKET_NAME: ${{ secrets.PRESIGN_BUCKET_NAME }}
