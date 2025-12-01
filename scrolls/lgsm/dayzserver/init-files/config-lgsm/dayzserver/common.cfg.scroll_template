@@ -1,3 +1,0 @@
-port="{{ env "DRUID_PORT_MAIN_1" | default "2302" }}"
-steamuser="{{ env "STEAM_USER" | default "drdmarc" }}"
-steampass="{{ env "STEAM_PASS" | default "!hb3rbasHuxGjM" }}"
