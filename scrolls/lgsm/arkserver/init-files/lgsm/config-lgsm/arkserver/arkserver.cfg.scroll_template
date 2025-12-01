@@ -1,0 +1,7 @@
+port="{{ env "DRUID_PORT_MAIN_1" | default "7777" }}"
+queryport="{{ env "DRUID_PORT_QUERY_1" | default "27015" }}"
+rconport="{{ .Config.rcon.port }}"
+
+{{ if not (empty (env "DRUID_IP_1")) }}
+publicip="{{ env "DRUID_IP_1" }}"
+{{ end }}
