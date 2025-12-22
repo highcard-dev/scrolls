@@ -10,7 +10,7 @@ TMP_VOLUME_NAME=lgsm-prebuild-$(date +%s)
 
 docker volume rm $TMP_VOLUME_NAME || true
 
-docker run --rm -v $TMP_VOLUME_NAME:/app/resources bash sh -c 'wget -O /app/resources/druid-install-command.sh https://github.com/highcard-dev/druid-cli/releases/latest/download/druid-install-command.sh && mkdir /app/resources/deployment && chmod +x /app/resources/druid-install-command.sh && chown 1000:1000 -R /app/resources/'
+docker run --rm -v $TMP_VOLUME_NAME:/app/resources bash sh -c 'wget -O /app/resources/druid-install-command.sh https://github.com/highcard-dev/druid-cli/releases/latest/download/druid-install-command.sh && mkdir -p /app/resources/deployment && chmod +x /app/resources/druid-install-command.sh && chown 1000:1000 -R /app/resources/'
 
 DOCKER_ENTRYPOINT=/app/resources/druid-install-command.sh
 
