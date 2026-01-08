@@ -24,7 +24,7 @@ commands:
       - file
       - jq
       - pkgsi686Linux.gcc
-      - netcat-openbsd
+      - netcat
       - pigz
       - python3
       - tmux
@@ -52,7 +52,7 @@ commands:
       - file
       - jq
       - pkgsi686Linux.gcc
-      - netcat-openbsd
+      - netcat
       - pigz
       - python3
       - tmux
@@ -85,7 +85,7 @@ commands:
       - file
       - jq
       - pkgsi686Linux.gcc
-      - netcat-openbsd
+      - netcat
       - pigz
       - python3
       - tmux
@@ -113,7 +113,7 @@ commands:
       - file
       - jq
       - pkgsi686Linux.gcc
-      - netcat-openbsd
+      - netcat
       - pigz
       - python3
       - tmux
