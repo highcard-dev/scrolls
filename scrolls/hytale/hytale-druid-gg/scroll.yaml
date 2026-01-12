@@ -1,0 +1,41 @@
+name: artifacts.druid.gg/druid-team/hytale
+desc: Hytale
+version: 0.0.1
+app_version: latest
+ports:
+  - name: main
+    protocol: udp
+    port: 5520
+init: "start"
+commands:
+  install:
+    run: once
+    dependencies: [wget, cacert, unzip]
+    procedures:
+      - mode: exec
+        data:
+          - wget
+          - -q
+          - -O
+          - hytale-downloader.zip
+          - https://downloader.hytale.com/hytale-downloader.zip
+      - mode: exec
+        data:
+          - unzip
+          - hytale-downloader.zip
+      - mode: exec
+        data:
+          - ./hytale-downloader-linux-amd64
+  start:
+    run: once
+    needs: [install]
+    dependencies: [jdk21]
+    procedures:
+      - mode: exec
+        data:
+          - java
+          - -jar
+          - HytaleServer.jar
+
+plugins:
+  rcon: {}
