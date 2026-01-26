@@ -4,8 +4,8 @@ wget https://codeload.github.com/GameServerManagers/LinuxGSM/zip/refs/heads/mast
 unzip lgsm.zip
 
 #recreate lgsm dir
-rm -rf lgsm
-mkdir lgsm
+#rm -rf lgsm
+mkdir -p lgsm
 
 
 mv LinuxGSM-master/linuxgsm.sh .
