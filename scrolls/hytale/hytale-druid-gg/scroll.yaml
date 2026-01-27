@@ -10,32 +10,47 @@ init: "start"
 commands:
   install:
     run: once
-    dependencies: [wget, cacert, unzip]
+    dependencies: [wget, cacert]
     procedures:
       - mode: exec
         data:
           - wget
           - -q
           - -O
-          - hytale-downloader.zip
-          - https://downloader.hytale.com/hytale-downloader.zip
+          - install-server.sh
+          - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-install-hytale-server.sh
       - mode: exec
         data:
-          - unzip
-          - hytale-downloader.zip
+          - wget
+          - -q
+          - -O
+          - start-server.sh
+          - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-start-hytale-server.sh
       - mode: exec
         data:
-          - ./hytale-downloader-linux-amd64
-  start:
+          - chmod
+          - "+x"
+          - install-server.sh
+          - start-server.sh
+  install-server:
     run: once
     needs: [install]
-    dependencies: [jdk21]
+    dependencies: [wget, cacert, unzip]
     procedures:
       - mode: exec
         data:
-          - java
-          - -jar
-          - HytaleServer.jar
+          - bash
+          - -c
+          - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) ./install-server.sh
+  start:
+    needs: [install-server]
+    dependencies: [jdk25]
+    procedures:
+      - mode: exec
+        data:
+          - bash
+          - -c
+          - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) ./start-server.sh
 
 plugins:
   rcon: {}

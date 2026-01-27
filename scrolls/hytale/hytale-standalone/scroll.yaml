@@ -8,34 +8,37 @@ ports:
     port: 5520
 init: "start"
 commands:
-  install:
+  install-hsm:
     run: once
-    dependencies: [wget, cacert, unzip]
+    dependencies: [wget, cacert]
     procedures:
       - mode: exec
         data:
-          - wget
-          - -q
-          - -O
-          - hytale-downloader.zip
-          - https://downloader.hytale.com/hytale-downloader.zip
+          - bash
+          - install.sh
+  login:
+    run: once
+    needs: [install-hsm]
+    procedures:
       - mode: exec
         data:
-          - unzip
-          - hytale-downloader.zip
+          - ./hsm
+          - login
+  download:
+    needs: [login]
+    procedures:
       - mode: exec
         data:
-          - ./hytale-downloader-linux-amd64
+          - ./hsm
+          - download
   start:
-    run: once
-    needs: [install]
-    dependencies: [jdk21]
+    needs: [download]
+    dependencies: [jdk25]
     procedures:
       - mode: exec
         data:
-          - java
-          - -jar
-          - HytaleServer.jar
+          - ./hsm
+          - start
 
 plugins:
   rcon: {}
