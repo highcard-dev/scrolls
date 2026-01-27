@@ -1,0 +1,44 @@
+name: artifacts.druid.gg/druid-team/hytale
+desc: Hytale
+version: 0.0.1
+app_version: standalone
+ports:
+  - name: main
+    protocol: udp
+    port: 5520
+init: "start"
+commands:
+  install-hsm:
+    run: once
+    dependencies: [wget, cacert]
+    procedures:
+      - mode: exec
+        data:
+          - bash
+          - install.sh
+  login:
+    run: once
+    needs: [install-hsm]
+    procedures:
+      - mode: exec
+        data:
+          - ./hsm
+          - login
+  download:
+    needs: [login]
+    procedures:
+      - mode: exec
+        data:
+          - ./hsm
+          - download
+  start:
+    needs: [download]
+    dependencies: [jdk25]
+    procedures:
+      - mode: exec
+        data:
+          - ./hsm
+          - start
+
+plugins:
+  rcon: {}

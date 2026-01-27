@@ -1,0 +1,56 @@
+name: artifacts.druid.gg/druid-team/hytale
+desc: Hytale
+version: 0.0.1
+app_version: latest
+ports:
+  - name: main
+    protocol: udp
+    port: 5520
+init: "start"
+commands:
+  install:
+    run: once
+    dependencies: [wget, cacert]
+    procedures:
+      - mode: exec
+        data:
+          - wget
+          - -q
+          - -O
+          - install-server.sh
+          - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-install-hytale-server.sh
+      - mode: exec
+        data:
+          - wget
+          - -q
+          - -O
+          - start-server.sh
+          - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-start-hytale-server.sh
+      - mode: exec
+        data:
+          - chmod
+          - "+x"
+          - install-server.sh
+          - start-server.sh
+  install-server:
+    run: once
+    needs: [install]
+    dependencies: [wget, cacert, unzip]
+    procedures:
+      - mode: exec
+        data:
+          - bash
+          - -c
+          - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) ./install-server.sh
+  start:
+    needs: [install-server]
+    dependencies: [jdk25]
+    procedures:
+      - mode: exec
+        data:
+          - bash
+          - -c
+          - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) ./start-server.sh
+
+plugins:
+  rcon: {}

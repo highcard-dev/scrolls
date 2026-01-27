@@ -128,6 +128,10 @@ jobs:
 
           druid registry push ./scrolls/lgsm/terrariaserver -p todo=8211/udp -i artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd -m
           druid registry push ./scrolls/lgsm/csgoserver -p query=27005/udp -p main=27015/udp -p sourcetv=27020/udp -p steam=27015 -i artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd -m --smart
+
+
+          druid registry push ./scrolls/hytale/hytale-standalone -p main=5520/udp -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 10Gi --min-ram 4Gi --min-cpu 1
+          druid registry push ./scrolls/hytale/hytale-druid-gg -p main=5520/udp -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 10Gi --min-ram 4Gi --min-cpu 1
       - name: Push Meta
         run: |
           druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot/.meta
