@@ -10,7 +10,7 @@ init: "start"
 commands:
   install-hsm:
     run: once
-    dependencies: [wget, cacert]
+    dependencies: [wget, cacert, curl]
     procedures:
       - mode: exec
         data:
