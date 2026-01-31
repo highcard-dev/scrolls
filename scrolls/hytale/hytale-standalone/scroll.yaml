@@ -24,15 +24,15 @@ commands:
         data:
           - ./hsm
           - login
-  download:
+  update:
     needs: [login]
     procedures:
       - mode: exec
         data:
           - ./hsm
-          - download
+          - update
   start:
-    needs: [download]
+    needs: [update]
     dependencies: [jdk25]
     procedures:
       - mode: exec

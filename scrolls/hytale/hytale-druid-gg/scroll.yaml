@@ -17,8 +17,8 @@ commands:
           - wget
           - -q
           - -O
-          - install-server.sh
-          - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-install-hytale-server.sh
+          - update-server.sh
+          - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-update-hytale-server.sh
       - mode: exec
         data:
           - wget
@@ -30,7 +30,7 @@ commands:
         data:
           - chmod
           - "+x"
-          - install-server.sh
+          - update-server.sh
           - start-server.sh
   install-server:
     run: once
@@ -41,7 +41,7 @@ commands:
         data:
           - bash
           - -c
-          - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) ./install-server.sh
+          - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) ./update-server.sh
   start:
     needs: [install-server]
     dependencies: [jdk25]
