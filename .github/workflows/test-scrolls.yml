@@ -1,0 +1,45 @@
+name: Test Scrolls
+
+on:
+  workflow_dispatch: # Manual trigger
+  # pull_request:     # Uncomment to run on PRs later
+  #   paths:
+  #     - 'scrolls/**'
+
+jobs:
+  test-scrolls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180 # 3 hours for all scrolls
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install netcat
+        run: sudo apt-get update && sudo apt-get install -y netcat-openbsd
+      
+      - name: Download druid CLI
+        run: |
+          curl -L -o druid "https://github.com/highcard-dev/druid-cli/releases/latest/download/druid"
+          chmod +x druid
+          sudo mv druid /usr/local/bin/
+          druid --version
+      
+      - name: Install Nix (for dependencies)
+        uses: cachix/install-nix-action@v24
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      
+      - name: Run scroll tests
+        run: |
+          ./test-scrolls.sh
+        env:
+          DRUID_BIN: druid
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 7
