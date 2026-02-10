@@ -62,18 +62,20 @@ echo "Image: $IMAGE"
 echo "Ports: ${PORTS[*]}"
 
 # Pull image
-echo "Pulling image..."
-docker pull "$IMAGE" || {
-    echo "SKIP: Cannot pull image"
+echo "Pulling image: $IMAGE"
+if ! docker pull "$IMAGE"; then
+    echo "SKIP: Cannot pull image $IMAGE"
     exit 0
-}
+fi
 
 # Start container - mount scroll to /home/druid/.scroll
 echo "Starting container..."
+echo "Mounting: $(pwd)/$SCROLL_PATH -> /home/druid/.scroll"
+
 CONTAINER_ID=$(docker run --rm -d \
     -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll" \
     "$IMAGE" \
-    druid serve --port 8081)
+    sh -c "ls -la /home/druid/.scroll && druid serve --port 8081")
 
 echo "Container: $CONTAINER_ID"
 

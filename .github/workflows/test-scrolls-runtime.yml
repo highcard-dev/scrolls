@@ -47,6 +47,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: artifacts.druid.gg
+          username: ${{ secrets.IMAGE_REGISTRY_USER }}
+          password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
+      
       - name: Setup
         run: |
           chmod +x scripts/test-scroll-runtime.sh
