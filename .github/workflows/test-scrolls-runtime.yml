@@ -1,207 +1,91 @@
-name: Test Scrolls Runtime
+name: Test Scrolls
 
 on:
   pull_request:
     paths:
-      - 'scrolls/**/*.yaml'
-      - 'scrolls/**/*.lua'
-      - 'scrolls/**/*.sh'
+      - 'scrolls/**'
       - '.github/workflows/test-scrolls-runtime.yml'
       - 'scripts/test-scroll-runtime.sh'
   push:
     branches:
       - master
     paths:
-      - 'scrolls/**/*.yaml'
-      - 'scrolls/**/*.lua'
-      - 'scrolls/**/*.sh'
+      - 'scrolls/**'
       - '.github/workflows/test-scrolls-runtime.yml'
       - 'scripts/test-scroll-runtime.sh'
-  workflow_dispatch:
-    inputs:
-      scroll_pattern:
-        description: 'Scroll pattern to test (e.g., minecraft/papermc/*, rust/*)'
-        required: false
-        default: ''
 
 jobs:
-  # Build druid-cli first
+  # Generate dynamic matrix of all scrolls
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate scroll list
+        id: set-matrix
+        run: |
+          SCROLLS=$(find scrolls -name "scroll.yaml" -type f | sed 's|/scroll.yaml||' | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix=$SCROLLS" >> $GITHUB_OUTPUT
+  
+  # Build druid-cli
   build-druid:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout druid-cli repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: highcard-dev/druid-cli
-          path: druid-cli
       
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
           go-version: '1.22'
       
-      - name: Build druid-cli
+      - name: Build
         run: |
-          cd druid-cli
           make build
           chmod +x bin/druid
       
-      - name: Upload druid binary
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: druid-cli
-          path: druid-cli/bin/druid
+          path: bin/druid
           retention-days: 1
   
-  # Test scrolls (sample set for now)
-  test-scrolls:
-    needs: build-druid
+  # Test all scrolls
+  test:
+    needs: [generate-matrix, build-druid]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        # Test a representative sample from each game type
-        # Full testing would take too long (222 * 3min = 11 hours)
-        game_group:
-          - minecraft-vanilla
-          - minecraft-papermc
-          - minecraft-spigot
-          - minecraft-forge
-          - lgsm-source
-          - rust
+        scroll: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     
     steps:
-      - name: Checkout scrolls repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
-      - name: Download druid binary
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: druid-cli
-          path: /tmp/druid-cli
       
-      - name: Setup druid CLI
+      - name: Setup
         run: |
-          chmod +x /tmp/druid-cli/druid
-          sudo mv /tmp/druid-cli/druid /usr/local/bin/druid
-          druid --version || echo "Druid CLI installed"
-      
-      - name: Install dependencies
-        run: |
+          chmod +x druid
+          sudo mv druid /usr/local/bin/
           sudo apt-get update
-          sudo apt-get install -y yq iproute2 net-tools
+          sudo apt-get install -y yq iproute2
+          chmod +x scripts/test-scroll-runtime.sh
       
-      - name: Make test script executable
-        run: chmod +x scripts/test-scroll-runtime.sh
-      
-      - name: Test scrolls - ${{ matrix.game_group }}
+      - name: Test ${{ matrix.scroll }}
         run: |
-          case "${{ matrix.game_group }}" in
-            minecraft-vanilla)
-              # Test one Minecraft Vanilla version
-              SCROLL_DIR="scrolls/minecraft/minecraft-vanilla/1.21.7"
-              ;;
-            minecraft-papermc)
-              # Test one PaperMC version
-              SCROLL_DIR="scrolls/minecraft/papermc/1.21.7"
-              ;;
-            minecraft-spigot)
-              # Test one Spigot version
-              SCROLL_DIR="scrolls/minecraft/minecraft-spigot/1.21.7"
-              ;;
-            minecraft-forge)
-              # Test one Forge version
-              SCROLL_DIR="scrolls/minecraft/forge/1.21.7"
-              ;;
-            lgsm-source)
-              # Test CS2 (Source engine game)
-              SCROLL_DIR="scrolls/lgsm/cs2server"
-              ;;
-            rust)
-              # Test Rust Vanilla
-              SCROLL_DIR="scrolls/rust/rust-vanilla/latest"
-              ;;
-          esac
-          
-          if [ -z "$SCROLL_DIR" ] || [ ! -d "$SCROLL_DIR" ]; then
-            echo "Scroll directory not found: $SCROLL_DIR"
-            exit 0  # Skip if not found
-          fi
-          
-          # Run test for this specific scroll
-          echo "Testing scroll: $SCROLL_DIR"
-          
-          # Override the script to test only this scroll
-          cd "$SCROLL_DIR"
-          
-          # Extract mandatory ports
-          MANDATORY_PORTS=$(yq eval '.ports[] | select(.mandatory == true) | .port' scroll.yaml 2>/dev/null || echo "")
-          
-          if [ -z "$MANDATORY_PORTS" ]; then
-            echo "No mandatory ports defined, skipping"
-            exit 0
-          fi
-          
-          echo "Mandatory ports: $MANDATORY_PORTS"
-          
-          # Start druid serve
-          druid serve --port 8081 > /tmp/druid-serve.log 2>&1 &
-          DRUID_PID=$!
-          
-          echo "Started druid serve (PID: $DRUID_PID)"
-          
-          # Wait for ports (max 3 minutes)
-          TIMEOUT=180
-          START_TIME=$(date +%s)
-          
-          while true; do
-            CURRENT_TIME=$(date +%s)
-            ELAPSED=$((CURRENT_TIME - START_TIME))
-            
-            if [ $ELAPSED -ge $TIMEOUT ]; then
-              echo "❌ TIMEOUT after ${TIMEOUT}s"
-              echo "Log output:"
-              tail -100 /tmp/druid-serve.log
-              kill $DRUID_PID 2>/dev/null || true
-              exit 1
-            fi
-            
-            # Check if all ports are open
-            ALL_OPEN=true
-            for PORT in $MANDATORY_PORTS; do
-              if ! ss -ltn | grep -q ":$PORT "; then
-                echo "Port $PORT not yet open (${ELAPSED}s elapsed)"
-                ALL_OPEN=false
-                break
-              fi
-            done
-            
-            if [ "$ALL_OPEN" = "true" ]; then
-              echo "✅ SUCCESS - All ports open after ${ELAPSED}s"
-              kill $DRUID_PID 2>/dev/null || true
-              exit 0
-            fi
-            
-            sleep 5
-          done
+          scripts/test-scroll-runtime.sh "${{ matrix.scroll }}"
       
-      - name: Upload logs on failure
+      - name: Upload logs
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: druid-logs-${{ matrix.game_group }}
+          name: logs-${{ hashFiles(matrix.scroll) }}
           path: /tmp/druid-serve.log
-          retention-days: 7
-  
-  # Summary job
-  test-summary:
-    needs: test-scrolls
-    runs-on: ubuntu-latest
-    if: always()
-    
-    steps:
-      - name: Check test results
-        run: |
-          echo "Runtime testing complete"
-          echo "Check individual job results above"
+          retention-days: 3
