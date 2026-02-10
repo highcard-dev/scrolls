@@ -73,6 +73,13 @@ fi
 # Start container
 echo ""
 echo "Starting container..."
+
+# Debug: show what we're mounting
+echo "Local scroll path: $(pwd)/$SCROLL_PATH"
+echo "Files in local path:"
+ls -la "$(pwd)/$SCROLL_PATH"
+echo ""
+
 CONTAINER_ID=$(docker run --rm -d \
     -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll" \
     -w /home/druid \
@@ -80,6 +87,15 @@ CONTAINER_ID=$(docker run --rm -d \
 
 echo "Container ID: $CONTAINER_ID"
 echo ""
+
+# Wait a moment for container to start
+sleep 2
+
+# Debug: check what's in the container
+echo "Files in container .scroll directory:"
+docker exec "$CONTAINER_ID" ls -la /home/druid/.scroll || echo "Failed to list directory"
+echo ""
+
 echo "=== Container Output ==="
 
 # Start following logs in background
