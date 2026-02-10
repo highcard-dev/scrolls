@@ -74,8 +74,7 @@ echo "Mounting: $(pwd)/$SCROLL_PATH -> /home/druid/.scroll"
 
 CONTAINER_ID=$(docker run --rm -d \
     -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll" \
-    "$IMAGE" \
-    sh -c "ls -la /home/druid/.scroll && druid serve --port 8081")
+    "$IMAGE")
 
 echo "Container: $CONTAINER_ID"
 
