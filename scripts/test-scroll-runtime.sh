@@ -70,39 +70,18 @@ if ! docker pull "$IMAGE"; then
     exit 0
 fi
 
-# Start container
+# Start container - use absolute path
+ABS_SCROLL_PATH="$(cd $(dirname $SCROLL_PATH) && pwd)/$(basename $SCROLL_PATH)"
 echo ""
 echo "Starting container..."
-
-# Debug: show what we're mounting
-echo "Local scroll path: $(pwd)/$SCROLL_PATH"
-echo "Files in local path:"
-ls -la "$(pwd)/$SCROLL_PATH"
-echo ""
-
-# Create temp directory with correct permissions
-TEMP_DIR=$(mktemp -d)
-cp -r "$(pwd)/$SCROLL_PATH/"* "$TEMP_DIR/"
-chmod -R 755 "$TEMP_DIR"
+echo "Mounting: $ABS_SCROLL_PATH -> /.scroll"
 
 CONTAINER_ID=$(docker run --rm -d \
-    -v "$TEMP_DIR:/home/druid/.scroll" \
-    -w /home/druid \
+    -v "$ABS_SCROLL_PATH:/.scroll:ro" \
     "$IMAGE")
-
-# Cleanup will happen when container stops (--rm flag handles it)
 
 echo "Container ID: $CONTAINER_ID"
 echo ""
-
-# Wait a moment for container to start
-sleep 2
-
-# Debug: check what's in the container
-echo "Files in container .scroll directory:"
-docker exec "$CONTAINER_ID" ls -la /home/druid/.scroll || echo "Failed to list directory"
-echo ""
-
 echo "=== Container Output ==="
 
 # Start following logs in background
@@ -124,7 +103,6 @@ while true; do
         echo "FAIL: Container exited after ${ELAPSED}s"
         echo "========================================"
         kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_DIR" 2>/dev/null || true
         exit 1
     fi
     
@@ -136,7 +114,6 @@ while true; do
         echo "========================================"
         docker kill "$CONTAINER_ID" 2>/dev/null || true
         kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_DIR" 2>/dev/null || true
         exit 1
     fi
     
@@ -150,7 +127,6 @@ while true; do
             echo "========================================"
             docker kill "$CONTAINER_ID" 2>/dev/null || true
             kill $LOGS_PID 2>/dev/null || true
-            rm -rf "$TEMP_DIR" 2>/dev/null || true
             exit 0
         fi
     fi
