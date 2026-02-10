@@ -21,11 +21,11 @@ get_ports() {
     grep "port:" "$SCROLL_PATH/scroll.yaml" | grep -oE "[0-9]+" | head -10
 }
 
-# Check if any port is open
+# Check if any port is open (check from inside container)
 check_port() {
     local container_id=$1
     local port=$2
-    docker exec "$container_id" sh -c "ss -ltn 2>/dev/null | grep -q ':$port ' || netstat -ltn 2>/dev/null | grep -q ':$port '" 2>/dev/null
+    docker exec "$container_id" sh -c "ss -ltn 2>/dev/null | grep -q ':$port ' || netstat -ltn 2>/dev/null | grep -q ':$port ' || lsof -i :$port 2>/dev/null" 2>/dev/null
 }
 
 # Main
@@ -72,24 +72,33 @@ CONTAINER_ID=$(docker run --rm -d \
     "$IMAGE")
 
 echo "Container: $CONTAINER_ID"
+echo "Logs:"
+echo "---"
 
-# Follow logs
+# Follow logs in background
 docker logs -f "$CONTAINER_ID" 2>&1 &
 LOGS_PID=$!
 
 # Check for ports
 START=$(date +%s)
+LAST_CHECK=0
+
 while true; do
     ELAPSED=$(($(date +%s) - START))
     
+    # Check if container is still running
     if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
+        echo "---"
         echo "FAIL: Container exited after ${ELAPSED}s"
+        echo "Exit code: $(docker inspect $CONTAINER_ID --format='{{.State.ExitCode}}' 2>/dev/null || echo 'unknown')"
         kill $LOGS_PID 2>/dev/null || true
         rm -rf "$TEMP_SCROLL"
         exit 1
     fi
     
+    # Timeout check
     if [ $ELAPSED -ge $TIMEOUT ]; then
+        echo "---"
         echo "FAIL: Timeout ${TIMEOUT}s"
         docker kill "$CONTAINER_ID" 2>/dev/null || true
         kill $LOGS_PID 2>/dev/null || true
@@ -97,10 +106,11 @@ while true; do
         exit 1
     fi
     
-    # Check ports every 5 seconds
-    if [ $((ELAPSED % 5)) -eq 0 ]; then
+    # Check ports every 2 seconds (not every loop to reduce overhead)
+    if [ $((ELAPSED - LAST_CHECK)) -ge 2 ]; then
         for port in "${PORTS[@]}"; do
             if check_port "$CONTAINER_ID" "$port"; then
+                echo "---"
                 echo "PASS: Port $port open after ${ELAPSED}s"
                 docker kill "$CONTAINER_ID" 2>/dev/null || true
                 kill $LOGS_PID 2>/dev/null || true
@@ -108,6 +118,7 @@ while true; do
                 exit 0
             fi
         done
+        LAST_CHECK=$ELAPSED
     fi
     
     sleep 1
