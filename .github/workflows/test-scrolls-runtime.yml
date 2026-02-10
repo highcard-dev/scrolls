@@ -40,7 +40,8 @@ jobs:
     needs: generate-matrix
     runs-on: self-hosted
     strategy:
-      fail-fast: true
+      fail-fast: false
+      max-parallel: 5
       matrix:
         scroll: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     
