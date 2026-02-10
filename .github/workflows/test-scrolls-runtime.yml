@@ -58,8 +58,6 @@ jobs:
         run: |
           chmod +x scripts/test-scroll-runtime.sh
       
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
       - name: Test ${{ matrix.scroll }}
         run: |
           scripts/test-scroll-runtime.sh "${{ matrix.scroll }}"
