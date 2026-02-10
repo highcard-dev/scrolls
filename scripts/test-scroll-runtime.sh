@@ -80,8 +80,9 @@ echo "Files in local path:"
 ls -la "$(pwd)/$SCROLL_PATH"
 echo ""
 
+# Mount as root-readable volume and let entrypoint handle it
 CONTAINER_ID=$(docker run --rm -d \
-    -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll" \
+    -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll:ro" \
     -w /home/druid \
     "$IMAGE")
 
