@@ -27,8 +27,9 @@ jobs:
       - name: Extract published scrolls
         id: set-matrix
         run: |
-          # Parse release.yml to get scroll paths
-          SCROLLS=$(grep "druid registry push" .github/workflows/release.yml | \
+          # Parse release.yml to get scroll paths (exclude .meta)
+          SCROLLS=$(grep "druid registry push \./scrolls/" .github/workflows/release.yml | \
+            grep -v "push meta" | \
             grep -oE '\./scrolls/[^ ]+' | \
             sed 's|^\./||' | \
             jq -R -s -c 'split("\n")[:-1]')

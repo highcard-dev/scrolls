@@ -38,14 +38,24 @@ check_ports_in_container() {
 }
 
 # Main
+if [ ! -f "$SCROLL_PATH/scroll.yaml" ]; then
+    echo "SKIP: No scroll.yaml found at $SCROLL_PATH"
+    exit 0
+fi
+
 PORTS=($(get_ports))
 
 if [ ${#PORTS[@]} -eq 0 ]; then
-    echo "SKIP: No ports defined"
+    echo "SKIP: No ports defined in scroll.yaml"
     exit 0
 fi
 
 IMAGE=$(get_image)
+
+if [ -z "$IMAGE" ]; then
+    echo "SKIP: Could not determine image from release.yml"
+    exit 0
+fi
 
 echo "Scroll: $SCROLL_PATH"
 echo "Image: $IMAGE"
@@ -75,13 +85,15 @@ while true; do
     
     # Check if container is still running
     if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
-        echo "FAIL: Container exited"
+        echo "FAIL: Container exited after ${ELAPSED}s"
+        echo "=== Container logs ==="
         docker logs "$CONTAINER_ID" 2>&1 | tail -100
         exit 1
     fi
     
     if [ $ELAPSED -ge $TIMEOUT ]; then
         echo "FAIL: Timeout after ${TIMEOUT}s"
+        echo "=== Container logs ==="
         docker logs "$CONTAINER_ID" 2>&1 | tail -100
         docker kill "$CONTAINER_ID" 2>/dev/null || true
         exit 1
@@ -93,5 +105,6 @@ while true; do
         exit 0
     fi
     
+    echo "  Waiting... ${ELAPSED}s elapsed"
     sleep $CHECK_INTERVAL
 done
