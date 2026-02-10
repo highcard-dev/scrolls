@@ -40,7 +40,8 @@ jobs:
     needs: generate-matrix
     runs-on: self-hosted
     strategy:
-      fail-fast: true
+      fail-fast: false
+      max-parallel: 3
       matrix:
         scroll: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     
@@ -61,7 +62,7 @@ jobs:
       - name: Test ${{ matrix.scroll }}
         run: |
           scripts/test-scroll-runtime.sh "${{ matrix.scroll }}"
-        timeout-minutes: 5
+        timeout-minutes: 12
       
       - name: Upload logs
         if: failure()

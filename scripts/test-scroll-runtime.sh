@@ -4,7 +4,7 @@
 set -euo pipefail
 
 SCROLL_PATH="${1}"
-TIMEOUT="${TIMEOUT:-300}"  # 5 minutes - vanilla Minecraft + LGSM need time to download/start
+TIMEOUT="${TIMEOUT:-600}"  # 10 minutes - vanilla Minecraft downloads large JARs
 
 # Determine Docker image from release.yml
 get_image() {
