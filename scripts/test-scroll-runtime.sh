@@ -1,5 +1,5 @@
 #!/bin/bash
-# Runtime scroll testing using Docker
+# Runtime scroll testing - shows live container output
 
 set -euo pipefail
 
@@ -57,43 +57,38 @@ if [ -z "$IMAGE" ]; then
     exit 0
 fi
 
+echo "========================================"
 echo "Scroll: $SCROLL_PATH"
 echo "Image: $IMAGE"
 echo "Ports: ${PORTS[*]}"
+echo "========================================"
 
 # Pull image
-echo "Pulling image: $IMAGE"
+echo "Pulling image..."
 if ! docker pull "$IMAGE"; then
     echo "SKIP: Cannot pull image $IMAGE"
     exit 0
 fi
 
-# Start container - mount scroll to /home/druid/.scroll
+# Start container
+echo ""
 echo "Starting container..."
-echo "Mounting: $(pwd)/$SCROLL_PATH -> /home/druid/.scroll"
-
-# Run container with proper user and working directory
 CONTAINER_ID=$(docker run --rm -d \
     -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll" \
     -w /home/druid \
     "$IMAGE")
 
-echo "Container: $CONTAINER_ID"
+echo "Container ID: $CONTAINER_ID"
+echo ""
+echo "=== Container Output ==="
 
-# Wait a moment for container to start
-sleep 2
+# Start following logs in background
+docker logs -f "$CONTAINER_ID" 2>&1 &
+LOGS_PID=$!
 
-# Check if container started successfully
-if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
-    echo "FAIL: Container exited immediately"
-    echo "=== Container logs ==="
-    docker logs "$CONTAINER_ID" 2>&1
-    exit 1
-fi
-
-echo "Container started successfully"
-
+# Monitor for port opening
 START_TIME=$(date +%s)
+PORT_CHECK_COUNT=0
 
 while true; do
     CURRENT_TIME=$(date +%s)
@@ -101,26 +96,38 @@ while true; do
     
     # Check if container is still running
     if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
+        echo ""
+        echo "========================================"
         echo "FAIL: Container exited after ${ELAPSED}s"
-        echo "=== Container logs ==="
-        docker logs "$CONTAINER_ID" 2>&1
+        echo "========================================"
+        kill $LOGS_PID 2>/dev/null || true
         exit 1
     fi
     
+    # Check timeout
     if [ $ELAPSED -ge $TIMEOUT ]; then
+        echo ""
+        echo "========================================"
         echo "FAIL: Timeout after ${TIMEOUT}s"
-        echo "=== Container logs ==="
-        docker logs "$CONTAINER_ID" 2>&1 | tail -100
+        echo "========================================"
         docker kill "$CONTAINER_ID" 2>/dev/null || true
+        kill $LOGS_PID 2>/dev/null || true
         exit 1
     fi
     
-    if OPEN_PORT=$(check_ports_in_container "$CONTAINER_ID" "${PORTS[@]}"); then
-        echo "PASS: Port $OPEN_PORT open after ${ELAPSED}s"
-        docker kill "$CONTAINER_ID" 2>/dev/null || true
-        exit 0
+    # Check ports
+    PORT_CHECK_COUNT=$((PORT_CHECK_COUNT + 1))
+    if [ $((PORT_CHECK_COUNT % (CHECK_INTERVAL))) -eq 0 ]; then
+        if OPEN_PORT=$(check_ports_in_container "$CONTAINER_ID" "${PORTS[@]}"); then
+            echo ""
+            echo "========================================"
+            echo "PASS: Port $OPEN_PORT open after ${ELAPSED}s"
+            echo "========================================"
+            docker kill "$CONTAINER_ID" 2>/dev/null || true
+            kill $LOGS_PID 2>/dev/null || true
+            exit 0
+        fi
     fi
     
-    echo "  Waiting... ${ELAPSED}s elapsed"
-    sleep $CHECK_INTERVAL
+    sleep 1
 done
