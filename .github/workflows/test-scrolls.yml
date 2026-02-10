@@ -9,7 +9,7 @@ on:
 jobs:
   test-scrolls:
     runs-on: ubuntu-latest
-    timeout-minutes: 180 # 3 hours for all scrolls
+    timeout-minutes: 120 # 2 hours for published scrolls
     
     steps:
       - name: Checkout repository

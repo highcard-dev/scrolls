@@ -4,9 +4,9 @@ This repository includes automated testing for all scrolls to ensure they start 
 
 ### Test Script
 
-The `test-scrolls.sh` script tests each scroll by:
+The `test-scrolls.sh` script tests each **published** scroll by:
 
-1. **Finding all scrolls** - Locates all `scroll.yaml` files
+1. **Finding published scrolls** - Reads scroll list from `.github/workflows/release.yml`
 2. **Parsing port configuration** - Extracts port numbers from scroll.yaml
 3. **Starting druid serve** - Runs the scroll with `druid serve`
 4. **Checking ports** - Verifies each port opens within timeout (60s)
@@ -55,7 +55,7 @@ Tests can be run manually via GitHub Actions:
 2. Select **Test Scrolls** workflow
 3. Click **Run workflow**
 
-**Note:** Testing all 222 scrolls takes ~3 hours.
+**Note:** Only tests scrolls that are published (defined in release.yml matrix). Currently 95 scrolls.
 
 ### Future: PR CI Integration
 

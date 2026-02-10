@@ -1,5 +1,5 @@
 #!/bin/bash
-# Test all scrolls by running druid serve and checking if mandatory ports open
+# Test published scrolls by running druid serve and checking if mandatory ports open
 
 set -e
 
@@ -34,11 +34,22 @@ log_warn() {
     echo -e "${YELLOW}[WARN]${NC} $1"
 }
 
+# Get published scrolls from release.yml
+get_published_scrolls() {
+    local release_yml="${SCRIPT_DIR}/.github/workflows/release.yml"
+    
+    if [ ! -f "$release_yml" ]; then
+        log_error "release.yml not found at $release_yml"
+        exit 1
+    fi
+    
+    # Extract scroll paths from matrix
+    grep "scroll:" "$release_yml" | sed 's/.*scroll:\s*//' | tr -d '"' | tr -d "'"
+}
+
 # Parse scroll.yaml to extract ports
 parse_ports() {
     local scroll_file="$1"
-    # Extract port numbers and mandatory status
-    # Simple parsing - looks for port: NUMBER under ports section
     grep -A 100 "^ports:" "$scroll_file" | grep "^\s*port:" | sed 's/.*port:\s*//' || echo ""
 }
 
@@ -47,29 +58,28 @@ check_port() {
     local port="$1"
     local timeout="$2"
     
-    # Try to connect to localhost:port
     timeout "$timeout" bash -c "until nc -z localhost $port 2>/dev/null; do sleep 1; done" 2>/dev/null
     return $?
 }
 
 # Test a single scroll
 test_scroll() {
-    local scroll_dir="$1"
+    local scroll_path="$1"
+    local scroll_dir="${SCRIPT_DIR}/${scroll_path}"
     local scroll_yaml="${scroll_dir}/scroll.yaml"
     
     if [ ! -f "$scroll_yaml" ]; then
-        log_error "No scroll.yaml found in ${scroll_dir}"
+        log_error "No scroll.yaml found at ${scroll_yaml}"
         return 1
     fi
     
-    local scroll_name=$(basename "$(dirname "$scroll_dir")")/$(basename "$scroll_dir")
-    log_info "Testing: ${scroll_name}"
+    log_info "Testing: ${scroll_path}"
     
     # Parse ports from scroll.yaml
     local ports=$(parse_ports "$scroll_yaml")
     
     if [ -z "$ports" ]; then
-        log_warn "No ports defined in ${scroll_name}, skipping"
+        log_warn "No ports defined in ${scroll_path}, skipping"
         return 2
     fi
     
@@ -78,7 +88,7 @@ test_scroll() {
     # Start druid serve in background
     cd "$scroll_dir"
     
-    local log_file="${TEST_RESULTS_DIR}/${scroll_name//\//_}.log"
+    local log_file="${TEST_RESULTS_DIR}/${scroll_path//\//_}.log"
     mkdir -p "$(dirname "$log_file")"
     
     log_info "  Starting druid serve..."
@@ -116,17 +126,17 @@ test_scroll() {
     sleep 2
     
     if [ "$all_ports_ok" = true ]; then
-        log_info "  ✓ PASSED: ${scroll_name}"
+        log_info "  ✓ PASSED: ${scroll_path}"
         return 0
     else
-        log_error "  ✗ FAILED: ${scroll_name}"
+        log_error "  ✗ FAILED: ${scroll_path}"
         return 1
     fi
 }
 
 # Main test function
 main() {
-    log_info "Starting scroll tests..."
+    log_info "Starting scroll tests (PUBLISHED SCROLLS ONLY)..."
     log_info "Druid binary: $DRUID_BIN"
     log_info "Test results: $TEST_RESULTS_DIR"
     
@@ -143,16 +153,17 @@ main() {
         exit 1
     fi
     
-    # Find all scroll directories
-    local scroll_dirs=$(find "${SCRIPT_DIR}/scrolls" -name "scroll.yaml" -exec dirname {} \;)
+    # Get published scrolls from release.yml
+    local published_scrolls=$(get_published_scrolls)
+    local scroll_count=$(echo "$published_scrolls" | wc -l)
     
-    log_info "Found $(echo "$scroll_dirs" | wc -l) scrolls to test"
+    log_info "Found ${scroll_count} published scrolls to test (from release.yml)"
     
     # Test each scroll
-    for scroll_dir in $scroll_dirs; do
+    for scroll_path in $published_scrolls; do
         TOTAL=$((TOTAL + 1))
         
-        if test_scroll "$scroll_dir"; then
+        if test_scroll "$scroll_path"; then
             PASSED=$((PASSED + 1))
         else
             local exit_code=$?
