@@ -1,11 +1,10 @@
 #!/bin/bash
-# Runtime scroll testing - shows live container output
+# Runtime scroll testing
 
 set -euo pipefail
 
 SCROLL_PATH="${1}"
 TIMEOUT="${TIMEOUT:-180}"
-CHECK_INTERVAL=5
 
 # Determine Docker image from release.yml
 get_image() {
@@ -22,118 +21,87 @@ get_ports() {
     grep "port:" "$SCROLL_PATH/scroll.yaml" | grep -oE "[0-9]+" | head -10
 }
 
-# Check if any port is open inside container
-check_ports_in_container() {
+# Check if any port is open
+check_port() {
     local container_id=$1
-    shift
-    local ports=("$@")
-    
-    for port in "${ports[@]}"; do
-        if docker exec "$container_id" sh -c "ss -ltn 2>/dev/null | grep -q ':$port ' || netstat -ltn 2>/dev/null | grep -q ':$port '" 2>/dev/null; then
-            echo "$port"
-            return 0
-        fi
-    done
-    return 1
+    local port=$2
+    docker exec "$container_id" sh -c "ss -ltn 2>/dev/null | grep -q ':$port ' || netstat -ltn 2>/dev/null | grep -q ':$port '" 2>/dev/null
 }
 
 # Main
 if [ ! -f "$SCROLL_PATH/scroll.yaml" ]; then
-    echo "SKIP: No scroll.yaml found at $SCROLL_PATH"
+    echo "SKIP: No scroll.yaml"
     exit 0
 fi
 
 PORTS=($(get_ports))
-
 if [ ${#PORTS[@]} -eq 0 ]; then
-    echo "SKIP: No ports defined in scroll.yaml"
+    echo "SKIP: No ports"
     exit 0
 fi
 
 IMAGE=$(get_image)
-
 if [ -z "$IMAGE" ]; then
-    echo "SKIP: Could not determine image from release.yml"
+    echo "SKIP: No image"
     exit 0
 fi
 
-echo "========================================"
 echo "Scroll: $SCROLL_PATH"
-echo "Image: $IMAGE"
+echo "Image: $IMAGE"  
 echo "Ports: ${PORTS[*]}"
-echo "========================================"
 
-# Pull image
-echo "Pulling image..."
-if ! docker pull "$IMAGE"; then
-    echo "SKIP: Cannot pull image $IMAGE"
-    exit 0
-fi
+docker pull "$IMAGE" || exit 0
 
-# Start container - use absolute path
-ABS_SCROLL_PATH="$(cd $(dirname $SCROLL_PATH) && pwd)/$(basename $SCROLL_PATH)"
+# Copy scroll to temp location
+TEMP_SCROLL="/tmp/test-scroll-$$"
+mkdir -p "$TEMP_SCROLL"
+cp -r "$SCROLL_PATH/"* "$TEMP_SCROLL/"
+chmod -R 777 "$TEMP_SCROLL"
 
-# Ensure files are readable
-chmod -R a+rX "$ABS_SCROLL_PATH" 2>/dev/null || true
-
-echo ""
 echo "Starting container..."
-echo "Mounting: $ABS_SCROLL_PATH -> /home/druid/.scroll"
 
+# Start container with temp scroll
 CONTAINER_ID=$(docker run --rm -d \
-    -v "$ABS_SCROLL_PATH:/home/druid/.scroll:ro" \
-    -w /home/druid \
+    -v "$TEMP_SCROLL:/home/druid/.scroll" \
     "$IMAGE")
 
-echo "Container ID: $CONTAINER_ID"
-echo ""
-echo "=== Container Output ==="
+echo "Container: $CONTAINER_ID"
 
-# Start following logs in background
+# Follow logs
 docker logs -f "$CONTAINER_ID" 2>&1 &
 LOGS_PID=$!
 
-# Monitor for port opening
-START_TIME=$(date +%s)
-PORT_CHECK_COUNT=0
-
+# Check for ports
+START=$(date +%s)
 while true; do
-    CURRENT_TIME=$(date +%s)
-    ELAPSED=$((CURRENT_TIME - START_TIME))
+    ELAPSED=$(($(date +%s) - START))
     
-    # Check if container is still running
     if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
-        echo ""
-        echo "========================================"
         echo "FAIL: Container exited after ${ELAPSED}s"
-        echo "========================================"
         kill $LOGS_PID 2>/dev/null || true
+        rm -rf "$TEMP_SCROLL"
         exit 1
     fi
     
-    # Check timeout
     if [ $ELAPSED -ge $TIMEOUT ]; then
-        echo ""
-        echo "========================================"
-        echo "FAIL: Timeout after ${TIMEOUT}s"
-        echo "========================================"
+        echo "FAIL: Timeout ${TIMEOUT}s"
         docker kill "$CONTAINER_ID" 2>/dev/null || true
         kill $LOGS_PID 2>/dev/null || true
+        rm -rf "$TEMP_SCROLL"
         exit 1
     fi
     
-    # Check ports
-    PORT_CHECK_COUNT=$((PORT_CHECK_COUNT + 1))
-    if [ $((PORT_CHECK_COUNT % (CHECK_INTERVAL))) -eq 0 ]; then
-        if OPEN_PORT=$(check_ports_in_container "$CONTAINER_ID" "${PORTS[@]}"); then
-            echo ""
-            echo "========================================"
-            echo "PASS: Port $OPEN_PORT open after ${ELAPSED}s"
-            echo "========================================"
-            docker kill "$CONTAINER_ID" 2>/dev/null || true
-            kill $LOGS_PID 2>/dev/null || true
-            exit 0
-        fi
+    # Check ports every 5 seconds
+    if [ $((ELAPSED % 5)) -eq 0 ]; then
+        for port in "${PORTS[@]}"; do
+            if check_port "$CONTAINER_ID" "$port"; then
+                echo "PASS: Port $port open after ${ELAPSED}s"
+                docker kill "$CONTAINER_ID" 2>/dev/null || true
+                kill $LOGS_PID 2>/dev/null || true
+                rm -rf "$TEMP_SCROLL"
+                exit 0
+            fi
+        done
     fi
     
     sleep 1
