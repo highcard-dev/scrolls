@@ -80,11 +80,17 @@ echo "Files in local path:"
 ls -la "$(pwd)/$SCROLL_PATH"
 echo ""
 
-# Mount as root-readable volume and let entrypoint handle it
+# Create temp directory with correct permissions
+TEMP_DIR=$(mktemp -d)
+cp -r "$(pwd)/$SCROLL_PATH/"* "$TEMP_DIR/"
+chmod -R 755 "$TEMP_DIR"
+
 CONTAINER_ID=$(docker run --rm -d \
-    -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll:ro" \
+    -v "$TEMP_DIR:/home/druid/.scroll" \
     -w /home/druid \
     "$IMAGE")
+
+# Cleanup will happen when container stops (--rm flag handles it)
 
 echo "Container ID: $CONTAINER_ID"
 echo ""
@@ -118,6 +124,7 @@ while true; do
         echo "FAIL: Container exited after ${ELAPSED}s"
         echo "========================================"
         kill $LOGS_PID 2>/dev/null || true
+        rm -rf "$TEMP_DIR" 2>/dev/null || true
         exit 1
     fi
     
@@ -129,6 +136,7 @@ while true; do
         echo "========================================"
         docker kill "$CONTAINER_ID" 2>/dev/null || true
         kill $LOGS_PID 2>/dev/null || true
+        rm -rf "$TEMP_DIR" 2>/dev/null || true
         exit 1
     fi
     
@@ -142,6 +150,7 @@ while true; do
             echo "========================================"
             docker kill "$CONTAINER_ID" 2>/dev/null || true
             kill $LOGS_PID 2>/dev/null || true
+            rm -rf "$TEMP_DIR" 2>/dev/null || true
             exit 0
         fi
     fi
