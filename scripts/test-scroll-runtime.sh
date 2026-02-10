@@ -16,9 +16,27 @@ get_image() {
     fi
 }
 
-# Get ports from scroll.yaml
+# Get ports from scroll.yaml AND release.yml (-p arguments)
 get_ports() {
-    grep "port:" "$SCROLL_PATH/scroll.yaml" | grep -oE "[0-9]+" | head -10
+    local ports=()
+    
+    # From scroll.yaml
+    local yaml_ports=$(grep "^\s*port:" "$SCROLL_PATH/scroll.yaml" 2>/dev/null | grep -oE "[0-9]+" || true)
+    if [ -n "$yaml_ports" ]; then
+        ports+=($yaml_ports)
+    fi
+    
+    # From release.yml (-p arguments like "-p main=25565/tcp")
+    local release_line=$(grep "druid registry push.*$SCROLL_PATH" .github/workflows/release.yml 2>/dev/null | head -1 || true)
+    if [ -n "$release_line" ]; then
+        local release_ports=$(echo "$release_line" | grep -oE '\-p [a-z]+=([0-9]+)' | grep -oE '[0-9]+' || true)
+        if [ -n "$release_ports" ]; then
+            ports+=($release_ports)
+        fi
+    fi
+    
+    # Return unique ports
+    printf '%s\n' "${ports[@]}" | sort -u | head -10
 }
 
 # Check if any port is open (check from inside container)
@@ -42,7 +60,7 @@ fi
 
 PORTS=($(get_ports))
 if [ ${#PORTS[@]} -eq 0 ]; then
-    echo "SKIP: No ports"
+    echo "SKIP: No ports defined"
     exit 0
 fi
 
