@@ -1,6 +1,5 @@
 #!/bin/bash
 # Runtime scroll testing using Docker
-# Only tests scrolls published to registry
 
 set -euo pipefail
 
@@ -59,11 +58,10 @@ docker pull "$IMAGE" || {
     exit 0
 }
 
-# Start container
+# Start container - mount scroll to /home/druid/.scroll
 echo "Starting container..."
 CONTAINER_ID=$(docker run --rm -d \
-    -v "$(pwd)/$SCROLL_PATH:/scroll" \
-    -w /scroll \
+    -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll" \
     "$IMAGE" \
     druid serve --port 8081)
 
@@ -78,13 +76,13 @@ while true; do
     # Check if container is still running
     if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
         echo "FAIL: Container exited"
-        docker logs "$CONTAINER_ID" 2>&1 | tail -50
+        docker logs "$CONTAINER_ID" 2>&1 | tail -100
         exit 1
     fi
     
     if [ $ELAPSED -ge $TIMEOUT ]; then
         echo "FAIL: Timeout after ${TIMEOUT}s"
-        docker logs "$CONTAINER_ID" 2>&1 | tail -50
+        docker logs "$CONTAINER_ID" 2>&1 | tail -100
         docker kill "$CONTAINER_ID" 2>/dev/null || true
         exit 1
     fi
