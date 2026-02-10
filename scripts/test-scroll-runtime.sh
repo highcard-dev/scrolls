@@ -4,7 +4,7 @@
 set -euo pipefail
 
 SCROLL_PATH="${1}"
-TIMEOUT="${TIMEOUT:-60}"  # Reduced to 60s for fail-fast
+TIMEOUT="${TIMEOUT:-60}"
 
 # Determine Docker image from release.yml
 get_image() {
@@ -43,12 +43,7 @@ get_ports() {
 check_port() {
     local container_id=$1
     local port=$2
-    # Try multiple methods (ss, netstat, lsof) - one should work
-    docker exec "$container_id" sh -c "
-        ss -tuln 2>/dev/null | grep -q ':$port ' || \
-        netstat -tuln 2>/dev/null | grep -q ':$port ' || \
-        (command -v lsof >/dev/null 2>&1 && lsof -i :$port 2>/dev/null | grep -q LISTEN)
-    " 2>/dev/null
+    docker exec "$container_id" sh -c "ss -tuln 2>/dev/null | grep -q ':$port '" 2>/dev/null
 }
 
 # Main
@@ -80,20 +75,22 @@ echo "Image: $IMAGE"
 echo "Ports: ${PORTS[*]}"
 echo "Timeout: ${TIMEOUT}s"
 
-docker pull "$IMAGE" || exit 0
+docker pull "$IMAGE" || {
+    echo "SKIP: Failed to pull image"
+    exit 0
+}
 
-# Copy scroll to temp location
-TEMP_SCROLL="/tmp/test-scroll-$$"
-mkdir -p "$TEMP_SCROLL"
-cp -r "$SCROLL_PATH/"* "$TEMP_SCROLL/"
-chmod -R 777 "$TEMP_SCROLL"
+# Get absolute path to scroll
+SCROLL_ABS=$(realpath "$SCROLL_PATH")
 
-echo "Starting container..."
+echo "Starting container with druid serve..."
 
-# Start container with temp scroll
+# Start container running druid serve
 CONTAINER_ID=$(docker run --rm -d \
-    -v "$TEMP_SCROLL:/home/druid/.scroll" \
-    "$IMAGE")
+    -v "$SCROLL_ABS:/scroll" \
+    -w /scroll \
+    "$IMAGE" \
+    druid serve)
 
 echo "Container: $CONTAINER_ID"
 echo "---"
@@ -113,32 +110,32 @@ while true; do
     if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
         echo "FAIL: Container exited after ${ELAPSED}s"
         echo "Exit code: $(docker inspect $CONTAINER_ID --format='{{.State.ExitCode}}' 2>/dev/null || echo 'unknown')"
-        echo "Last 30 lines of logs:"
-        tail -30 /tmp/container-$$.log
+        echo "Last 40 lines of logs:"
+        tail -40 /tmp/container-$$.log
         kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_SCROLL" /tmp/container-$$.log
+        rm -f /tmp/container-$$.log
         exit 1
     fi
     
     # Timeout check
     if [ $ELAPSED -ge $TIMEOUT ]; then
         echo "FAIL: Timeout ${TIMEOUT}s reached"
-        echo "Last 30 lines of logs:"
-        tail -30 /tmp/container-$$.log
+        echo "Last 40 lines of logs:"
+        tail -40 /tmp/container-$$.log
         docker kill "$CONTAINER_ID" 2>/dev/null || true
         kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_SCROLL" /tmp/container-$$.log
+        rm -f /tmp/container-$$.log
         exit 1
     fi
     
-    # Check ports every 2 seconds (not every loop to reduce overhead)
+    # Check ports every 2 seconds
     if [ $((ELAPSED - LAST_CHECK)) -ge 2 ]; then
         for port in "${PORTS[@]}"; do
             if check_port "$CONTAINER_ID" "$port"; then
                 echo "PASS: Port $port open after ${ELAPSED}s"
                 docker kill "$CONTAINER_ID" 2>/dev/null || true
                 kill $LOGS_PID 2>/dev/null || true
-                rm -rf "$TEMP_SCROLL" /tmp/container-$$.log
+                rm -f /tmp/container-$$.log
                 exit 0
             fi
         done
