@@ -6,22 +6,6 @@ set -euo pipefail
 SCROLL_PATH="${1}"
 TIMEOUT="${TIMEOUT:-600}"
 
-# Skip known-broken scroll types (configuration issues, not test framework issues)
-SKIP_PATTERNS=(
-    "minecraft-vanilla"
-    "lgsm/"
-    "hytale/"
-    "cuberite"
-)
-
-for pattern in "${SKIP_PATTERNS[@]}"; do
-    if echo "$SCROLL_PATH" | grep -q "$pattern"; then
-        echo "SKIP: Known configuration issue (not test framework bug)"
-        echo "This scroll type needs druid.gg team review"
-        exit 0
-    fi
-done
-
 # Determine Docker image from release.yml
 get_image() {
     local line=$(grep "druid registry push.*$SCROLL_PATH" .github/workflows/release.yml | head -1)
@@ -65,7 +49,7 @@ if [ ! -f "$SCROLL_PATH/scroll.yaml" ]; then
     exit 0
 fi
 
-# Skip scrolls with internal URLs
+# Skip scrolls with internal URLs (not accessible in CI)
 if grep -q "192.168." "$SCROLL_PATH/scroll.yaml"; then
     echo "SKIP: Internal URL (not accessible in CI)"
     exit 0
