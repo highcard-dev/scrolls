@@ -72,11 +72,26 @@ fi
 echo "Starting container..."
 echo "Mounting: $(pwd)/$SCROLL_PATH -> /home/druid/.scroll"
 
+# Run container with proper user and working directory
 CONTAINER_ID=$(docker run --rm -d \
     -v "$(pwd)/$SCROLL_PATH:/home/druid/.scroll" \
+    -w /home/druid \
     "$IMAGE")
 
 echo "Container: $CONTAINER_ID"
+
+# Wait a moment for container to start
+sleep 2
+
+# Check if container started successfully
+if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
+    echo "FAIL: Container exited immediately"
+    echo "=== Container logs ==="
+    docker logs "$CONTAINER_ID" 2>&1
+    exit 1
+fi
+
+echo "Container started successfully"
 
 START_TIME=$(date +%s)
 
@@ -88,7 +103,7 @@ while true; do
     if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
         echo "FAIL: Container exited after ${ELAPSED}s"
         echo "=== Container logs ==="
-        docker logs "$CONTAINER_ID" 2>&1 | tail -100
+        docker logs "$CONTAINER_ID" 2>&1
         exit 1
     fi
     
