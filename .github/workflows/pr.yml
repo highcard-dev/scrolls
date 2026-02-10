@@ -20,14 +20,9 @@ jobs:
         with:
           go-version: ">=1.19.3"
       - run: make build-tree
-      - name: Get registry binary
-        uses: robinraju/release-downloader@v1.7
-        with:
-          repository: "highcard-dev/druid-cli"
-          latest: true
-          fileName: "druid"
-          token: ${{ secrets.GO_REPO_TOKEN }}
-      - run: chmod +x ./druid
-      - name: Install druid
-        run: sudo mv ./druid /usr/local/bin/druid
+      - name: Download druid binary
+        run: |
+          curl -L -o druid "https://github.com/highcard-dev/druid-cli/releases/latest/download/druid"
+          chmod +x druid
+          sudo mv druid /usr/local/bin/druid
       - run: ./scripts/validate_all_scrolls.sh
