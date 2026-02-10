@@ -2,6 +2,10 @@ name: PR Pipeline
 on:
   pull_request:
     branches: [master]
+    paths-ignore:
+      - '.github/workflows/test-scrolls.yml'
+      - 'test-scrolls.sh'
+      - 'README_TESTING.md'
 jobs:
   build-deploy:
     runs-on: self-hosted
