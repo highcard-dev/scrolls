@@ -34,6 +34,12 @@ if [ ! -f "$SCROLL_PATH/scroll.yaml" ]; then
     exit 0
 fi
 
+# Skip scrolls with internal URLs (not accessible in CI)
+if grep -q "192.168." "$SCROLL_PATH/scroll.yaml"; then
+    echo "SKIP: Internal URL (not accessible in CI)"
+    exit 0
+fi
+
 PORTS=($(get_ports))
 if [ ${#PORTS[@]} -eq 0 ]; then
     echo "SKIP: No ports"
