@@ -1,0 +1,70 @@
+name: Validate Scrolls
+
+on:
+  pull_request:
+    paths:
+      - 'scrolls/**/*.yaml'
+      - 'scrolls/**/*.lua'
+      - '.github/workflows/validate-scrolls.yml'
+      - 'scripts/validate-scrolls.sh'
+  push:
+    branches:
+      - master
+    paths:
+      - 'scrolls/**/*.yaml'
+      - 'scrolls/**/*.lua'
+      - '.github/workflows/validate-scrolls.yml'
+      - 'scripts/validate-scrolls.sh'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run scroll validation
+        run: |
+          bash scripts/validate-scrolls.sh
+      
+      - name: Upload validation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-results
+          path: /tmp/scroll-validation-results.txt
+          retention-days: 30
+      
+      - name: Comment PR with results (on failure)
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const resultsPath = '/tmp/scroll-validation-results.txt';
+            
+            if (!fs.existsSync(resultsPath)) {
+              console.log('Results file not found');
+              return;
+            }
+            
+            const results = fs.readFileSync(resultsPath, 'utf8');
+            const failures = results.split('\n')
+              .filter(line => line.startsWith('FAIL:'))
+              .slice(0, 20)  // Limit to first 20 failures
+              .join('\n');
+            
+            const body = `## ❌ Scroll Validation Failed
+            
+            ${failures}
+            
+            See full results in the workflow artifacts.
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
