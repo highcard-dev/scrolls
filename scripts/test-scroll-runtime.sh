@@ -4,7 +4,7 @@
 set -euo pipefail
 
 SCROLL_PATH="${1}"
-TIMEOUT="${TIMEOUT:-180}"  # 3 minutes - some servers need time to start
+TIMEOUT="${TIMEOUT:-300}"  # 5 minutes - vanilla Minecraft + LGSM need time to download/start
 
 # Determine Docker image from release.yml
 get_image() {
