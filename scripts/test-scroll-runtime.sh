@@ -72,12 +72,17 @@ fi
 
 # Start container - use absolute path
 ABS_SCROLL_PATH="$(cd $(dirname $SCROLL_PATH) && pwd)/$(basename $SCROLL_PATH)"
+
+# Ensure files are readable
+chmod -R a+rX "$ABS_SCROLL_PATH" 2>/dev/null || true
+
 echo ""
 echo "Starting container..."
-echo "Mounting: $ABS_SCROLL_PATH -> /.scroll"
+echo "Mounting: $ABS_SCROLL_PATH -> /home/druid/.scroll"
 
 CONTAINER_ID=$(docker run --rm -d \
-    -v "$ABS_SCROLL_PATH:/.scroll:ro" \
+    -v "$ABS_SCROLL_PATH:/home/druid/.scroll:ro" \
+    -w /home/druid \
     "$IMAGE")
 
 echo "Container ID: $CONTAINER_ID"
