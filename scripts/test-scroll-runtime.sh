@@ -4,7 +4,7 @@
 set -euo pipefail
 
 SCROLL_PATH="${1}"
-TIMEOUT="${TIMEOUT:-180}"
+TIMEOUT="${TIMEOUT:-60}"  # Reduced to 60s for fail-fast
 
 # Determine Docker image from release.yml
 get_image() {
@@ -39,11 +39,16 @@ get_ports() {
     printf '%s\n' "${ports[@]}" | sort -u | head -10
 }
 
-# Check if any port is open (check from inside container)
+# Check if any port is open (works for both TCP and UDP)
 check_port() {
     local container_id=$1
     local port=$2
-    docker exec "$container_id" sh -c "ss -ltn 2>/dev/null | grep -q ':$port ' || netstat -ltn 2>/dev/null | grep -q ':$port ' || lsof -i :$port 2>/dev/null" 2>/dev/null
+    # Try multiple methods (ss, netstat, lsof) - one should work
+    docker exec "$container_id" sh -c "
+        ss -tuln 2>/dev/null | grep -q ':$port ' || \
+        netstat -tuln 2>/dev/null | grep -q ':$port ' || \
+        (command -v lsof >/dev/null 2>&1 && lsof -i :$port 2>/dev/null | grep -q LISTEN)
+    " 2>/dev/null
 }
 
 # Main
@@ -73,6 +78,7 @@ fi
 echo "Scroll: $SCROLL_PATH"
 echo "Image: $IMAGE"  
 echo "Ports: ${PORTS[*]}"
+echo "Timeout: ${TIMEOUT}s"
 
 docker pull "$IMAGE" || exit 0
 
@@ -90,11 +96,10 @@ CONTAINER_ID=$(docker run --rm -d \
     "$IMAGE")
 
 echo "Container: $CONTAINER_ID"
-echo "Logs:"
 echo "---"
 
-# Follow logs in background
-docker logs -f "$CONTAINER_ID" 2>&1 &
+# Follow logs in background (suppress to reduce noise)
+docker logs -f "$CONTAINER_ID" > /tmp/container-$$.log 2>&1 &
 LOGS_PID=$!
 
 # Check for ports
@@ -106,21 +111,23 @@ while true; do
     
     # Check if container is still running
     if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
-        echo "---"
         echo "FAIL: Container exited after ${ELAPSED}s"
         echo "Exit code: $(docker inspect $CONTAINER_ID --format='{{.State.ExitCode}}' 2>/dev/null || echo 'unknown')"
+        echo "Last 30 lines of logs:"
+        tail -30 /tmp/container-$$.log
         kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_SCROLL"
+        rm -rf "$TEMP_SCROLL" /tmp/container-$$.log
         exit 1
     fi
     
     # Timeout check
     if [ $ELAPSED -ge $TIMEOUT ]; then
-        echo "---"
-        echo "FAIL: Timeout ${TIMEOUT}s"
+        echo "FAIL: Timeout ${TIMEOUT}s reached"
+        echo "Last 30 lines of logs:"
+        tail -30 /tmp/container-$$.log
         docker kill "$CONTAINER_ID" 2>/dev/null || true
         kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_SCROLL"
+        rm -rf "$TEMP_SCROLL" /tmp/container-$$.log
         exit 1
     fi
     
@@ -128,11 +135,10 @@ while true; do
     if [ $((ELAPSED - LAST_CHECK)) -ge 2 ]; then
         for port in "${PORTS[@]}"; do
             if check_port "$CONTAINER_ID" "$port"; then
-                echo "---"
                 echo "PASS: Port $port open after ${ELAPSED}s"
                 docker kill "$CONTAINER_ID" 2>/dev/null || true
                 kill $LOGS_PID 2>/dev/null || true
-                rm -rf "$TEMP_SCROLL"
+                rm -rf "$TEMP_SCROLL" /tmp/container-$$.log
                 exit 0
             fi
         done
