@@ -15,7 +15,7 @@ on:
       - 'scripts/test-scroll-runtime.sh'
 
 jobs:
-  # Generate dynamic matrix of all scrolls
+  # Extract published scrolls from release.yml
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -24,39 +24,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Generate scroll list
+      - name: Extract published scrolls
         id: set-matrix
         run: |
-          SCROLLS=$(find scrolls -name "scroll.yaml" -type f | sed 's|/scroll.yaml||' | jq -R -s -c 'split("\n")[:-1]')
+          # Parse release.yml to get scroll paths
+          SCROLLS=$(grep "druid registry push" .github/workflows/release.yml | \
+            grep -oE '\./scrolls/[^ ]+' | \
+            sed 's|^\./||' | \
+            jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=$SCROLLS" >> $GITHUB_OUTPUT
   
-  # Build druid-cli
-  build-druid:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: highcard-dev/druid-cli
-      
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
-      
-      - name: Build
-        run: |
-          make build
-          chmod +x bin/druid
-      
-      - uses: actions/upload-artifact@v4
-        with:
-          name: druid-cli
-          path: bin/druid
-          retention-days: 1
-  
-  # Test all scrolls
+  # Test scrolls in Docker
   test:
-    needs: [generate-matrix, build-druid]
+    needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -66,26 +46,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: actions/download-artifact@v4
-        with:
-          name: druid-cli
-      
       - name: Setup
         run: |
-          chmod +x druid
-          sudo mv druid /usr/local/bin/
-          sudo apt-get update
-          sudo apt-get install -y yq iproute2
           chmod +x scripts/test-scroll-runtime.sh
       
       - name: Test ${{ matrix.scroll }}
         run: |
           scripts/test-scroll-runtime.sh "${{ matrix.scroll }}"
+        timeout-minutes: 5
       
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        run: |
+          # Get last container ID
+          CONTAINER_ID=$(docker ps -a --format "{{.ID}}" | head -1)
+          if [ -n "$CONTAINER_ID" ]; then
+            docker logs "$CONTAINER_ID" > /tmp/container.log 2>&1 || true
+          fi
+      
+      - uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: logs-${{ hashFiles(matrix.scroll) }}
-          path: /tmp/druid-serve.log
+          path: /tmp/container.log
           retention-days: 3

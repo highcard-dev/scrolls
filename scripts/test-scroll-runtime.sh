@@ -1,26 +1,36 @@
 #!/bin/bash
-# Runtime scroll testing - starts server and checks if any port opens
+# Runtime scroll testing using Docker
+# Only tests scrolls published to registry
 
 set -euo pipefail
 
-SCROLL_DIR="${1:-.}"
+SCROLL_PATH="${1}"
 TIMEOUT="${TIMEOUT:-180}"
 CHECK_INTERVAL=5
 
-# Get all defined ports from scroll.yaml
-get_ports() {
-    if command -v yq &> /dev/null; then
-        yq eval '.ports[].port' "$SCROLL_DIR/scroll.yaml" 2>/dev/null | grep -v '^$' || echo ""
+# Determine Docker image from release.yml
+get_image() {
+    local line=$(grep "druid registry push.*$SCROLL_PATH" .github/workflows/release.yml | head -1)
+    if echo "$line" | grep -q "stable-nix-steamcmd"; then
+        echo "artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd"
     else
-        grep -A 1 "port:" "$SCROLL_DIR/scroll.yaml" | grep -E "^\s+[0-9]+" | awk '{print $NF}' || echo ""
+        echo "artifacts.druid.gg/druid-team/druid:stable-nix"
     fi
 }
 
-# Check if any port is listening
-check_ports() {
-    local ports=($1)
+# Get ports from scroll.yaml
+get_ports() {
+    grep "port:" "$SCROLL_PATH/scroll.yaml" | grep -oE "[0-9]+" | head -10
+}
+
+# Check if any port is open inside container
+check_ports_in_container() {
+    local container_id=$1
+    shift
+    local ports=("$@")
+    
     for port in "${ports[@]}"; do
-        if ss -ltn 2>/dev/null | grep -q ":$port " || netstat -ltn 2>/dev/null | grep -q ":$port "; then
+        if docker exec "$container_id" sh -c "ss -ltn 2>/dev/null | grep -q ':$port ' || netstat -ltn 2>/dev/null | grep -q ':$port '" 2>/dev/null; then
             echo "$port"
             return 0
         fi
@@ -29,8 +39,6 @@ check_ports() {
 }
 
 # Main
-cd "$SCROLL_DIR"
-
 PORTS=($(get_ports))
 
 if [ ${#PORTS[@]} -eq 0 ]; then
@@ -38,11 +46,28 @@ if [ ${#PORTS[@]} -eq 0 ]; then
     exit 0
 fi
 
-echo "Ports: ${PORTS[*]}"
-echo "Starting druid serve..."
+IMAGE=$(get_image)
 
-druid serve --port 8081 > /tmp/druid-serve.log 2>&1 &
-DRUID_PID=$!
+echo "Scroll: $SCROLL_PATH"
+echo "Image: $IMAGE"
+echo "Ports: ${PORTS[*]}"
+
+# Pull image
+echo "Pulling image..."
+docker pull "$IMAGE" || {
+    echo "SKIP: Cannot pull image"
+    exit 0
+}
+
+# Start container
+echo "Starting container..."
+CONTAINER_ID=$(docker run --rm -d \
+    -v "$(pwd)/$SCROLL_PATH:/scroll" \
+    -w /scroll \
+    "$IMAGE" \
+    druid serve --port 8081)
+
+echo "Container: $CONTAINER_ID"
 
 START_TIME=$(date +%s)
 
@@ -50,16 +75,23 @@ while true; do
     CURRENT_TIME=$(date +%s)
     ELAPSED=$((CURRENT_TIME - START_TIME))
     
-    if [ $ELAPSED -ge $TIMEOUT ]; then
-        echo "FAIL: Timeout after ${TIMEOUT}s"
-        tail -50 /tmp/druid-serve.log
-        kill $DRUID_PID 2>/dev/null || true
+    # Check if container is still running
+    if ! docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; then
+        echo "FAIL: Container exited"
+        docker logs "$CONTAINER_ID" 2>&1 | tail -50
         exit 1
     fi
     
-    if OPEN_PORT=$(check_ports "${PORTS[*]}"); then
+    if [ $ELAPSED -ge $TIMEOUT ]; then
+        echo "FAIL: Timeout after ${TIMEOUT}s"
+        docker logs "$CONTAINER_ID" 2>&1 | tail -50
+        docker kill "$CONTAINER_ID" 2>/dev/null || true
+        exit 1
+    fi
+    
+    if OPEN_PORT=$(check_ports_in_container "$CONTAINER_ID" "${PORTS[@]}"); then
         echo "PASS: Port $OPEN_PORT open after ${ELAPSED}s"
-        kill $DRUID_PID 2>/dev/null || true
+        docker kill "$CONTAINER_ID" 2>/dev/null || true
         exit 0
     fi
     
