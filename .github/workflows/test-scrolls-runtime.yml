@@ -192,6 +192,235 @@ jobs:
           fi
         timeout-minutes: 300
 
+  # Test all Forge versions
+  test-forge:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      
+      - name: Download druid-cli
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid"
+          out-file-path: "/tmp"
+      
+      - name: Download druid_rcon plugin
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid_rcon"
+          out-file-path: "/tmp"
+      
+      - name: Download druid_rcon_web_rust plugin
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid_rcon_web_rust"
+          out-file-path: "/tmp"
+      
+      - name: Make binaries executable
+        run: |
+          chmod +x /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
+          /tmp/druid version
+      
+      - name: Test all Forge versions
+        env:
+          TIMEOUT: 600
+        run: |
+          chmod +x scripts/test-scroll-runtime.sh
+          FAILED=0
+          for scroll in scrolls/minecraft/forge/*/; do
+            echo "Testing $scroll"
+            if ! scripts/test-scroll-runtime.sh "${scroll%/}"; then
+              echo "FAILED: $scroll"
+              FAILED=$((FAILED + 1))
+            fi
+          done
+          if [ $FAILED -gt 0 ]; then
+            echo "Total failures: $FAILED"
+            exit 1
+          fi
+        timeout-minutes: 300
+
+  # Test Cuberite
+  test-cuberite:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      
+      - name: Download druid-cli
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid"
+          out-file-path: "/tmp"
+      
+      - name: Download druid_rcon plugin
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid_rcon"
+          out-file-path: "/tmp"
+      
+      - name: Download druid_rcon_web_rust plugin
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid_rcon_web_rust"
+          out-file-path: "/tmp"
+      
+      - name: Make binaries executable
+        run: |
+          chmod +x /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
+          /tmp/druid version
+      
+      - name: Test Cuberite
+        env:
+          TIMEOUT: 600
+        run: |
+          chmod +x scripts/test-scroll-runtime.sh
+          scripts/test-scroll-runtime.sh "scrolls/minecraft/cuberite/latest"
+        timeout-minutes: 15
+
+  # Test Rust scrolls
+  test-rust:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      
+      - name: Install SteamCMD (for Rust)
+        run: |
+          nix-env -iA nixpkgs.steamcmd || true
+      
+      - name: Download druid-cli
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid"
+          out-file-path: "/tmp"
+      
+      - name: Download druid_rcon plugin
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid_rcon"
+          out-file-path: "/tmp"
+      
+      - name: Download druid_rcon_web_rust plugin
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid_rcon_web_rust"
+          out-file-path: "/tmp"
+      
+      - name: Make binaries executable
+        run: |
+          chmod +x /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
+          /tmp/druid version
+      
+      - name: Test Rust scrolls
+        env:
+          TIMEOUT: 600
+        run: |
+          chmod +x scripts/test-scroll-runtime.sh
+          FAILED=0
+          for scroll in scrolls/rust/*/latest; do
+            echo "Testing $scroll"
+            if ! scripts/test-scroll-runtime.sh "$scroll"; then
+              echo "FAILED: $scroll"
+              FAILED=$((FAILED + 1))
+            fi
+          done
+          if [ $FAILED -gt 0 ]; then
+            echo "Total failures: $FAILED"
+            exit 1
+          fi
+        timeout-minutes: 30
+
+  # Test Hytale scrolls
+  test-hytale:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      
+      - name: Download druid-cli
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid"
+          out-file-path: "/tmp"
+      
+      - name: Download druid_rcon plugin
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid_rcon"
+          out-file-path: "/tmp"
+      
+      - name: Download druid_rcon_web_rust plugin
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid_rcon_web_rust"
+          out-file-path: "/tmp"
+      
+      - name: Make binaries executable
+        run: |
+          chmod +x /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
+          /tmp/druid version
+      
+      - name: Test Hytale scrolls
+        env:
+          TIMEOUT: 600
+        run: |
+          chmod +x scripts/test-scroll-runtime.sh
+          FAILED=0
+          for scroll in scrolls/hytale/*/; do
+            echo "Testing $scroll"
+            if ! scripts/test-scroll-runtime.sh "${scroll%/}"; then
+              echo "FAILED: $scroll"
+              FAILED=$((FAILED + 1))
+            fi
+          done
+          if [ $FAILED -gt 0 ]; then
+            echo "Total failures: $FAILED"
+            exit 1
+          fi
+        timeout-minutes: 30
+
   # Test all LGSM versions
   test-lgsm:
     runs-on: self-hosted
