@@ -17,7 +17,7 @@ init: "start"
 commands:
   start:
     needs: [install]
-    dependencies: [jdk16]
+    dependencies: [openjdk16]
     run: restart
     procedures:
       - mode: exec

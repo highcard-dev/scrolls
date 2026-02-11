@@ -20,12 +20,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Login to Docker registry
-        uses: docker/login-action@v3
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
         with:
-          registry: artifacts.druid.gg
-          username: ${{ secrets.IMAGE_REGISTRY_USER }}
-          password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
+          nix_path: nixpkgs=channel:nixos-unstable
+      
+      - name: Install SteamCMD (for LGSM games)
+        run: |
+          nix-env -iA nixpkgs.steamcmd || true
+      
+      - name: Download druid-cli
+        run: |
+          # Get latest release from GitHub
+          DRUID_VERSION=$(curl -s https://api.github.com/repos/highcard-dev/druid-cli/releases/latest | jq -r .tag_name)
+          curl -L -o /tmp/druid "https://github.com/highcard-dev/druid-cli/releases/download/${DRUID_VERSION}/druid-linux-amd64"
+          chmod +x /tmp/druid
+          /tmp/druid --version
       
       - name: Test Minecraft Vanilla 1.21.1
         env:
