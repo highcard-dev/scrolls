@@ -127,9 +127,11 @@ while true; do
     
     echo "[${ELAPSED}s] Checking server status..."
     
-    # Check server status
+    # Check server status (capture exit code without triggering set -e)
+    set +e
     check_server_started "$CONTAINER_ID"
     STATUS=$?
+    set -e
     
     if [ $STATUS -eq 0 ]; then
         echo "---"
