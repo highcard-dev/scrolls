@@ -15,8 +15,34 @@ on:
       - 'scripts/test-scroll-runtime.sh'
 
 jobs:
-  test:
+  # Generate matrix of all vanilla Minecraft versions
+  generate-matrix:
     runs-on: self-hosted
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate vanilla Minecraft version matrix
+        id: set-matrix
+        run: |
+          # Find all vanilla Minecraft scroll directories
+          VERSIONS=$(find scrolls/minecraft/minecraft-vanilla -name "scroll.yaml" | \
+            sed 's|/scroll.yaml||' | \
+            jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix=$VERSIONS" >> $GITHUB_OUTPUT
+  
+  # Test all vanilla Minecraft versions
+  test:
+    needs: generate-matrix
+    runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        scroll: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    
     steps:
       - uses: actions/checkout@v4
       
@@ -40,10 +66,10 @@ jobs:
           chmod +x /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
           /tmp/druid version
       
-      - name: Test Minecraft Vanilla 1.21.1
+      - name: Test ${{ matrix.scroll }}
         env:
           TIMEOUT: 600
         run: |
           chmod +x scripts/test-scroll-runtime.sh
-          scripts/test-scroll-runtime.sh scrolls/minecraft/minecraft-vanilla/1.21.1
+          scripts/test-scroll-runtime.sh "${{ matrix.scroll }}"
         timeout-minutes: 15
