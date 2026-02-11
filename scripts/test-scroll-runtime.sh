@@ -79,19 +79,19 @@ while true; do
     fi
     
     # Check scroll-lock.json for errors or pending state
-    if [ -f "scroll-lock.json" ]; then
+    if [ -f ".scroll/scroll-lock.json" ]; then
         # Check for error state or error messages in JSON
-        if grep -qiE '"state":\s*"error"|"error":|"fail":|"fatal":|"exception"' "scroll-lock.json" 2>/dev/null; then
+        if grep -qiE '"state":\s*"error"|"error":|"fail":|"fatal":|"exception"' ".scroll/scroll-lock.json" 2>/dev/null; then
             echo "--- FAIL: Error detected in scroll-lock.json after ${ELAPSED}s ---"
             echo "scroll-lock.json contents:"
-            cat "scroll-lock.json"
+            cat ".scroll/scroll-lock.json"
             echo ""
             echo "Druid log:"
             tail -50 druid.log
             exit 1
         fi
         # Check for pending state (not progressing)
-        if grep -qE '"state":\s*"pending"' "scroll-lock.json" 2>/dev/null; then
+        if grep -qE '"state":\s*"pending"' ".scroll/scroll-lock.json" 2>/dev/null; then
             echo "WARNING: Scroll still in pending state at ${ELAPSED}s"
         fi
     fi
@@ -105,9 +105,9 @@ while true; do
     # Check for timeout
     if [ $ELAPSED -ge "$TIMEOUT" ]; then
         echo "--- FAIL: Timeout after ${ELAPSED}s ---"
-        if [ -f "scroll-lock.json" ]; then
+        if [ -f ".scroll/scroll-lock.json" ]; then
             echo "scroll-lock.json contents:"
-            cat "scroll-lock.json"
+            cat ".scroll/scroll-lock.json"
             echo ""
         fi
         echo "Druid log:"
