@@ -71,7 +71,7 @@ commands:
           - -o
           - oxide.zip
           - -d
-          - /app/resources/deployment
+          - ./
       - mode: exec
         data:
           - rm
