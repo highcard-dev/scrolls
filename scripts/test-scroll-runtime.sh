@@ -29,25 +29,43 @@ trap cleanup EXIT
 echo "Working directory: $TEMP_DIR"
 echo "--- Druid Output ---"
 
-# Run druid serve and stream output
-$DRUID_BIN serve 2>&1 | while IFS= read -r line; do
-    echo "$line"
-    if echo "$line" | grep -qE "$SUCCESS_PATTERNS"; then
-        echo "--- PASS: Server started ---"
-        exit 0
-    fi
-done &
+# Run druid serve in background
+$DRUID_BIN serve > druid.log 2>&1 &
 DRUID_PID=$!
 
-# Wait with timeout
+# Monitor output with timeout
 START=$(date +%s)
-while kill -0 $DRUID_PID 2>/dev/null; do
-    if [ $(( $(date +%s) - START )) -ge "$TIMEOUT" ]; then
-        echo "--- FAIL: Timeout ---"
+LAST_SIZE=0
+
+while true; do
+    ELAPSED=$(( $(date +%s) - START ))
+    
+    # Check if druid is still running
+    if ! kill -0 $DRUID_PID 2>/dev/null; then
+        echo "--- FAIL: Druid exited after ${ELAPSED}s ---"
+        tail -50 druid.log
         exit 1
     fi
-    sleep 1
+    
+    # Show new output
+    CURRENT_SIZE=$(wc -l < druid.log 2>/dev/null || echo 0)
+    if [ "$CURRENT_SIZE" -gt "$LAST_SIZE" ]; then
+        tail -n +$((LAST_SIZE + 1)) druid.log 2>/dev/null
+        LAST_SIZE=$CURRENT_SIZE
+    fi
+    
+    # Check for success
+    if grep -qE "$SUCCESS_PATTERNS" druid.log 2>/dev/null; then
+        echo "--- PASS: Server started after ${ELAPSED}s ---"
+        exit 0
+    fi
+    
+    # Check for timeout
+    if [ $ELAPSED -ge "$TIMEOUT" ]; then
+        echo "--- FAIL: Timeout after ${ELAPSED}s ---"
+        tail -50 druid.log
+        exit 1
+    fi
+    
+    sleep 2
 done
-
-# Check exit status
-wait $DRUID_PID && exit 0 || { echo "--- FAIL: Druid exited ---"; exit 1; }
