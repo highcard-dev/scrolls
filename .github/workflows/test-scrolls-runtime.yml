@@ -60,6 +60,8 @@ jobs:
           chmod +x scripts/test-scroll-runtime.sh
       
       - name: Test ${{ matrix.scroll }}
+        env:
+          TIMEOUT: 1200
         run: |
           scripts/test-scroll-runtime.sh "${{ matrix.scroll }}"
         timeout-minutes: 25
