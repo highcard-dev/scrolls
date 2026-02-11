@@ -15,7 +15,7 @@ on:
       - 'scripts/test-scroll-runtime.sh'
 
 jobs:
-  # Generate matrix of all vanilla Minecraft versions
+  # Generate matrix of all Minecraft variants (vanilla, paper, spigot, forge, cuberite)
   generate-matrix:
     runs-on: self-hosted
     outputs:
@@ -24,16 +24,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Generate vanilla Minecraft version matrix
+      - name: Generate Minecraft matrix (all variants)
         id: set-matrix
         run: |
-          # Find all vanilla Minecraft scroll directories
-          VERSIONS=$(find scrolls/minecraft/minecraft-vanilla -name "scroll.yaml" | \
+          # Find all Minecraft scroll directories (vanilla, paper, spigot, forge, cuberite)
+          VERSIONS=$(find scrolls/minecraft -name "scroll.yaml" | \
             sed 's|/scroll.yaml||' | \
             jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=$VERSIONS" >> $GITHUB_OUTPUT
   
-  # Test all vanilla Minecraft versions
+  # Test all Minecraft variants
   test:
     needs: generate-matrix
     runs-on: self-hosted
