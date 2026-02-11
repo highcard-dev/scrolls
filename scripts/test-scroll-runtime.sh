@@ -16,7 +16,8 @@ echo "Druid: $DRUID_BIN | Timeout: ${TIMEOUT}s"
 
 # Setup temp directory with scroll
 TEMP_DIR=$(mktemp -d)
-cp -r "$SCROLL_PATH/"* "$TEMP_DIR/"
+mkdir -p "$TEMP_DIR/.scroll"
+cp -r "$SCROLL_PATH/"* "$TEMP_DIR/.scroll/"
 cd "$TEMP_DIR"
 
 cleanup() { kill "$DRUID_PID" 2>/dev/null || true; cd /; rm -rf "$TEMP_DIR"; }
