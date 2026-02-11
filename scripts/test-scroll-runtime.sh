@@ -23,7 +23,25 @@ cp -r "$SCROLL_PATH/"* "$TEMP_DIR/.scroll/"
 [ -f /tmp/druid_rcon_web_rust ] && cp /tmp/druid_rcon_web_rust "$TEMP_DIR/"
 cd "$TEMP_DIR"
 
-cleanup() { kill "$DRUID_PID" 2>/dev/null || true; cd /; rm -rf "$TEMP_DIR"; }
+cleanup() {
+    echo "--- Cleanup: Stopping druid and all child processes ---"
+    if [ -n "${DRUID_PID:-}" ]; then
+        # Kill entire process group (druid + game server + any children)
+        pkill -P "$DRUID_PID" 2>/dev/null || true
+        kill "$DRUID_PID" 2>/dev/null || true
+        # Wait for processes to exit
+        sleep 2
+        # Force kill if still running
+        kill -9 "$DRUID_PID" 2>/dev/null || true
+    fi
+    # Extra safety: kill any remaining druid/java/server processes
+    pkill -f "druid serve" 2>/dev/null || true
+    pkill -f "minecraft.*server.jar" 2>/dev/null || true
+    sleep 1
+    cd /
+    rm -rf "$TEMP_DIR"
+    echo "--- Cleanup complete ---"
+}
 trap cleanup EXIT
 
 echo "Working directory: $TEMP_DIR"
