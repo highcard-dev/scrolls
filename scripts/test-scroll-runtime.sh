@@ -120,10 +120,6 @@ CONTAINER_ID=$(docker run --rm -d \
 echo "Container: $CONTAINER_ID"
 echo "---"
 
-# Follow logs in background
-docker logs -f "$CONTAINER_ID" > /tmp/container-$$.log 2>&1 &
-LOGS_PID=$!
-
 START=$(date +%s)
 
 while true; do
@@ -138,18 +134,17 @@ while true; do
     if [ $STATUS -eq 0 ]; then
         echo "---"
         echo "PASS: Server started after ${ELAPSED}s"
+        echo "Last 30 lines of output:"
         docker logs "$CONTAINER_ID" 2>&1 | tail -30
         docker kill "$CONTAINER_ID" 2>/dev/null || true
-        kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_DIR" /tmp/container-$$.log
+        rm -rf "$TEMP_DIR"
         exit 0
     elif [ $STATUS -eq 2 ]; then
         echo "---"
         echo "FAIL: Container exited after ${ELAPSED}s"
-        echo "Last 40 lines of logs:"
-        tail -40 /tmp/container-$$.log
-        kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_DIR" /tmp/container-$$.log
+        echo "Last 50 lines of output:"
+        docker logs "$CONTAINER_ID" 2>&1 | tail -50
+        rm -rf "$TEMP_DIR"
         exit 1
     fi
     
@@ -157,11 +152,10 @@ while true; do
     if [ $ELAPSED -ge $TIMEOUT ]; then
         echo "---"
         echo "FAIL: Timeout ${TIMEOUT}s reached"
-        echo "Last 40 lines of logs:"
-        tail -40 /tmp/container-$$.log
+        echo "Last 50 lines of output:"
+        docker logs "$CONTAINER_ID" 2>&1 | tail -50
         docker kill "$CONTAINER_ID" 2>/dev/null || true
-        kill $LOGS_PID 2>/dev/null || true
-        rm -rf "$TEMP_DIR" /tmp/container-$$.log
+        rm -rf "$TEMP_DIR"
         exit 1
     fi
     
