@@ -29,13 +29,15 @@ jobs:
         run: |
           nix-env -iA nixpkgs.steamcmd || true
       
-      - name: Download druid-cli
+      - name: Download druid-cli and plugins
         run: |
           # Get latest release from GitHub
           DRUID_VERSION=$(curl -s https://api.github.com/repos/highcard-dev/druid-cli/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\(.*\)".*/\1/')
           echo "Downloading druid-cli ${DRUID_VERSION}..."
           curl -L -o /tmp/druid "https://github.com/highcard-dev/druid-cli/releases/download/${DRUID_VERSION}/druid"
-          chmod +x /tmp/druid
+          curl -L -o /tmp/druid_rcon "https://github.com/highcard-dev/druid-cli/releases/download/${DRUID_VERSION}/druid_rcon"
+          curl -L -o /tmp/druid_rcon_web_rust "https://github.com/highcard-dev/druid-cli/releases/download/${DRUID_VERSION}/druid_rcon_web_rust"
+          chmod +x /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
           /tmp/druid version
       
       - name: Test Minecraft Vanilla 1.21.1

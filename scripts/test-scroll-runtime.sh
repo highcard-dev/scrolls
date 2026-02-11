@@ -18,6 +18,9 @@ echo "Druid: $DRUID_BIN | Timeout: ${TIMEOUT}s"
 TEMP_DIR=$(mktemp -d)
 mkdir -p "$TEMP_DIR/.scroll"
 cp -r "$SCROLL_PATH/"* "$TEMP_DIR/.scroll/"
+# Copy plugins if they exist
+[ -f /tmp/druid_rcon ] && cp /tmp/druid_rcon "$TEMP_DIR/"
+[ -f /tmp/druid_rcon_web_rust ] && cp /tmp/druid_rcon_web_rust "$TEMP_DIR/"
 cd "$TEMP_DIR"
 
 cleanup() { kill "$DRUID_PID" 2>/dev/null || true; cd /; rm -rf "$TEMP_DIR"; }
