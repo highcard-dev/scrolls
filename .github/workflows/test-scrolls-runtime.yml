@@ -17,7 +17,7 @@ on:
 jobs:
   # Test all Minecraft Vanilla versions
   test-vanilla:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -76,7 +76,7 @@ jobs:
 
   # Test all PaperMC versions
   test-paper:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -135,7 +135,7 @@ jobs:
 
   # Test all Spigot versions
   test-spigot:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -194,7 +194,7 @@ jobs:
 
   # Test all Forge versions
   test-forge:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -253,7 +253,7 @@ jobs:
 
   # Test Cuberite
   test-cuberite:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -301,7 +301,7 @@ jobs:
 
   # Test Rust scrolls
   test-rust:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -363,7 +363,7 @@ jobs:
 
   # Test all LGSM versions
   test-lgsm:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
