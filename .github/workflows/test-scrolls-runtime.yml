@@ -236,6 +236,16 @@ jobs:
           chmod +x /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
           /tmp/druid version
       
+      - name: Create non-root user for LGSM
+        run: |
+          # LGSM cannot run as root, create test user
+          useradd -m -s /bin/bash lgsm-test || true
+          # Give user access to test files
+          chown -R lgsm-test:lgsm-test .
+          chmod -R 755 .
+          # Allow user to run druid binaries
+          chmod 755 /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
+      
       - name: Test all LGSM versions
         env:
           TIMEOUT: 600
@@ -244,7 +254,8 @@ jobs:
           FAILED=0
           for scroll in scrolls/lgsm/*/; do
             echo "Testing $scroll"
-            if ! scripts/test-scroll-runtime.sh "${scroll%/}"; then
+            # Run as non-root user (LGSM requirement)
+            if ! sudo -u lgsm-test bash -c "cd $PWD && scripts/test-scroll-runtime.sh '${scroll%/}'"; then
               echo "FAILED: $scroll"
               FAILED=$((FAILED + 1))
             fi

@@ -14,6 +14,12 @@ grep -q "192.168." "$SCROLL_PATH/scroll.yaml" 2>/dev/null && { echo "SKIP: Inter
 echo "=== Testing: $SCROLL_PATH ==="
 echo "Druid: $DRUID_BIN | Timeout: ${TIMEOUT}s"
 
+# Check if LGSM scroll and running as root
+if [[ "$SCROLL_PATH" == *"/lgsm/"* ]] && [ "$(id -u)" -eq 0 ]; then
+    echo "SKIP: LGSM scrolls cannot run as root"
+    exit 0
+fi
+
 # Setup temp directory with scroll
 TEMP_DIR=$(mktemp -d)
 mkdir -p "$TEMP_DIR/.scroll"
@@ -72,6 +78,19 @@ while true; do
         LAST_SIZE=$CURRENT_SIZE
     fi
     
+    # Check scroll-lock for errors
+    if [ -f ".scroll/.scroll-lock" ]; then
+        if grep -qiE "error|fail|fatal|exception" ".scroll/.scroll-lock" 2>/dev/null; then
+            echo "--- FAIL: Error detected in scroll-lock after ${ELAPSED}s ---"
+            echo "Scroll-lock contents:"
+            cat ".scroll/.scroll-lock"
+            echo ""
+            echo "Druid log:"
+            tail -50 druid.log
+            exit 1
+        fi
+    fi
+    
     # Check for success
     if grep -qE "$SUCCESS_PATTERNS" druid.log 2>/dev/null; then
         echo "--- PASS: Server started after ${ELAPSED}s ---"
@@ -81,6 +100,11 @@ while true; do
     # Check for timeout
     if [ $ELAPSED -ge "$TIMEOUT" ]; then
         echo "--- FAIL: Timeout after ${ELAPSED}s ---"
+        if [ -f ".scroll/.scroll-lock" ]; then
+            echo "Scroll-lock contents:"
+            cat ".scroll/.scroll-lock"
+            echo ""
+        fi
         tail -50 druid.log
         exit 1
     fi
