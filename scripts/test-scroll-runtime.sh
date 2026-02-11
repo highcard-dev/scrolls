@@ -45,15 +45,25 @@ get_ports() {
 # Check if server started in logs (more reliable than port check)
 check_server_started() {
     local container_id=$1
-    local logs=$(docker logs "$container_id" 2>&1 | tail -200)
+    local logs=$(docker logs "$container_id" 2>&1)
+    local line_count=$(echo "$logs" | wc -l)
+    
+    echo "[DEBUG] Container has $line_count lines of output" >&2
     
     # Minecraft servers log "Done" when ready
-    echo "$logs" | grep -qE "(Done \(|Server started|RCON running|Starting.*server on)" && return 0
+    if echo "$logs" | grep -qE "(Done \(|Server started|RCON running|Starting.*server on)"; then
+        echo "[DEBUG] Found success pattern in logs!" >&2
+        return 0
+    fi
     
     # Check if still running
-    docker ps -q --filter "id=$container_id" | grep -q . && return 1
+    if docker ps -q --filter "id=$container_id" | grep -q .; then
+        echo "[DEBUG] Container still running, waiting..." >&2
+        return 1
+    fi
     
     # Container exited
+    echo "[DEBUG] Container exited!" >&2
     return 2
 }
 
@@ -118,6 +128,8 @@ START=$(date +%s)
 
 while true; do
     ELAPSED=$(($(date +%s) - START))
+    
+    echo "[${ELAPSED}s] Checking server status..."
     
     # Check server status
     check_server_started "$CONTAINER_ID"
