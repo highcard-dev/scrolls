@@ -246,16 +246,29 @@ jobs:
           # Allow user to run druid binaries
           chmod 755 /tmp/druid /tmp/druid_rcon /tmp/druid_rcon_web_rust
       
-      - name: Test all LGSM versions
+      - name: Test released LGSM scrolls only
         env:
           TIMEOUT: 600
         run: |
           chmod +x scripts/test-scroll-runtime.sh
+          # Only test LGSM scrolls that are actually released (from release.yml)
+          RELEASED_LGSM=(
+            "scrolls/lgsm/pwserver"
+            "scrolls/lgsm/arkserver"
+            "scrolls/lgsm/untserver"
+            "scrolls/lgsm/dayzserver"
+            "scrolls/lgsm/sdtdserver"
+            "scrolls/lgsm/gmodserver"
+            "scrolls/lgsm/cs2server"
+            "scrolls/lgsm/pzserver"
+            "scrolls/lgsm/terrariaserver"
+            "scrolls/lgsm/csgoserver"
+          )
           FAILED=0
-          for scroll in scrolls/lgsm/*/; do
+          for scroll in "${RELEASED_LGSM[@]}"; do
             echo "Testing $scroll"
             # Run as non-root user (LGSM requirement)
-            if ! sudo -u lgsm-test bash -c "cd $PWD && scripts/test-scroll-runtime.sh '${scroll%/}'"; then
+            if ! sudo -u lgsm-test bash -c "cd $PWD && scripts/test-scroll-runtime.sh '$scroll'"; then
               echo "FAILED: $scroll"
               FAILED=$((FAILED + 1))
             fi
