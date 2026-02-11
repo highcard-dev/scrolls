@@ -36,7 +36,7 @@ jobs:
           echo "Downloading druid-cli ${DRUID_VERSION}..."
           curl -L -o /tmp/druid "https://github.com/highcard-dev/druid-cli/releases/download/${DRUID_VERSION}/druid"
           chmod +x /tmp/druid
-          /tmp/druid --version
+          /tmp/druid version
       
       - name: Test Minecraft Vanilla 1.21.1
         env:
