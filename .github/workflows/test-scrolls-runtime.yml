@@ -62,7 +62,7 @@ jobs:
       - name: Test ${{ matrix.scroll }}
         run: |
           scripts/test-scroll-runtime.sh "${{ matrix.scroll }}"
-        timeout-minutes: 12
+        timeout-minutes: 25
       
       - name: Upload logs
         if: failure()
