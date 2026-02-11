@@ -52,7 +52,7 @@ commands:
         data:
           - steamcmd
           - +force_install_dir
-          - /app/resources/deployment
+          - ./
           - +login
           - anonymous
           - +app_update

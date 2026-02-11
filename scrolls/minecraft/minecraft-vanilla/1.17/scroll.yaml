@@ -7,6 +7,7 @@ ports:
     protocol: tcp
     port: 25565
     sleep_handler: packet_handler/minecraft.lua
+    mandatory: true
     start_delay: 10
     finish_after_command: install
   - name: rcon
@@ -16,7 +17,7 @@ init: "start"
 commands:
   start:
     needs: [install]
-    dependencies: [jdk16]
+    dependencies: [jdk17]
     run: restart
     procedures:
       - mode: exec
