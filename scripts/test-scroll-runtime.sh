@@ -1,165 +1,60 @@
 #!/bin/bash
-# Runtime scroll testing
+# Runtime scroll testing - streams container output and detects server ready state
 
 set -euo pipefail
 
-SCROLL_PATH="${1}"
-TIMEOUT="${TIMEOUT:-600}"  # 10 minutes for downloads
+SCROLL_PATH="${1:?Usage: $0 <scroll-path>}"
+TIMEOUT="${TIMEOUT:-600}"
+SUCCESS_PATTERNS="Done \(|Server started|RCON running|Starting.*server on"
 
-# Skip scrolls with internal URLs (not accessible in CI)
-if [ -f "$SCROLL_PATH/scroll.yaml" ] && grep -q "192.168." "$SCROLL_PATH/scroll.yaml"; then
-    echo "SKIP: Internal URL (not accessible in CI)"
-    exit 0
-fi
+# Skip internal URLs
+grep -q "192.168." "$SCROLL_PATH/scroll.yaml" 2>/dev/null && { echo "SKIP: Internal URL"; exit 0; }
 
-# Determine Docker image from release.yml
-get_image() {
-    local line=$(grep "druid registry push.*$SCROLL_PATH" .github/workflows/release.yml | head -1)
-    if echo "$line" | grep -q "stable-nix-steamcmd"; then
-        echo "artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd"
-    else
-        echo "artifacts.druid.gg/druid-team/druid:stable-nix"
-    fi
-}
+# Determine image from release.yml
+IMAGE="artifacts.druid.gg/druid-team/druid:stable-nix"
+grep -q "druid registry push.*$SCROLL_PATH.*stable-nix-steamcmd" .github/workflows/release.yml 2>/dev/null && \
+    IMAGE="artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd"
 
-# Get ports from scroll.yaml AND release.yml
-get_ports() {
-    local ports=()
-    
-    local yaml_ports=$(grep "^\s*port:" "$SCROLL_PATH/scroll.yaml" 2>/dev/null | grep -oE "[0-9]+" || true)
-    if [ -n "$yaml_ports" ]; then
-        ports+=($yaml_ports)
-    fi
-    
-    local release_line=$(grep "druid registry push.*$SCROLL_PATH" .github/workflows/release.yml 2>/dev/null | head -1 || true)
-    if [ -n "$release_line" ]; then
-        local release_ports=$(echo "$release_line" | grep -oE '\-p [a-z]+=([0-9]+)' | grep -oE '[0-9]+' || true)
-        if [ -n "$release_ports" ]; then
-            ports+=($release_ports)
-        fi
-    fi
-    
-    printf '%s\n' "${ports[@]}" | sort -u | head -10
-}
+echo "=== Testing: $SCROLL_PATH ==="
+echo "Image: $IMAGE | Timeout: ${TIMEOUT}s"
 
-# Check if server started in logs (more reliable than port check)
-check_server_started() {
-    local container_id=$1
-    local logs=$(docker logs "$container_id" 2>&1)
-    local line_count=$(echo "$logs" | wc -l)
-    
-    echo "[DEBUG] Container has $line_count lines of output" >&2
-    
-    # Minecraft servers log "Done" when ready
-    if echo "$logs" | grep -qE "(Done \(|Server started|RCON running|Starting.*server on)"; then
-        echo "[DEBUG] Found success pattern in logs!" >&2
-        return 0
-    fi
-    
-    # Check if still running
-    if docker ps -q --filter "id=$container_id" | grep -q .; then
-        echo "[DEBUG] Container still running, waiting..." >&2
-        return 1
-    fi
-    
-    # Container exited
-    echo "[DEBUG] Container exited!" >&2
-    return 2
-}
+docker pull -q "$IMAGE" || { echo "SKIP: Failed to pull image"; exit 0; }
 
-# Main
-if [ ! -f "$SCROLL_PATH/scroll.yaml" ]; then
-    echo "SKIP: No scroll.yaml"
-    exit 0
-fi
-
-PORTS=($(get_ports))
-if [ ${#PORTS[@]} -eq 0 ]; then
-    echo "SKIP: No ports defined"
-    exit 0
-fi
-
-IMAGE=$(get_image)
-if [ -z "$IMAGE" ]; then
-    echo "SKIP: No image"
-    exit 0
-fi
-
-echo "Scroll: $SCROLL_PATH"
-echo "Image: $IMAGE"  
-echo "Ports: ${PORTS[*]}"
-echo "Timeout: ${TIMEOUT}s"
-
-docker pull "$IMAGE" || {
-    echo "SKIP: Failed to pull image"
-    exit 0
-}
-
-# Create temp directory with correct structure:
-# /tmp/test-XXXXX/
-#   .scroll/        <- mounted to /scroll/.scroll
-#     scroll.yaml
-#     packet_handler/
-#     init-files/
-#     etc.
+# Setup temp directory with scroll
 TEMP_DIR=$(mktemp -d)
 mkdir -p "$TEMP_DIR/.scroll"
 cp -r "$SCROLL_PATH/"* "$TEMP_DIR/.scroll/"
 chmod -R 777 "$TEMP_DIR"
 
-echo "Starting container with druid serve..."
+cleanup() { docker kill "$CONTAINER_ID" 2>/dev/null || true; rm -rf "$TEMP_DIR"; }
+trap cleanup EXIT
 
-# Mount the temp dir to /scroll
-# druid will look for /scroll/.scroll/scroll.yaml
-CONTAINER_ID=$(docker run --rm -d \
-    -v "$TEMP_DIR:/scroll" \
-    -w /scroll \
-    "$IMAGE" \
-    serve)
+# Run container in background
+CONTAINER_ID=$(docker run --rm -d -v "$TEMP_DIR:/scroll" -w /scroll "$IMAGE" serve)
+echo "Container: ${CONTAINER_ID:0:12}"
+echo "--- Container Output ---"
 
-echo "Container: $CONTAINER_ID"
-echo "---"
-
+# Stream logs and check for success
 START=$(date +%s)
-
-while true; do
-    ELAPSED=$(($(date +%s) - START))
-    
-    echo "[${ELAPSED}s] Checking server status..."
-    
-    # Check server status (capture exit code without triggering set -e)
-    set +e
-    check_server_started "$CONTAINER_ID"
-    STATUS=$?
-    set -e
-    
-    if [ $STATUS -eq 0 ]; then
-        echo "---"
-        echo "PASS: Server started after ${ELAPSED}s"
-        echo "Last 30 lines of output:"
-        docker logs "$CONTAINER_ID" 2>&1 | tail -30
-        docker kill "$CONTAINER_ID" 2>/dev/null || true
-        rm -rf "$TEMP_DIR"
+docker logs -f "$CONTAINER_ID" 2>&1 | while IFS= read -r line; do
+    echo "$line"
+    if echo "$line" | grep -qE "$SUCCESS_PATTERNS"; then
+        echo "--- PASS: Server started ($(( $(date +%s) - START ))s) ---"
         exit 0
-    elif [ $STATUS -eq 2 ]; then
-        echo "---"
-        echo "FAIL: Container exited after ${ELAPSED}s"
-        echo "Last 50 lines of output:"
-        docker logs "$CONTAINER_ID" 2>&1 | tail -50
-        rm -rf "$TEMP_DIR"
+    fi
+    if [ $(( $(date +%s) - START )) -ge "$TIMEOUT" ]; then
+        echo "--- FAIL: Timeout ---"
         exit 1
     fi
-    
-    # Timeout check
-    if [ $ELAPSED -ge $TIMEOUT ]; then
-        echo "---"
-        echo "FAIL: Timeout ${TIMEOUT}s reached"
-        echo "Last 50 lines of output:"
-        docker logs "$CONTAINER_ID" 2>&1 | tail -50
-        docker kill "$CONTAINER_ID" 2>/dev/null || true
-        rm -rf "$TEMP_DIR"
-        exit 1
-    fi
-    
-    sleep 2
+done &
+LOG_PID=$!
+
+# Wait for log reader or container to exit
+while kill -0 $LOG_PID 2>/dev/null && docker ps -q --filter "id=$CONTAINER_ID" | grep -q .; do
+    sleep 1
 done
+
+# Check exit status
+wait $LOG_PID 2>/dev/null && exit 0
+docker ps -q --filter "id=$CONTAINER_ID" | grep -q . || { echo "--- FAIL: Container exited ---"; exit 1; }
+exit 1

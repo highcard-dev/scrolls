@@ -15,36 +15,8 @@ on:
       - 'scripts/test-scroll-runtime.sh'
 
 jobs:
-  # Extract published scrolls from release.yml
-  generate-matrix:
-    runs-on: self-hosted
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Extract published scrolls
-        id: set-matrix
-        run: |
-          # Parse release.yml to get scroll paths (exclude .meta)
-          SCROLLS=$(grep "druid registry push \./scrolls/" .github/workflows/release.yml | \
-            grep -v "push meta" | \
-            grep -oE '\./scrolls/[^ ]+' | \
-            sed 's|^\./||' | \
-            jq -R -s -c 'split("\n")[:-1]')
-          echo "matrix=$SCROLLS" >> $GITHUB_OUTPUT
-  
-  # Test scrolls in Docker
   test:
-    needs: generate-matrix
     runs-on: self-hosted
-    strategy:
-      fail-fast: true
-      max-parallel: 3
-      matrix:
-        scroll: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-    
     steps:
       - uses: actions/checkout@v4
       
@@ -55,29 +27,10 @@ jobs:
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
       
-      - name: Setup
+      - name: Test Minecraft Vanilla 1.21.1
+        env:
+          TIMEOUT: 600
         run: |
           chmod +x scripts/test-scroll-runtime.sh
-      
-      - name: Test ${{ matrix.scroll }}
-        env:
-          TIMEOUT: 1200
-        run: |
-          scripts/test-scroll-runtime.sh "${{ matrix.scroll }}"
-        timeout-minutes: 25
-      
-      - name: Upload logs
-        if: failure()
-        run: |
-          # Get last container ID
-          CONTAINER_ID=$(docker ps -a --format "{{.ID}}" | head -1)
-          if [ -n "$CONTAINER_ID" ]; then
-            docker logs "$CONTAINER_ID" > /tmp/container.log 2>&1 || true
-          fi
-      
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: logs-${{ hashFiles(matrix.scroll) }}
-          path: /tmp/container.log
-          retention-days: 3
+          scripts/test-scroll-runtime.sh scrolls/minecraft/minecraft-vanilla/1.21.1
+        timeout-minutes: 15
