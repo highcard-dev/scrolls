@@ -105,8 +105,7 @@ func main() {
 		// Print out the template to std
 		scollYamltemplate.Execute(outputFile, templateVars)
 
-		cp.Copy(buildPath+"/init-files", dir+"/init-files")
-		cp.Copy(buildPath+"/init-files-template", dir+"/init-files-template")
+		cp.Copy(buildPath+"/data", dir+"/data")
 		cp.Copy(buildPath+"/packet_handler", dir+"/packet_handler")
 
 		cp.Copy(buildPath+"/update", dir+"/update")
