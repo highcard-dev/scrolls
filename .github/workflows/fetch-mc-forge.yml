@@ -1,43 +1,85 @@
 name: Fetch Forge
+
 on:
   workflow_dispatch:
   schedule:
     - cron: "0 2 * * *"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
-  build-spigot:
+  build-forge:  # Fixed: was named build-spigot (copy-paste error)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
     strategy:
+      fail-fast: false
       matrix:
         version:
-          [
-            1.17.1,
-            1.18,
-            1.18.1,
-            1.18.2,
-            1.19,
-            1.19.1,
-            1.19.2,
-            1.19.3,
-            1.19.4,
-            "1.20",
-            1.20.1,
-            1.20.2,
-            1.20.3,
-            1.20.4,
-            1.20.6,
-            1.21.1,
-            1.21.3,
-            1.21.4,
-            1.21.5,
-            1.21.6,
-            1.21.7,
-          ]
-    runs-on: ubuntu-latest
+          - "1.17.1"
+          - "1.18"
+          - "1.18.1"
+          - "1.18.2"
+          - "1.19"
+          - "1.19.1"
+          - "1.19.2"
+          - "1.19.3"
+          - "1.19.4"
+          - "1.20"
+          - "1.20.1"
+          - "1.20.2"
+          - "1.20.3"
+          - "1.20.4"
+          - "1.20.6"
+          - "1.21.1"
+          - "1.21.3"
+          - "1.21.4"
+          - "1.21.5"
+          - "1.21.6"
+          - "1.21.7"
+    
     steps:
-      - uses: actions/checkout@v3
-      - run: go install github.com/ericchiang/pup@latest
-      - run: ./scrolls/minecraft/forge/fetch.sh ${{ matrix.version }}
-      - run: mkdir -p forge && mv forge-${{ matrix.version }}.jar forge/forge-${{ matrix.version }}.jar
-      - uses: jakejarvis/s3-sync-action@master
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "^1.21"
+
+      - name: Install pup
+        run: go install github.com/ericchiang/pup@latest
+
+      - name: Fetch Forge ${{ matrix.version }}
+        run: |
+          set -e
+          export PATH=${PATH}:$(go env GOPATH)/bin
+          
+          # Fetch the Forge installer link
+          HTML_URL="https://files.minecraftforge.net/net/minecraftforge/forge/index_${{ matrix.version }}.html"
+          echo "Fetching from: $HTML_URL"
+          
+          LINK=$(curl -s --max-time 30 "$HTML_URL" | \
+            pup ':parent-of(.classifier-installer) json{}' | \
+            jq -r 'first(.[] | select(.href != null) | .href)' | \
+            sed 's/^.*https:\/\/maven.minecraftforge.net/https:\/\/maven.minecraftforge.net/')
+          
+          if [ -z "$LINK" ]; then
+            echo "::error::Failed to find Forge download link for version ${{ matrix.version }}"
+            exit 1
+          fi
+          
+          echo "Downloading from: $LINK"
+          wget --timeout=120 --tries=3 -O forge-${{ matrix.version }}.jar "$LINK"
+          
+          mkdir -p forge
+          ls -la forge-${{ matrix.version }}.jar
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --follow-symlinks
         env:
           AWS_S3_BUCKET: ${{ secrets.PRESIGN_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.PRESIGN_ACCESS_KEY }}
