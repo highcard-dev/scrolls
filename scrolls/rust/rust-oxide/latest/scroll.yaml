@@ -53,7 +53,7 @@ commands:
         data:
           - steamcmd
           - +force_install_dir
-          - /app/resources/deployment
+          - ./
           - +login
           - anonymous
           - +app_update
@@ -71,7 +71,7 @@ commands:
           - -o
           - oxide.zip
           - -d
-          - /app/resources/deployment
+          - ./
       - mode: exec
         data:
           - rm
