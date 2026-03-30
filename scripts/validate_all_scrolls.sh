@@ -6,5 +6,5 @@ ALL_SCROLL_DIRS=$(find . -type f -name "scroll.yaml" -exec dirname {} \; | sort 
 
 for SCROLL_DIR in $ALL_SCROLL_DIRS; do
     echo "Validating $SCROLL_DIR"
-    druid scroll validate $SCROLL_DIR
+    druid scroll validate --strict $SCROLL_DIR
 done
