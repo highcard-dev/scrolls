@@ -1,0 +1,164 @@
+name: artifacts.druid.gg/druid-team/scroll-lgsm
+desc: sdtdserver
+version: 0.0.2
+app_version: sdtdserver
+keepAlivePPM: 5
+ports:
+  - name: query
+    protocol: udp
+    description: Steam Query Port. Use this to connect via the Steam client.
+    start_delay: 0
+    finish_after_command: install
+    sleep_handler: packet_handler/query.lua
+    vars:
+      - name: GameName
+        value: "7 Days To Die"
+      - name: GameSteamFolder
+        value: 7DTD
+      - name: GameSteamId
+        value: "0"
+      - name: MapName
+        value: server idle
+      - name: ServerListName
+        value: "Druid.gg Server (idle) - join to start"
+      - name: SteamAppId
+        value: "251570"
+  - name: main
+    description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
+    protocol: udp
+    start_delay: 0
+    finish_after_command: install
+    sleep_handler: generic
+    check_activity: true
+init: "console"
+commands:
+  console:
+    needs: [start]
+    run: restart
+    dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat
+      - pigz
+      - python3
+      - tmux
+      - unzip
+      - util-linux
+      - moreutils
+      - iproute2
+    procedures:
+      - mode: stdin
+        wait: 5
+        data:
+          - 'console.1'
+          - "\r"
+      - mode: exec-tty
+        data:
+          - ./sdtdserver
+          - console
+  start:
+    needs: [install]
+    dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat
+      - pigz
+      - python3
+      - tmux
+      - unzip
+      - util-linux
+      - moreutils
+      - iproute2
+    procedures:
+      - mode: exec
+        ignore_failure: true
+        data:
+          - ./sdtdserver
+          - update
+      - mode: exec
+        data:
+          - ./sdtdserver
+          - start
+  stop:
+    procedures:
+      - mode: exec
+        data:
+          - ./sdtdserver
+          - stop
+  restart:
+    dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat
+      - pigz
+      - python3
+      - tmux
+      - unzip
+      - util-linux
+      - moreutils
+      - iproute2
+    procedures:
+      - mode: exec
+        data:
+          - echo
+          - "Restarting server..."
+      - mode: exec
+        data:
+          - ./sdtdserver
+          - restart
+      - mode: command
+        data: console
+  install:
+    dependencies:
+      - bc
+      - binutils
+      - bzip2
+      - cpio
+      - file
+      - jq
+      - pkgsi686Linux.gcc
+      - netcat
+      - pigz
+      - python3
+      - tmux
+      - unzip
+      - util-linux
+      - moreutils
+      - iproute2
+    run: once
+    procedures:
+      - mode: exec
+        data:
+          - echo
+          - "Installing LGSM..."
+      - mode: exec
+        data:
+          - sh
+          - install-lgsm.sh
+      - mode: exec
+        data:
+          - ./linuxgsm.sh
+          - sdtdserver
+      - mode: exec
+        data:
+          - ./sdtdserver
+          - auto-install
+cronjobs:
+  - name: Restart every 6 hours
+    schedule: "0 */6 * * *"
+    command: restart
