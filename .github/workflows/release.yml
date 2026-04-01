@@ -126,7 +126,6 @@ jobs:
           druid registry push --cwd ./scrolls/lgsm/cs2server -p main=/udp -p rcon=27015 -i artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd -m --min-disk 38Gi --min-ram 1Gi --min-cpu 0.5 --smart
           druid registry push --cwd ./scrolls/lgsm/pzserver -p main=/udp -p main2=/udp  -i artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd -m --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart
 
-          druid registry push --cwd ./scrolls/lgsm/terrariaserver -p todo=8211/udp -i artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd -m
           druid registry push --cwd ./scrolls/lgsm/csgoserver -p query=27005/udp -p main=27015/udp -p sourcetv=27020/udp -p steam=27015 -i artifacts.druid.gg/druid-team/druid:stable-nix-steamcmd -m --smart
 
 
