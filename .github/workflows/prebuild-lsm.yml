@@ -1,44 +1,60 @@
 name: Prebuild LGSM
+
 on:
   workflow_dispatch:
     inputs:
       image:
-        description: "Image"
+        description: "Image to prebuild (ark, cs2, or empty for all)"
         required: false
         default: ""
   schedule:
     - cron: "0 3 * * *"
+
+env:
+  # Opt into Node.js 24 to fix deprecation warnings
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-lgsm:
     runs-on: self-hosted
+    timeout-minutes: 30
     strategy:
+      fail-fast: false  # Don't cancel other jobs if one fails
       matrix:
         image: ["ark", "cs2"]
+    
     steps:
-      - uses: actions/checkout@v3
-      - name: Login to Docker Hub
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Updated from v3
+
+      - name: Login to Docker Registry
         uses: docker/login-action@v3
         with:
           registry: artifacts.druid.gg
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
-      - uses: actions/setup-go@v5
-        with:
-          go-version: ">=1.22.3"
 
-      #      - name: Setup tmate session
-      #        uses: mxschmitt/action-tmate@v3
-      #        env:
-      #          PRESIGN_ACCESS_KEY: ${{ secrets.PRESIGN_ACCESS_KEY }}
-      #          PRESIGN_BUCKET_NAME: ${{ secrets.PRESIGN_BUCKET_NAME }}
-      #          PRESIGN_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
-      #          PRESIGN_SECRET_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
-      #          BACKUP_ADDITIONAL_ARGS: "--insecure"
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
       - name: Prebuild and upload Image ${{ matrix.image }}
-        run: ./scripts/prebuild/prebuild.sh ${{ matrix.image }}
+        id: prebuild
+        run: |
+          set -e
+          echo "::group::Starting prebuild for ${{ matrix.image }}"
+          ./scripts/prebuild/prebuild.sh ${{ matrix.image }}
+          echo "::endgroup::"
         env:
           PRESIGN_ACCESS_KEY: ${{ secrets.PRESIGN_ACCESS_KEY }}
           PRESIGN_BUCKET_NAME: ${{ secrets.PRESIGN_BUCKET_NAME }}
           PRESIGN_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
           PRESIGN_SECRET_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
           BACKUP_ADDITIONAL_ARGS: "--insecure"
+
+      - name: Cleanup on failure
+        if: failure()
+        run: |
+          echo "Cleaning up Docker volumes..."
+          docker volume ls -q -f name=lgsm-prebuild- | xargs -r docker volume rm || true
