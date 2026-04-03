@@ -37,8 +37,6 @@ jobs:
       - name: Prebuild and upload Image ${{ matrix.image }}
         run: ./scripts/prebuild/prebuild.sh ${{ matrix.image }}
         env:
-          PRESIGN_ACCESS_KEY: ${{ secrets.PRESIGN_ACCESS_KEY }}
-          PRESIGN_BUCKET_NAME: ${{ secrets.PRESIGN_BUCKET_NAME }}
-          PRESIGN_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
-          PRESIGN_SECRET_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
-          BACKUP_ADDITIONAL_ARGS: "--insecure"
+          SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
+          SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
+          SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
