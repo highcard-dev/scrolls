@@ -17,7 +17,7 @@ echo "Running scroll install script"
 docker run --rm -v $TMP_VOLUME_NAME:/app/resources --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druid:latest-nix-steamcmd run install
 
 echo "Pushing scroll to registry"
-docker run --rm -v $TMP_VOLUME_NAME:/app/resources -e DRUID_REGISTRY_HOST="${SCROLL_REGISTRY_HOST}" -e DRUID_REGISTRY_USER="${SCROLL_REGISTRY_USER}" -e DRUID_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD}" --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druid:latest-nix-steamcmd registry push artifacts.druid.gg/druid-team/scroll-lgsm:${TAG}server-prebuild
+docker run --rm -v $TMP_VOLUME_NAME:/app/resources -e DRUID_REGISTRY_HOST="${SCROLL_REGISTRY_HOST}" -e DRUID_REGISTRY_USER="${SCROLL_REGISTRY_USER}" -e DRUID_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD}" --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druid:latest-nix-steamcmd registry push -m artifacts.druid.gg/druid-team/scroll-lgsm:${TAG}server-prebuild
 echo "Prebuild uploaded"
 
 docker volume rm $TMP_VOLUME_NAME || true
