@@ -30,6 +30,9 @@ jobs:
             { java-version: "21", spigot-version: "1.21.6" },
             { java-version: "21", spigot-version: "1.21.7" },
             { java-version: "21", spigot-version: "1.21.8" },
+            { java-version: "21", spigot-version: "1.21.9" },
+            { java-version: "21", spigot-version: "1.21.10" },
+            { java-version: "21", spigot-version: "1.21.11" },
           ]
     runs-on: ubuntu-latest
     steps:
