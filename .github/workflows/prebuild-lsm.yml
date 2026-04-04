@@ -10,7 +10,7 @@ on:
     - cron: "0 3 * * *"
 jobs:
   build-lgsm:
-    runs-on: self-hosted
+    runs-on: [self-hosted, nauen]
     strategy:
       matrix:
         image: ["ark", "cs2"]
