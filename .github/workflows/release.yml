@@ -31,6 +31,26 @@ jobs:
       - run: ./scripts/validate_all_scrolls.sh
       - name: Login to registry
         run: druid registry login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+      - name: Push Categories
+        run: |
+          druid registry push category artifacts.druid.gg/druid-team/scroll-minecraft-spigot minecraft ./scrolls/minecraft/minecraft-spigot/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-minecraft-vanilla minecraft ./scrolls/minecraft/minecraft-vanilla/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-minecraft-paper minecraft ./scrolls/minecraft/papermc/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-minecraft-forge minecraft ./scrolls/minecraft/forge/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-minecraft-cuberite minecraft ./scrolls/minecraft/cuberite/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-rust-oxide rust ./scrolls/rust/rust-oxide/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-rust-vanilla rust ./scrolls/rust/rust-vanilla/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:pwserver palworld ./scrolls/lgsm/pwserver/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:arkserver ark ./scrolls/lgsm/arkserver/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:untserver unturned ./scrolls/lgsm/untserver/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:dayzserver dayz ./scrolls/lgsm/dayzserver/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:sdtdserver 7days ./scrolls/lgsm/sdtdserver/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:gmodserver gmod ./scrolls/lgsm/gmodserver/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:cs2server cs2 ./scrolls/lgsm/cs2server/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:pzserver zomboid ./scrolls/lgsm/pzserver/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-lgsm:csgoserver csgo ./scrolls/lgsm/csgoserver/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-hytale:hytale-standalone hytale ./scrolls/hytale/hytale-standalone/.meta
+          druid registry push category artifacts.druid.gg/druid-team/scroll-hytale:hytale-druid-gg hytale ./scrolls/hytale/hytale-druid-gg/.meta
       - name: Pushing new scrolls
         shell: bash
         run: |
@@ -131,12 +151,4 @@ jobs:
 
           druid registry push --cwd ./scrolls/hytale/hytale-standalone -p main=5520/udp -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 10Gi --min-ram 4Gi --min-cpu 1 -m --smart --category hytale
           druid registry push --cwd ./scrolls/hytale/hytale-druid-gg -p main=5520/udp -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 10Gi --min-ram 4Gi --min-cpu 1 -m --smart --category hytale
-      - name: Push Meta
-        run: |
-          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-spigot ./scrolls/minecraft/minecraft-spigot
-          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-vanilla ./scrolls/minecraft/minecraft-vanilla
-          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-paper ./scrolls/minecraft/papermc
-          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-forge ./scrolls/minecraft/forge
-          druid registry push meta artifacts.druid.gg/druid-team/scroll-minecraft-cuberite ./scrolls/minecraft/cuberite
-          druid registry push meta artifacts.druid.gg/druid-team/scroll-rust-oxide ./scrolls/rust/rust-oxide
-          druid registry push meta artifacts.druid.gg/druid-team/scroll-rust-vanilla ./scrolls/rust/rust-vanilla
+
