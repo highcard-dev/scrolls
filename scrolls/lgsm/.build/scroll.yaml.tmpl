@@ -3,6 +3,8 @@ desc: {{ .Version }}
 version: 0.0.2
 app_version: {{ .Version }}
 keepAlivePPM: {{ or .Vars.ppm 5 }}
+{{- if .ChunksYaml }}
+{{ .ChunksYaml }}{{- end }}
 {{- if or .Vars.lua_query_game_name .Vars.main_port_protocol .Vars.rcon_port }}
 ports:
 {{- if .Vars.lua_query_game_name }}

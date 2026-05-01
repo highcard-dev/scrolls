@@ -22,6 +22,7 @@ type TemplateVars struct {
 	Artifacts          map[string]string
 	ArtifactsUnescaped map[string]string
 	Vars               map[string]string
+	ChunksYaml         string
 }
 
 func main() {
@@ -90,6 +91,14 @@ func main() {
 			templateVars.Vars = vars[version]
 		}
 
+		chunksYaml, err := ioutil.ReadFile(filepath.Join(buildPath, "versions", version, "chunks.yaml"))
+		if err == nil {
+			templateVars.ChunksYaml = string(chunksYaml)
+		} else if !os.IsNotExist(err) {
+			log.Println("read chunks.yaml: ", err)
+			return
+		}
+
 		//create scroll dir
 		dir := filepath.Join(basepath, version)
 		os.MkdirAll(dir, os.ModePerm)
@@ -115,6 +124,9 @@ func main() {
 		cp.Copy(buildPath+"/versions/"+version, dir, cp.Options{
 			OnDirExists: func(src, dest string) cp.DirExistsAction {
 				return cp.Merge
+			},
+			Skip: func(info os.FileInfo, src, dest string) (bool, error) {
+				return info.Name() == "chunks.yaml", nil
 			},
 		})
 

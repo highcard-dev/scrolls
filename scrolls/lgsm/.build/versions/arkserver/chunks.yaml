@@ -1,0 +1,38 @@
+chunks:
+  - name: install-lgsm
+    path: install-lgsm.sh
+  - name: lgsm-launcher
+    path: arkserver
+  - name: linuxgsm
+    path: linuxgsm.sh
+  - name: lgsm
+    path: lgsm
+  - name: serverfiles
+    path: serverfiles
+    chunks:
+      - name: server-engine
+        path: Engine
+      - name: server-linux64
+        path: linux64
+      - name: server-steamapps
+        path: steamapps
+      - name: shootergame
+        path: ShooterGame
+        chunks:
+          - name: shootergame-binaries
+            path: Binaries
+          - name: shootergame-config
+            path: Config
+          - name: shootergame-saved
+            path: Saved
+          - name: content
+            path: Content
+            chunks:
+              - name: maps
+                path: Maps/*
+              - name: mods
+                path: Mods/*
+              - name: movies
+                path: Movies/*
+              - name: reflectioncaptures
+                path: ReflectionCaptures/*
