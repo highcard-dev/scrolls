@@ -1,0 +1,54 @@
+chunks:
+  - name: install-lgsm
+    path: install-lgsm.sh
+  - name: lgsm-launcher
+    path: cs2server
+  - name: linuxgsm
+    path: linuxgsm.sh
+  - name: lgsm
+    path: lgsm
+  - name: log
+    path: log
+  - name: postinstall
+    path: postinstall.sh
+  - name: postinstall-template
+    path: postinstall.sh.scroll_template
+  - name: serverfiles
+    path: serverfiles
+    chunks:
+      - name: steamapps
+        path: steamapps
+      - name: game
+        path: game
+        chunks:
+          - name: game-bin
+            path: bin
+          - name: game-core
+            path: core
+          - name: csgo
+            path: csgo
+            chunks:
+              - name: csgo-bin
+                path: bin
+              - name: csgo-cfg
+                path: cfg
+              - name: csgo-logs
+                path: logs
+              - name: csgo-maps
+                path: maps
+              - name: csgo-panorama
+                path: panorama
+              - name: csgo-resource
+                path: resource
+              - name: csgo-pak
+                path: pak01_*.vpk
+              - name: csgo-shaders-vulkan
+                path: shaders_vulkan_*.vpk
+          - name: csgo-community-addons
+            path: csgo_community_addons
+          - name: csgo-core
+            path: csgo_core
+          - name: csgo-imported
+            path: csgo_imported
+          - name: csgo-lv
+            path: csgo_lv
