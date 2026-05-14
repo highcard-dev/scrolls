@@ -2,144 +2,122 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: dayzserver
 version: 0.0.2
 app_version: dayzserver
-keepAlivePPM: 5
 ports:
-  - name: main
-    description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
-    protocol: udp
-    start_delay: 0
-    finish_after_command: install
-    sleep_handler: generic
-    check_activity: true
-init: "console"
+- name: main
+  description: Main game port. Use this port inside of your game client to connect
+    to the server. Depending on the game you might need the query port to connect.
+  protocol: udp
+  start_delay: 0
+  finish_after_command: install
+  sleep_handler: generic
+  port: 2302
 commands:
   console:
-    needs: [start]
+    needs:
+    - start
     run: restart
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     procedures:
-      - mode: stdin
-        wait: 5
-        data:
-          - 'console.1'
-          - "\r"
-      - mode: exec-tty
-        data:
-          - ./dayzserver
-          - console
+    - id: coldstart
+      image: artifacts.druid.gg/druid-team/druid:stable
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      mounts:
+      - path: "/runtime"
+        sub_path: "."
+      working_dir: "/runtime"
+      command:
+      - druid-coldstarter
+      - "--root"
+      - "/runtime"
+      - "--status-file"
+      - ".coldstarter-finished.json"
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      tty: true
+      command:
+      - "./dayzserver"
+      - console
+      id: start
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
   start:
-    needs: [install]
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
+    needs:
+    - install
     procedures:
-      - mode: exec
-        ignore_failure: true
-        data:
-          - ./dayzserver
-          - update
-      - mode: exec
-        data:
-          - ./dayzserver
-          - start
+    - ignore_failure: true
+      image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./dayzserver"
+      - update
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./dayzserver"
+      - start
   stop:
     procedures:
-      - mode: exec
-        data:
-          - ./dayzserver
-          - stop
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./dayzserver"
+      - stop
+    run: always
   restart:
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     procedures:
-      - mode: exec
-        data:
-          - echo
-          - "Restarting server..."
-      - mode: exec
-        data:
-          - ./dayzserver
-          - restart
-      - mode: command
-        data: console
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - echo
+      - Restarting server...
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./dayzserver"
+      - restart
   install:
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     run: once
     procedures:
-      - mode: exec
-        data:
-          - echo
-          - "Installing LGSM..."
-      - mode: exec
-        data:
-          - sh
-          - install-lgsm.sh
-      - mode: exec
-        data:
-          - ./linuxgsm.sh
-          - dayzserver
-      - mode: exec
-        data:
-          - ./dayzserver
-          - auto-install
-cronjobs:
-  - name: Restart every 6 hours
-    schedule: "0 */6 * * *"
-    command: restart
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - echo
+      - Installing LGSM...
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - install-lgsm.sh
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./linuxgsm.sh"
+      - dayzserver
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./dayzserver"
+      - auto-install
+serve: console

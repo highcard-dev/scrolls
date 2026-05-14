@@ -2,32 +2,32 @@ name: sample@1.23
 desc: Sample Game
 version: 0.0.1
 app_version: 0.0.1
-init: "install"
 commands:
   start:
-    should_change_status: start
     procedures:
-      - mode: exec
-        data:
-          - sh
-          - ./start.sh
+    - image: alpine:3.20
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - "./start.sh"
+      id: start
   stop:
-    type: stop
     procedures:
-      - mode: rcon_web_rust
-        data:
-          - quit
+    - type: signal
+      target: start
+      signal: SIGTERM
+    run: always
   install:
-    should_change_status: start
     procedures:
-      - mode: exec
-        data:
-          - steamcmd
-          - app/resources/druid-deployment
-          - +login
-          - anonymous
-          - +app_update
-          - 258550
-          - +quit
-plugins:
-  rcon_web_rust: {}
+    - image: alpine:3.20
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - "-c"
+      - echo sample install complete
+    run: once
+serve: start

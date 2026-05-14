@@ -1,65 +1,76 @@
 name: artifacts.druid.gg/druid-team/scroll-minecraft-vanilla
 desc: Minecraft Vanilla
 version: 0.0.1
-app_version: 1.19.2
+app_version: "1.19.2"
 ports:
-  - name: main
-    protocol: tcp
-    port: 25565
-    sleep_handler: packet_handler/minecraft.lua
-    mandatory: true
-    start_delay: 10
-    finish_after_command: install
-  - name: rcon
-    protocol: tcp
-    port: 25575
-serve: "start"
+- name: main
+  protocol: tcp
+  port: 25565
+  sleep_handler: packet_handler/minecraft.lua
+  mandatory: true
+  start_delay: 10
+  finish_after_command: install
+- name: rcon
+  protocol: tcp
+  port: 25575
+  sleep_handler: generic
+serve: start
 commands:
   start:
-    needs: [install]
+    needs:
+    - install
     run: restart
     procedures:
-      - id: start
-        image: eclipse-temurin:17-jre
-        expectedPorts:
-          - name: main
-            keepAliveTraffic: 10kb/5m
-        mounts:
-          - path: /server
-            sub_path: data
-        working_dir: /server
-        command:
-          - bash
-          - ./start.sh
+    - image: artifacts.druid.gg/druid-team/druid:stable
+      id: coldstart
+      mounts:
+      - path: "/runtime"
+        sub_path: "."
+      working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
+      command:
+      - druid-coldstarter
+    - image: eclipse-temurin:17-jre
+      mounts:
+      - path: "/server"
+        sub_path: data
+      working_dir: "/server"
+      command:
+      - sh
+      - "./start.sh"
+      id: start
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
   stop:
     run: always
     procedures:
-      - type: signal
-        target: start
-        signal: SIGTERM
+    - type: signal
+      target: start
+      signal: SIGTERM
   install:
     run: once
     procedures:
-      - image: alpine:3.20
-        mounts:
-          - path: /server
-            sub_path: data
-        working_dir: /server
-        command:
-          - sh
-          - -c
-          - >-
-            apk add --no-cache ca-certificates wget
-            && wget -q -O server.jar https://launcher.mojang.com/v1/objects/f69c284232d7c7580bd89a5a4931c3581eae1378/server.jar
-            && echo eula=true > eula.txt
+    - image: alpine:3.20
+      mounts:
+      - path: "/server"
+        sub_path: data
+      working_dir: "/server"
+      command:
+      - sh
+      - "-c"
+      - apk add --no-cache ca-certificates wget && wget -q -O server.jar https://launcher.mojang.com/v1/objects/f69c284232d7c7580bd89a5a4931c3581eae1378/server.jar
+        && echo eula=true > eula.txt
   update:
     procedures:
-      - image: alpine:3.20
-        mounts:
-          - path: /server
-            sub_path: data
-        working_dir: /server
-        command:
-          - sh
-          - -c
-          - apk add --no-cache jq yq moreutils && ./update.sh && echo eula=true > eula.txt
+    - image: alpine:3.20
+      mounts:
+      - path: "/server"
+        sub_path: data
+      working_dir: "/server"
+      command:
+      - sh
+      - "-c"
+      - apk add --no-cache jq yq moreutils && ./update.sh && echo eula=true > eula.txt

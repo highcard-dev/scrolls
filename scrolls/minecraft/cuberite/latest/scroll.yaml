@@ -3,50 +3,83 @@ desc: Cuberite
 version: 0.0.1
 app_version: latest
 ports:
-  - name: main
-    protocol: tcp
-    port: 25565
-    sleep_handler: packet_handler/minecraft.lua
-    start_delay: 10
-    finish_after_command: install
-  - name: webpanel
-    protocol: tcp
-    port: 8080
-init: "start"
+- name: main
+  protocol: tcp
+  port: 25565
+  sleep_handler: packet_handler/minecraft.lua
+  start_delay: 10
+  finish_after_command: install
+- name: webpanel
+  protocol: tcp
+  port: 8080
 commands:
   start:
-    needs: [install]
+    needs:
+    - install
     run: restart
     procedures:
-      - mode: exec
-        data:
-          - bash
-          - ./start.sh
+    - id: coldstart
+      image: artifacts.druid.gg/druid-team/druid:stable
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      mounts:
+      - path: "/runtime"
+        sub_path: "."
+      working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
+      command:
+      - druid-coldstarter
+    - image: artifacts.druid.gg/druid-team/druid:stable
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - "./start.sh"
+      id: start
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      - name: webpanel
+        keepAliveTraffic: 10kb/5m
   stop:
     procedures:
-      - mode: stdin
-        data:
-          - start
-          - stop
+    - type: signal
+      target: start
+      signal: SIGTERM
+    run: always
   install:
     run: once
-    dependencies: [wget, cacert]
     procedures:
-      - mode: exec
-        data:
-          - wget
-          - -q
-          - -O
-          - Cuberite.tar.gz
-          - https://download.cuberite.org/linux-x86_64/Cuberite.tar.gz
-      - mode: exec
-        data:
-          - tar
-          - -xzf
-          - Cuberite.tar.gz
+    - image: artifacts.druid.gg/druid-team/druid:stable
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - wget
+      - "-q"
+      - "-O"
+      - Cuberite.tar.gz
+      - https://download.cuberite.org/linux-x86_64/Cuberite.tar.gz
+    - image: artifacts.druid.gg/druid-team/druid:stable
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - tar
+      - "-xzf"
+      - Cuberite.tar.gz
   update:
     procedures:
-      - mode: exec
-        data:
-          - sh
-          - $SCROLL_DIR/update.sh
+    - image: alpine:3.20
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - "-c"
+      - apk add --no-cache jq yq moreutils && ./update.sh
+serve: start

@@ -2,163 +2,146 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: csgoserver
 version: 0.0.2
 app_version: csgoserver
-keepAlivePPM: 600
 ports:
-  - name: query
-    protocol: udp
-    description: Steam Query Port. Use this to connect via the Steam client.
-    start_delay: 0
-    finish_after_command: install
-    sleep_handler: packet_handler/query.lua
-    vars:
-      - name: GameName
-        value: "Counter-Strike: Global Offensive"
-      - name: GameSteamFolder
-        value: csgo
-      - name: GameSteamId
-        value: "0"
-      - name: MapName
-        value: server idle
-      - name: ServerListName
-        value: "Druid.gg Server (idle) - join to start"
-      - name: SteamAppId
-        value: "730"
-  - name: main
-    description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
-    protocol: udp
-    start_delay: 0
-    finish_after_command: install
-    sleep_handler: generic
-    check_activity: true
-init: "console"
+- name: query
+  protocol: udp
+  description: Steam Query Port. Use this to connect via the Steam client.
+  start_delay: 0
+  finish_after_command: install
+  sleep_handler: packet_handler/query.lua
+  vars:
+  - name: GameName
+    value: 'Counter-Strike: Global Offensive'
+  - name: GameSteamFolder
+    value: csgo
+  - name: GameSteamId
+    value: '0'
+  - name: MapName
+    value: server idle
+  - name: ServerListName
+    value: Druid.gg Server (idle) - join to start
+  - name: SteamAppId
+    value: '730'
+  port: 27015
+- name: main
+  description: Main game port. Use this port inside of your game client to connect
+    to the server. Depending on the game you might need the query port to connect.
+  protocol: udp
+  start_delay: 0
+  finish_after_command: install
+  sleep_handler: generic
+  port: 27015
 commands:
   console:
-    needs: [start]
+    needs:
+    - start
     run: restart
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     procedures:
-      - mode: stdin
-        wait: 5
-        data:
-          - 'console.1'
-          - "\r"
-      - mode: exec-tty
-        data:
-          - ./csgoserver
-          - console
+    - id: coldstart
+      image: artifacts.druid.gg/druid-team/druid:stable
+      expectedPorts:
+      - name: query
+        keepAliveTraffic: 10kb/5m
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      mounts:
+      - path: "/runtime"
+        sub_path: "."
+      working_dir: "/runtime"
+      command:
+      - druid-coldstarter
+      - "--root"
+      - "/runtime"
+      - "--status-file"
+      - ".coldstarter-finished.json"
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      tty: true
+      command:
+      - "./csgoserver"
+      - console
+      id: start
+      expectedPorts:
+      - name: query
+        keepAliveTraffic: 10kb/5m
+      - name: main
+        keepAliveTraffic: 10kb/5m
   start:
-    needs: [install]
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
+    needs:
+    - install
     procedures:
-      - mode: exec
-        ignore_failure: true
-        data:
-          - ./csgoserver
-          - update
-      - mode: exec
-        data:
-          - ./csgoserver
-          - start
+    - ignore_failure: true
+      image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./csgoserver"
+      - update
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./csgoserver"
+      - start
   stop:
     procedures:
-      - mode: exec
-        data:
-          - ./csgoserver
-          - stop
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./csgoserver"
+      - stop
+    run: always
   restart:
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     procedures:
-      - mode: exec
-        data:
-          - echo
-          - "Restarting server..."
-      - mode: exec
-        data:
-          - ./csgoserver
-          - restart
-      - mode: command
-        data: console
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - echo
+      - Restarting server...
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./csgoserver"
+      - restart
   install:
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     run: once
     procedures:
-      - mode: exec
-        data:
-          - echo
-          - "Installing LGSM..."
-      - mode: exec
-        data:
-          - sh
-          - install-lgsm.sh
-      - mode: exec
-        data:
-          - ./linuxgsm.sh
-          - csgoserver
-      - mode: exec
-        data:
-          - ./csgoserver
-          - auto-install
-cronjobs:
-  - name: Restart every 6 hours
-    schedule: "0 */6 * * *"
-    command: restart
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - echo
+      - Installing LGSM...
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - install-lgsm.sh
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./linuxgsm.sh"
+      - csgoserver
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./csgoserver"
+      - auto-install
+serve: console

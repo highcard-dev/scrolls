@@ -30,17 +30,16 @@ jobs:
       - name: Install druid
         run: |
           install .ci/druid-cli/bin/druid /usr/local/bin/druid
-          install .ci/druid-cli/bin/druid-client /usr/local/bin/druid-client
-      - name: Validate Minecraft Vanilla scrolls
+      - name: Validate all scrolls
         run: |
           set -euo pipefail
-          for dir in ./scrolls/minecraft/minecraft-vanilla/*; do
+          for dir in $(find ./scrolls -type f -name scroll.yaml -exec dirname {} \; | sort); do
             [ -f "$dir/scroll.yaml" ] || continue
-            druid validate "$dir"
+            druid validate --strict "$dir"
           done
       - name: Login to registry
         if: github.event.pull_request.head.repo.full_name == github.repository
-        run: druid-client login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+        run: druid login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
       - name: Ensure experimental registry project
         if: github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
@@ -68,14 +67,14 @@ jobs:
           for dir in ./scrolls/minecraft/minecraft-vanilla/*; do
             [ -f "$dir/scroll.yaml" ] || continue
             version="$(basename "$dir")"
-            druid-client push "artifacts.druid.gg/druid-team-experimental/scroll-minecraft-vanilla:${version}-pr${pr_number}" "$dir" \
+            druid push "artifacts.druid.gg/druid-team-experimental/scroll-minecraft-vanilla:${version}-pr${pr_number}" "$dir" \
               -p main=25565 -p rcon=25575 \
               -i artifacts.druid.gg/druid-team/druid:stable-nix \
               --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 \
               --smart --category minecraft
 
             if [ "$version" = "1.21.7" ]; then
-              druid-client push "artifacts.druid.gg/druid-team-experimental/scroll-minecraft-vanilla:latest-pr${pr_number}" "$dir" \
+              druid push "artifacts.druid.gg/druid-team-experimental/scroll-minecraft-vanilla:latest-pr${pr_number}" "$dir" \
                 -p main=25565 -p rcon=25575 \
                 -i artifacts.druid.gg/druid-team/druid:stable-nix \
                 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 \

@@ -2,164 +2,142 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: gmodserver
 version: 0.0.2
 app_version: gmodserver
-keepAlivePPM: 5
 ports:
-  - name: main
-    protocol: udp
-    description: Steam Query Port. Use this to connect via the Steam client.
-    start_delay: 0
-    finish_after_command: install
-    sleep_handler: packet_handler/query.lua
-    vars:
-      - name: GameName
-        value: "Idle Druid Server"
-      - name: GameSteamFolder
-        value: garrysmod
-      - name: GameSteamId
-        value: "0"
-      - name: MapName
-        value: server idle
-      - name: ServerListName
-        value: "Druid.gg Server (idle) - join to start"
-      - name: GameKeywords
-        value: " ver:250717"
-      - name: GameVersion
-        value: "2025.03.26"
-      - name: GameVersionPrefix
-        value: "01"
-      - name: StartOnUnknownPacket
-        value: "yes"
-      - name: SteamAppId
-        value: "4000"
-init: "console"
+- name: main
+  protocol: udp
+  description: Steam Query Port. Use this to connect via the Steam client.
+  start_delay: 0
+  finish_after_command: install
+  sleep_handler: packet_handler/query.lua
+  vars:
+  - name: GameName
+    value: Idle Druid Server
+  - name: GameSteamFolder
+    value: garrysmod
+  - name: GameSteamId
+    value: '0'
+  - name: MapName
+    value: server idle
+  - name: ServerListName
+    value: Druid.gg Server (idle) - join to start
+  - name: GameKeywords
+    value: " ver:250717"
+  - name: GameVersion
+    value: 2025.03.26
+  - name: GameVersionPrefix
+    value: '01'
+  - name: StartOnUnknownPacket
+    value: 'yes'
+  - name: SteamAppId
+    value: '4000'
+  port: 27015
 commands:
   console:
-    needs: [start]
+    needs:
+    - start
     run: restart
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     procedures:
-      - mode: stdin
-        wait: 5
-        data:
-          - 'console.1'
-          - "\r"
-      - mode: exec-tty
-        data:
-          - ./gmodserver
-          - console
+    - id: coldstart
+      image: artifacts.druid.gg/druid-team/druid:stable
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      mounts:
+      - path: "/runtime"
+        sub_path: "."
+      working_dir: "/runtime"
+      command:
+      - druid-coldstarter
+      - "--root"
+      - "/runtime"
+      - "--status-file"
+      - ".coldstarter-finished.json"
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      tty: true
+      command:
+      - "./gmodserver"
+      - console
+      id: start
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
   start:
-    needs: [install]
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
+    needs:
+    - install
     procedures:
-      - mode: exec
-        ignore_failure: true
-        data:
-          - ./gmodserver
-          - update
-      - mode: exec
-        data:
-          - ./gmodserver
-          - start
+    - ignore_failure: true
+      image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./gmodserver"
+      - update
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./gmodserver"
+      - start
   stop:
     procedures:
-      - mode: exec
-        data:
-          - ./gmodserver
-          - stop
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./gmodserver"
+      - stop
+    run: always
   restart:
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     procedures:
-      - mode: exec
-        data:
-          - echo
-          - "Restarting server..."
-      - mode: exec
-        data:
-          - ./gmodserver
-          - restart
-      - mode: command
-        data: console
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - echo
+      - Restarting server...
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./gmodserver"
+      - restart
   install:
-    dependencies:
-      - bc
-      - binutils
-      - bzip2
-      - cpio
-      - file
-      - jq
-      - pkgsi686Linux.gcc
-      - netcat
-      - pigz
-      - python3
-      - tmux
-      - unzip
-      - util-linux
-      - moreutils
-      - iproute2
     run: once
     procedures:
-      - mode: exec
-        data:
-          - echo
-          - "Installing LGSM..."
-      - mode: exec
-        data:
-          - sh
-          - install-lgsm.sh
-      - mode: exec
-        data:
-          - ./linuxgsm.sh
-          - gmodserver
-      - mode: exec
-        data:
-          - ./gmodserver
-          - auto-install
-cronjobs:
-  - name: Restart every 6 hours
-    schedule: "0 */6 * * *"
-    command: restart
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - echo
+      - Installing LGSM...
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - install-lgsm.sh
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./linuxgsm.sh"
+      - gmodserver
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./gmodserver"
+      - auto-install
+serve: console
