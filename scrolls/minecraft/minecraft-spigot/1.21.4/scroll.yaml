@@ -35,23 +35,23 @@ commands:
         DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
       command:
       - druid-coldstarter
-    - image: eclipse-temurin:21-jre
+    - id: start
+      image: eclipse-temurin:21-jre
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - "./start.sh"
-      id: start
-      expectedPorts:
-      - name: main
-        keepAliveTraffic: 10kb/5m
   stop:
+    run: always
     procedures:
     - type: signal
       target: start
       signal: SIGTERM
-    run: always
   install:
     run: once
     procedures:

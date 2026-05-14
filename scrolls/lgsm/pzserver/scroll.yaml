@@ -2,6 +2,7 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: pzserver
 version: 0.0.2
 app_version: pzserver
+keepAlivePPM: 5
 ports:
 - name: main
   protocol: udp
@@ -11,20 +12,19 @@ ports:
   sleep_handler: packet_handler/query.lua
   vars:
   - name: GameName
-    value: Project Zomboid
+    value: "Project Zomboid"
   - name: GameSteamFolder
     value: zomboid
   - name: GameSteamId
-    value: '0'
+    value: "0"
   - name: MapName
     value: server idle
   - name: ServerListName
-    value: Druid.gg Server (idle) - join to start
+    value: "Druid.gg Server (idle) - join to start"
   - name: StartOnUnknownPacket
-    value: 'yes'
+    value: "yes"
   - name: SteamAppId
-    value: '108600'
-  port: 16261
+    value: "108600"
 commands:
   console:
     needs:
@@ -40,24 +40,23 @@ commands:
       - path: "/runtime"
         sub_path: "."
       working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
       command:
       - druid-coldstarter
-      - "--root"
-      - "/runtime"
-      - "--status-file"
-      - ".coldstarter-finished.json"
-    - image: highcard/druid:stable-steamcmd
+    - id: start
+      image: highcard/druid:stable-steamcmd
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
       mounts:
       - path: "/server"
       working_dir: "/server"
       tty: true
       command:
-      - "./pzserver"
+      - ./pzserver
       - console
-      id: start
-      expectedPorts:
-      - name: main
-        keepAliveTraffic: 10kb/5m
   start:
     needs:
     - install
@@ -68,25 +67,25 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./pzserver"
+      - ./pzserver
       - update
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./pzserver"
+      - ./pzserver
       - start
   stop:
+    run: always
     procedures:
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./pzserver"
+      - ./pzserver
       - stop
-    run: always
   restart:
     procedures:
     - image: highcard/druid:stable-steamcmd
@@ -101,7 +100,7 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./pzserver"
+      - ./pzserver
       - restart
   install:
     run: once
@@ -125,13 +124,13 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./linuxgsm.sh"
+      - ./linuxgsm.sh
       - pzserver
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./pzserver"
+      - ./pzserver
       - auto-install
 serve: console

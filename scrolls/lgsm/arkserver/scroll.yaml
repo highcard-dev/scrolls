@@ -2,44 +2,46 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: arkserver
 version: 0.0.2
 app_version: arkserver
+keepAlivePPM: 5
 chunks:
-- name: install-lgsm
-  path: install-lgsm.sh
-- name: lgsm-launcher
-  path: arkserver
-- name: linuxgsm
-  path: linuxgsm.sh
-- name: lgsm
-  path: lgsm
-- name: serverfiles
-  path: serverfiles
-  chunks:
-  - name: server-engine
-    path: Engine
-  - name: server-linux64
-    path: linux64
-  - name: server-steamapps
-    path: steamapps
-  - name: shootergame
-    path: ShooterGame
+  - name: install-lgsm
+    path: install-lgsm.sh
+  - name: lgsm-launcher
+    path: arkserver
+  - name: linuxgsm
+    path: linuxgsm.sh
+  - name: lgsm
+    path: lgsm
+  - name: serverfiles
+    path: serverfiles
     chunks:
-    - name: shootergame-binaries
-      path: Binaries
-    - name: shootergame-config
-      path: Config
-    - name: shootergame-saved
-      path: Saved
-    - name: content
-      path: Content
-      chunks:
-      - name: maps
-        path: Maps/*
-      - name: mods
-        path: Mods/*
-      - name: movies
-        path: Movies/*
-      - name: reflectioncaptures
-        path: ReflectionCaptures/*
+      - name: server-engine
+        path: Engine
+      - name: server-linux64
+        path: linux64
+      - name: server-steamapps
+        path: steamapps
+      - name: shootergame
+        path: ShooterGame
+        chunks:
+          - name: shootergame-binaries
+            path: Binaries
+          - name: shootergame-config
+            path: Config
+          - name: shootergame-saved
+            path: Saved
+          - name: content
+            path: Content
+            chunks:
+              - name: maps
+                path: Maps/*
+              - name: mods
+                path: Mods/*
+              - name: movies
+                path: Movies/*
+              - name: reflectioncaptures
+                path: ReflectionCaptures/*
+
 ports:
 - name: query
   protocol: udp
@@ -49,29 +51,27 @@ ports:
   sleep_handler: packet_handler/query.lua
   vars:
   - name: GameName
-    value: 'ARK: Survival Evolved'
+    value: "ARK: Survival Evolved"
   - name: GameSteamFolder
     value: ark_survival_evolved
   - name: GameSteamId
-    value: '0'
+    value: "0"
   - name: MapName
     value: server idle
   - name: ServerListName
-    value: Druid.gg Server (idle) - join to start
+    value: "Druid.gg Server (idle) - join to start"
   - name: SteamAppId
-    value: '346110'
-  port: 27015
+    value: "346110"
 - name: main
-  description: Main game port. Use this port inside of your game client to connect
-    to the server. Depending on the game you might need the query port to connect.
+  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
   protocol: udp
   start_delay: 0
   finish_after_command: install
   sleep_handler: generic
-  port: 7777
+  check_activity: true
 - name: rcon
   protocol: tcp
-  port: 27020
+  sleep_handler: generic
 commands:
   console:
     needs:
@@ -85,30 +85,30 @@ commands:
         keepAliveTraffic: 10kb/5m
       - name: main
         keepAliveTraffic: 10kb/5m
+      - name: rcon
       mounts:
       - path: "/runtime"
         sub_path: "."
       working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
       command:
       - druid-coldstarter
-      - "--root"
-      - "/runtime"
-      - "--status-file"
-      - ".coldstarter-finished.json"
-    - image: highcard/druid:stable-steamcmd
-      mounts:
-      - path: "/server"
-      working_dir: "/server"
-      tty: true
-      command:
-      - "./arkserver"
-      - console
-      id: start
+    - id: start
+      image: highcard/druid:stable-steamcmd
       expectedPorts:
       - name: query
         keepAliveTraffic: 10kb/5m
       - name: main
         keepAliveTraffic: 10kb/5m
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      tty: true
+      command:
+      - ./arkserver
+      - console
   start:
     needs:
     - install
@@ -119,25 +119,25 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./arkserver"
+      - ./arkserver
       - update
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./arkserver"
+      - ./arkserver
       - start
   stop:
+    run: always
     procedures:
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./arkserver"
+      - ./arkserver
       - stop
-    run: always
   restart:
     procedures:
     - image: highcard/druid:stable-steamcmd
@@ -152,7 +152,7 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./arkserver"
+      - ./arkserver
       - restart
   install:
     run: once
@@ -176,13 +176,13 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./linuxgsm.sh"
+      - ./linuxgsm.sh
       - arkserver
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./arkserver"
+      - ./arkserver
       - auto-install
 serve: console

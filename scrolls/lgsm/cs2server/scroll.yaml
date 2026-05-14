@@ -2,60 +2,62 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: cs2server
 version: 0.0.2
 app_version: cs2server
+keepAlivePPM: 5
 chunks:
-- name: install-lgsm
-  path: install-lgsm.sh
-- name: lgsm-launcher
-  path: cs2server
-- name: linuxgsm
-  path: linuxgsm.sh
-- name: lgsm
-  path: lgsm
-- name: log
-  path: log
-- name: postinstall
-  path: postinstall.sh
-- name: postinstall-template
-  path: postinstall.sh.scroll_template
-- name: serverfiles
-  path: serverfiles
-  chunks:
-  - name: steamapps
-    path: steamapps
-  - name: game
-    path: game
+  - name: install-lgsm
+    path: install-lgsm.sh
+  - name: lgsm-launcher
+    path: cs2server
+  - name: linuxgsm
+    path: linuxgsm.sh
+  - name: lgsm
+    path: lgsm
+  - name: log
+    path: log
+  - name: postinstall
+    path: postinstall.sh
+  - name: postinstall-template
+    path: postinstall.sh.scroll_template
+  - name: serverfiles
+    path: serverfiles
     chunks:
-    - name: game-bin
-      path: bin
-    - name: game-core
-      path: core
-    - name: csgo
-      path: csgo
-      chunks:
-      - name: csgo-bin
-        path: bin
-      - name: csgo-cfg
-        path: cfg
-      - name: csgo-logs
-        path: logs
-      - name: csgo-maps
-        path: maps
-      - name: csgo-panorama
-        path: panorama
-      - name: csgo-resource
-        path: resource
-      - name: csgo-pak
-        path: pak01_*.vpk
-      - name: csgo-shaders-vulkan
-        path: shaders_vulkan_*.vpk
-    - name: csgo-community-addons
-      path: csgo_community_addons
-    - name: csgo-core
-      path: csgo_core
-    - name: csgo-imported
-      path: csgo_imported
-    - name: csgo-lv
-      path: csgo_lv
+      - name: steamapps
+        path: steamapps
+      - name: game
+        path: game
+        chunks:
+          - name: game-bin
+            path: bin
+          - name: game-core
+            path: core
+          - name: csgo
+            path: csgo
+            chunks:
+              - name: csgo-bin
+                path: bin
+              - name: csgo-cfg
+                path: cfg
+              - name: csgo-logs
+                path: logs
+              - name: csgo-maps
+                path: maps
+              - name: csgo-panorama
+                path: panorama
+              - name: csgo-resource
+                path: resource
+              - name: csgo-pak
+                path: pak01_*.vpk
+              - name: csgo-shaders-vulkan
+                path: shaders_vulkan_*.vpk
+          - name: csgo-community-addons
+            path: csgo_community_addons
+          - name: csgo-core
+            path: csgo_core
+          - name: csgo-imported
+            path: csgo_imported
+          - name: csgo-lv
+            path: csgo_lv
+
 ports:
 - name: main
   protocol: udp
@@ -65,20 +67,19 @@ ports:
   sleep_handler: packet_handler/query.lua
   vars:
   - name: GameName
-    value: 'CS2: Druid Server'
+    value: "CS2: Druid Server"
   - name: GameSteamFolder
     value: csgo
   - name: GameSteamId
-    value: '0'
+    value: "0"
   - name: MapName
     value: server idle
   - name: ServerListName
-    value: Druid.gg Server (idle) - join to start
+    value: "Druid.gg Server (idle) - join to start"
   - name: StartOnUnknownPacket
-    value: 'yes'
+    value: "yes"
   - name: SteamAppId
-    value: '730'
-  port: 27015
+    value: "730"
 commands:
   console:
     needs:
@@ -94,24 +95,23 @@ commands:
       - path: "/runtime"
         sub_path: "."
       working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
       command:
       - druid-coldstarter
-      - "--root"
-      - "/runtime"
-      - "--status-file"
-      - ".coldstarter-finished.json"
-    - image: highcard/druid:stable-steamcmd
+    - id: start
+      image: highcard/druid:stable-steamcmd
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
       mounts:
       - path: "/server"
       working_dir: "/server"
       tty: true
       command:
-      - "./cs2server"
+      - ./cs2server
       - console
-      id: start
-      expectedPorts:
-      - name: main
-        keepAliveTraffic: 10kb/5m
   start:
     needs:
     - install
@@ -122,25 +122,25 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./cs2server"
+      - ./cs2server
       - update
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./cs2server"
+      - ./cs2server
       - start
   stop:
+    run: always
     procedures:
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./cs2server"
+      - ./cs2server
       - stop
-    run: always
   restart:
     procedures:
     - image: highcard/druid:stable-steamcmd
@@ -155,7 +155,7 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./cs2server"
+      - ./cs2server
       - restart
   install:
     run: once
@@ -179,20 +179,20 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./linuxgsm.sh"
+      - ./linuxgsm.sh
       - cs2server
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./cs2server"
+      - ./cs2server
       - auto-install
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - sh
+      - bash
       - postinstall.sh
 serve: console

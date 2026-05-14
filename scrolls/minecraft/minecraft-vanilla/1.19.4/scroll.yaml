@@ -14,15 +14,18 @@ ports:
   protocol: tcp
   port: 25575
   sleep_handler: generic
-serve: start
 commands:
   start:
     needs:
     - install
     run: restart
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:stable
-      id: coldstart
+    - id: coldstart
+      image: artifacts.druid.gg/druid-team/druid:stable
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      - name: rcon
       mounts:
       - path: "/runtime"
         sub_path: "."
@@ -32,18 +35,17 @@ commands:
         DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
       command:
       - druid-coldstarter
-    - image: eclipse-temurin:17-jre
+    - id: start
+      image: eclipse-temurin:17-jre
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
       mounts:
       - path: "/server"
-        sub_path: data
       working_dir: "/server"
       command:
       - sh
       - "./start.sh"
-      id: start
-      expectedPorts:
-      - name: main
-        keepAliveTraffic: 10kb/5m
   stop:
     run: always
     procedures:
@@ -56,21 +58,22 @@ commands:
     - image: alpine:3.20
       mounts:
       - path: "/server"
-        sub_path: data
       working_dir: "/server"
       command:
       - sh
       - "-c"
-      - apk add --no-cache ca-certificates wget && wget -q -O server.jar https://launcher.mojang.com/v1/objects/8f3112a1049751cc472ec13e397eade5336ca7ae/server.jar
+      - >-
+        apk add --no-cache ca-certificates wget
+        && wget -q -O server.jar https://launcher.mojang.com/v1/objects/8f3112a1049751cc472ec13e397eade5336ca7ae/server.jar
         && echo eula=true > eula.txt
   update:
     procedures:
     - image: alpine:3.20
       mounts:
       - path: "/server"
-        sub_path: data
       working_dir: "/server"
       command:
       - sh
       - "-c"
       - apk add --no-cache jq yq moreutils && ./update.sh && echo eula=true > eula.txt
+serve: start

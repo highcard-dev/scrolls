@@ -41,23 +41,23 @@ commands:
       command:
       - sh
       - "./update_user_args.sh"
-    - image: eclipse-temurin:21-jre
+    - id: start
+      image: eclipse-temurin:17-jre
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - "./run.sh"
-      id: start
-      expectedPorts:
-      - name: main
-        keepAliveTraffic: 10kb/5m
   stop:
+    run: always
     procedures:
     - type: signal
       target: start
       signal: SIGTERM
-    run: always
   install:
     run: once
     procedures:
@@ -71,7 +71,7 @@ commands:
       - "-O"
       - forge-installer.jar
       - http://192.168.100.200:9000/snapshot-cache/minecraft/forge/forge-1.20.4.jar
-    - image: eclipse-temurin:21-jre
+    - image: eclipse-temurin:17-jre
       mounts:
       - path: "/server"
       working_dir: "/server"
