@@ -7,10 +7,6 @@ ports:
 - name: main
   description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
   protocol: udp
-  start_delay: 0
-  finish_after_command: install
-  sleep_handler: generic
-  check_activity: true
 commands:
   console:
     needs:
@@ -28,7 +24,7 @@ commands:
       working_dir: "/runtime"
       env:
         DRUID_ROOT: "/runtime"
-        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
+        DRUID_PORT_MAIN_COLDSTARTER: "generic"
       command:
       - druid-coldstarter
     - id: start

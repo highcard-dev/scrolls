@@ -7,30 +7,6 @@ ports:
 - name: main
   protocol: udp
   description: Steam Query Port. Use this to connect via the Steam client.
-  start_delay: 0
-  finish_after_command: install
-  sleep_handler: packet_handler/query.lua
-  vars:
-  - name: GameName
-    value: "Idle Druid Server"
-  - name: GameSteamFolder
-    value: garrysmod
-  - name: GameSteamId
-    value: "0"
-  - name: MapName
-    value: server idle
-  - name: ServerListName
-    value: "Druid.gg Server (idle) - join to start"
-  - name: GameKeywords
-    value: " ver:250717"
-  - name: GameVersion
-    value: "2025.03.26"
-  - name: GameVersionPrefix
-    value: "01"
-  - name: StartOnUnknownPacket
-    value: "yes"
-  - name: SteamAppId
-    value: "4000"
 commands:
   console:
     needs:
@@ -48,7 +24,17 @@ commands:
       working_dir: "/runtime"
       env:
         DRUID_ROOT: "/runtime"
-        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
+        DRUID_PORT_MAIN_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_COLDSTARTER_VAR_GAME_NAME: "Idle Druid Server"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "garrysmod"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
+        DRUID_COLDSTARTER_VAR_MAP_NAME: "server idle"
+        DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid.gg Server (idle) - join to start"
+        DRUID_COLDSTARTER_VAR_GAME_KEYWORDS: " ver:250717"
+        DRUID_COLDSTARTER_VAR_GAME_VERSION: "2025.03.26"
+        DRUID_COLDSTARTER_VAR_GAME_VERSION_PREFIX: "01"
+        DRUID_COLDSTARTER_VAR_START_ON_UNKNOWN_PACKET: "yes"
+        DRUID_COLDSTARTER_VAR_STEAM_APP_ID: "4000"
       command:
       - druid-coldstarter
     - id: start

@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"unicode"
 
 	cp "github.com/otiai10/copy"
 
@@ -68,6 +69,21 @@ func main() {
 	funcMap := template.FuncMap{
 		"split": func(sep, s string) []string {
 			return strings.Split(s, sep)
+		},
+		"upper": strings.ToUpper,
+		"env": func(value string) string {
+			var out strings.Builder
+			for i, r := range value {
+				if i > 0 && unicode.IsUpper(r) {
+					out.WriteByte('_')
+				}
+				if r == '-' || r == ' ' {
+					out.WriteByte('_')
+					continue
+				}
+				out.WriteRune(unicode.ToUpper(r))
+			}
+			return out.String()
 		},
 	}
 	scollYamltemplate, err := template.New(filepath.Base(scrollYamlTemplate)).Funcs(funcMap).ParseFiles(scrollYamlTemplate)

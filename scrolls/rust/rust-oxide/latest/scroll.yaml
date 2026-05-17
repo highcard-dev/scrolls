@@ -5,28 +5,10 @@ app_version: latest
 ports:
 - name: main
   protocol: udp
-  sleep_handler: generic
   port: 28015
 - name: query
   protocol: udp
   description: Steam Query Port. Use this to connect via the Steam client.
-  finish_after_command: install
-  sleep_handler: packet_handler/query.lua
-  vars:
-  - name: GameName
-    value: Rust
-  - name: GameSteamFolder
-    value: rust
-  - name: GameSteamId
-    value: '0'
-  - name: MapName
-    value: Procedual Map
-  - name: ServerListName
-    value: Druid Gameserver (idle) - Start server by joining
-  - name: GameVersion
-    value: '1337'
-  - name: GameKeywords
-    value: mp0,cp0,ptrak,qp0,$r?,v2592,born0,gmrust,cs1337420
   port: 28017
 - name: rustplus
   protocol: tcp
@@ -51,12 +33,19 @@ commands:
       - path: "/runtime"
         sub_path: "."
       working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+        DRUID_PORT_MAIN_COLDSTARTER: "generic"
+        DRUID_PORT_QUERY_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_COLDSTARTER_VAR_GAME_NAME: "Rust"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "rust"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
+        DRUID_COLDSTARTER_VAR_MAP_NAME: "Procedual Map"
+        DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid Gameserver (idle) - Start server by joining"
+        DRUID_COLDSTARTER_VAR_GAME_VERSION: "1337"
+        DRUID_COLDSTARTER_VAR_GAME_KEYWORDS: "mp0,cp0,ptrak,qp0,$r?,v2592,born0,gmrust,cs1337420"
       command:
       - druid-coldstarter
-      - "--root"
-      - "/runtime"
-      - "--status-file"
-      - ".coldstarter-finished.json"
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"

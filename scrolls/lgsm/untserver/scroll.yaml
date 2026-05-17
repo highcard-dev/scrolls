@@ -7,24 +7,6 @@ ports:
 - name: main
   protocol: udp
   description: Steam Query Port. Use this to connect via the Steam client.
-  start_delay: 0
-  finish_after_command: install
-  sleep_handler: packet_handler/query.lua
-  vars:
-  - name: GameName
-    value: "Unturned Server"
-  - name: GameSteamFolder
-    value: Unturned
-  - name: GameSteamId
-    value: "0"
-  - name: MapName
-    value: server idle
-  - name: ServerListName
-    value: "Druid.gg Server (idle) - join to start"
-  - name: StartOnUnknownPacket
-    value: "yes"
-  - name: SteamAppId
-    value: "304930"
 commands:
   console:
     needs:
@@ -42,7 +24,14 @@ commands:
       working_dir: "/runtime"
       env:
         DRUID_ROOT: "/runtime"
-        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
+        DRUID_PORT_MAIN_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_COLDSTARTER_VAR_GAME_NAME: "Unturned Server"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "Unturned"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
+        DRUID_COLDSTARTER_VAR_MAP_NAME: "server idle"
+        DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid.gg Server (idle) - join to start"
+        DRUID_COLDSTARTER_VAR_START_ON_UNKNOWN_PACKET: "yes"
+        DRUID_COLDSTARTER_VAR_STEAM_APP_ID: "304930"
       command:
       - druid-coldstarter
     - id: start

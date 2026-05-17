@@ -46,32 +46,11 @@ ports:
 - name: query
   protocol: udp
   description: Steam Query Port. Use this to connect via the Steam client.
-  start_delay: 0
-  finish_after_command: install
-  sleep_handler: packet_handler/query.lua
-  vars:
-  - name: GameName
-    value: "ARK: Survival Evolved"
-  - name: GameSteamFolder
-    value: ark_survival_evolved
-  - name: GameSteamId
-    value: "0"
-  - name: MapName
-    value: server idle
-  - name: ServerListName
-    value: "Druid.gg Server (idle) - join to start"
-  - name: SteamAppId
-    value: "346110"
 - name: main
   description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
   protocol: udp
-  start_delay: 0
-  finish_after_command: install
-  sleep_handler: generic
-  check_activity: true
 - name: rcon
   protocol: tcp
-  sleep_handler: generic
 commands:
   console:
     needs:
@@ -92,7 +71,15 @@ commands:
       working_dir: "/runtime"
       env:
         DRUID_ROOT: "/runtime"
-        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
+        DRUID_PORT_QUERY_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_COLDSTARTER_VAR_GAME_NAME: "ARK: Survival Evolved"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "ark_survival_evolved"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
+        DRUID_COLDSTARTER_VAR_MAP_NAME: "server idle"
+        DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid.gg Server (idle) - join to start"
+        DRUID_COLDSTARTER_VAR_STEAM_APP_ID: "346110"
+        DRUID_PORT_MAIN_COLDSTARTER: "generic"
+        DRUID_PORT_RCON_COLDSTARTER: "generic"
       command:
       - druid-coldstarter
     - id: start

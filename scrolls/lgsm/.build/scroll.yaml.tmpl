@@ -11,54 +11,15 @@ ports:
 - name: {{ or .Vars.lua_query_port  "query" }}
   protocol: udp
   description: Steam Query Port. Use this to connect via the Steam client.
-  start_delay: {{ or .Vars.start_delay 0 }}
-  finish_after_command: install
-  sleep_handler: packet_handler/query.lua
-  vars:
-  - name: GameName
-    value: "{{ .Vars.lua_query_game_name }}"
-  - name: GameSteamFolder
-    value: {{ .Vars.lua_query_folder }}
-  - name: GameSteamId
-    value: "0"
-  - name: MapName
-    value: {{ .Vars.lua_query_map }}
-  - name: ServerListName
-    value: "{{ .Vars.lua_query_servername }}"
-{{- if .Vars.lua_query_keywords }}
-  - name: GameKeywords
-    value: "{{ .Vars.lua_query_keywords }}"
-{{- end }}
-{{- if .Vars.lua_query_version }}
-  - name: GameVersion
-    value: "{{ .Vars.lua_query_version }}"
-{{- end }}
-{{- if .Vars.lua_query_version_prefix }}
-  - name: GameVersionPrefix
-    value: "{{ .Vars.lua_query_version_prefix }}"
-{{- end }}
-{{- if .Vars.lua_query_start_on_unknown_packet }}
-  - name: StartOnUnknownPacket
-    value: "{{ .Vars.lua_query_start_on_unknown_packet }}"
-{{- end }}
-{{- if .Vars.lua_steam_app_id }}
-  - name: SteamAppId
-    value: "{{ .Vars.lua_steam_app_id }}"
-{{- end }}
 {{- end }}
 {{- if .Vars.main_port_protocol }}
 - name: main
   description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
   protocol: {{ .Vars.main_port_protocol }}
-  start_delay: {{ or .Vars.start_delay 0 }}
-  finish_after_command: install
-  sleep_handler: generic
-  check_activity: true
 {{- end }}
 {{- if .Vars.rcon_port }}
 - name: rcon
   protocol: tcp
-  sleep_handler: generic
 {{- end }}
 {{- end }}
 commands:
@@ -87,7 +48,35 @@ commands:
       working_dir: "/runtime"
       env:
         DRUID_ROOT: "/runtime"
-        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
+{{- if .Vars.lua_query_game_name }}
+        DRUID_PORT_{{ upper (or .Vars.lua_query_port "query") }}_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_COLDSTARTER_VAR_{{ env "GameName" }}: "{{ .Vars.lua_query_game_name }}"
+        DRUID_COLDSTARTER_VAR_{{ env "GameSteamFolder" }}: "{{ .Vars.lua_query_folder }}"
+        DRUID_COLDSTARTER_VAR_{{ env "GameSteamId" }}: "0"
+        DRUID_COLDSTARTER_VAR_{{ env "MapName" }}: "{{ .Vars.lua_query_map }}"
+        DRUID_COLDSTARTER_VAR_{{ env "ServerListName" }}: "{{ .Vars.lua_query_servername }}"
+{{- if .Vars.lua_query_keywords }}
+        DRUID_COLDSTARTER_VAR_{{ env "GameKeywords" }}: "{{ .Vars.lua_query_keywords }}"
+{{- end }}
+{{- if .Vars.lua_query_version }}
+        DRUID_COLDSTARTER_VAR_{{ env "GameVersion" }}: "{{ .Vars.lua_query_version }}"
+{{- end }}
+{{- if .Vars.lua_query_version_prefix }}
+        DRUID_COLDSTARTER_VAR_{{ env "GameVersionPrefix" }}: "{{ .Vars.lua_query_version_prefix }}"
+{{- end }}
+{{- if .Vars.lua_query_start_on_unknown_packet }}
+        DRUID_COLDSTARTER_VAR_{{ env "StartOnUnknownPacket" }}: "{{ .Vars.lua_query_start_on_unknown_packet }}"
+{{- end }}
+{{- if .Vars.lua_steam_app_id }}
+        DRUID_COLDSTARTER_VAR_{{ env "SteamAppId" }}: "{{ .Vars.lua_steam_app_id }}"
+{{- end }}
+{{- end }}
+{{- if .Vars.main_port_protocol }}
+        DRUID_PORT_MAIN_COLDSTARTER: "generic"
+{{- end }}
+{{- if .Vars.rcon_port }}
+        DRUID_PORT_RCON_COLDSTARTER: "generic"
+{{- end }}
       command:
       - druid-coldstarter
     - id: start

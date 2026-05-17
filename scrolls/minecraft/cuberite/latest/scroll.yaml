@@ -6,9 +6,6 @@ ports:
 - name: main
   protocol: tcp
   port: 25565
-  sleep_handler: packet_handler/minecraft.lua
-  start_delay: 10
-  finish_after_command: install
 - name: webpanel
   protocol: tcp
   port: 8080
@@ -29,7 +26,7 @@ commands:
       working_dir: "/runtime"
       env:
         DRUID_ROOT: "/runtime"
-        DRUID_COLDSTARTER_STATUS_FILE: ".coldstarter-finished.json"
+        DRUID_PORT_MAIN_COLDSTARTER: "packet_handler/minecraft.lua"
       command:
       - druid-coldstarter
     - image: artifacts.druid.gg/druid-team/druid:stable

@@ -6,30 +6,11 @@ ports:
 - name: query
   protocol: udp
   description: Steam Query Port. Use this to connect via the Steam client.
-  start_delay: 0
-  finish_after_command: install
-  sleep_handler: packet_handler/query.lua
-  vars:
-  - name: GameName
-    value: 7 Days To Die
-  - name: GameSteamFolder
-    value: 7DTD
-  - name: GameSteamId
-    value: '0'
-  - name: MapName
-    value: server idle
-  - name: ServerListName
-    value: Druid.gg Server (idle) - join to start
-  - name: SteamAppId
-    value: '251570'
   port: 26900
 - name: main
   description: Main game port. Use this port inside of your game client to connect
     to the server. Depending on the game you might need the query port to connect.
   protocol: udp
-  start_delay: 0
-  finish_after_command: install
-  sleep_handler: generic
   port: 26900
 commands:
   console:
@@ -48,12 +29,18 @@ commands:
       - path: "/runtime"
         sub_path: "."
       working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+        DRUID_PORT_QUERY_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_PORT_MAIN_COLDSTARTER: "generic"
+        DRUID_COLDSTARTER_VAR_GAME_NAME: "7 Days To Die"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "7DTD"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
+        DRUID_COLDSTARTER_VAR_MAP_NAME: "server idle"
+        DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid.gg Server (idle) - join to start"
+        DRUID_COLDSTARTER_VAR_STEAM_APP_ID: "251570"
       command:
       - druid-coldstarter
-      - "--root"
-      - "/runtime"
-      - "--status-file"
-      - ".coldstarter-finished.json"
     - image: highcard/druid:stable-steamcmd
       mounts:
       - path: "/server"
