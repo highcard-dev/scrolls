@@ -25,6 +25,6 @@ else
 fi
 
 echo "Downloading hsm ${VERSION} for ${OS}/${ARCH}..."
-curl -fL "$URL" -o hsm
+wget -q -O hsm "$URL"
 chmod +x hsm
 echo "Done"

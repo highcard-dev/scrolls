@@ -3,42 +3,57 @@ desc: Hytale
 version: 0.0.1
 app_version: standalone
 ports:
-  - name: main
-    protocol: udp
-    port: 5520
-init: "start"
+- name: main
+  protocol: udp
+  port: 5520
 commands:
   install-hsm:
     run: once
-    dependencies: [wget, cacert, curl]
     procedures:
-      - mode: exec
-        data:
-          - bash
-          - install.sh
+    - image: artifacts.druid.gg/druid-team/druid:stable
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - install.sh
   login:
     run: once
-    needs: [install-hsm]
+    needs:
+    - install-hsm
     procedures:
-      - mode: exec
-        data:
-          - ./hsm
-          - login
+    - image: eclipse-temurin:25-jre
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./hsm"
+      - login
   update:
-    needs: [login]
+    needs:
+    - login
     procedures:
-      - mode: exec
-        data:
-          - ./hsm
-          - update
+    - image: eclipse-temurin:25-jre
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./hsm"
+      - update
   start:
-    needs: [update]
-    dependencies: [jdk25]
+    needs:
+    - update
     procedures:
-      - mode: exec
-        data:
-          - ./hsm
-          - start
-
-plugins:
-  rcon: {}
+    - image: eclipse-temurin:25-jre
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - "./hsm"
+      - start
+      id: start
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+    run: restart
+serve: start

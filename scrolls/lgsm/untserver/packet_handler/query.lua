@@ -108,7 +108,7 @@ function handle(ctx, data)
             finishSec = math.ceil(finishSec)
         end
 
-        if snapshotMode ~= "noop" then
+        if snapshotMode ~= "idle" then
             if snapshotMode == "restore" then
                 if snapshotPercentage == nil or snapshotPercentage == 100 then
                     name = get_var("ServerListNameRestoring") or "EXTRACTING snapshot, this might take a moment"

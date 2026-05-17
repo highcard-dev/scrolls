@@ -8,157 +8,178 @@ keepAlivePPM: {{ or .Vars.ppm 5 }}
 {{- if or .Vars.lua_query_game_name .Vars.main_port_protocol .Vars.rcon_port }}
 ports:
 {{- if .Vars.lua_query_game_name }}
-  - name: {{ or .Vars.lua_query_port  "query" }}
-    protocol: udp
-    description: Steam Query Port. Use this to connect via the Steam client.
-    start_delay: {{ or .Vars.start_delay 0 }}
-    finish_after_command: install
-    sleep_handler: packet_handler/query.lua
-    vars:
-      - name: GameName
-        value: "{{ .Vars.lua_query_game_name }}"
-      - name: GameSteamFolder
-        value: {{ .Vars.lua_query_folder }}
-      - name: GameSteamId
-        value: "0"
-      - name: MapName
-        value: {{ .Vars.lua_query_map }}
-      - name: ServerListName
-        value: "{{ .Vars.lua_query_servername }}"
+- name: {{ or .Vars.lua_query_port  "query" }}
+  protocol: udp
+  description: Steam Query Port. Use this to connect via the Steam client.
+{{- end }}
+{{- if .Vars.main_port_protocol }}
+- name: main
+  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
+  protocol: {{ .Vars.main_port_protocol }}
+{{- end }}
+{{- if .Vars.rcon_port }}
+- name: rcon
+  protocol: tcp
+{{- end }}
+{{- end }}
+commands:
+  console:
+    needs:
+    - start
+    run: restart
+    procedures:
+    - id: coldstart
+      image: artifacts.druid.gg/druid-team/druid:stable
+      expectedPorts:
+{{- if .Vars.lua_query_game_name }}
+      - name: {{ or .Vars.lua_query_port  "query" }}
+        keepAliveTraffic: 10kb/5m
+{{- end }}
+{{- if .Vars.main_port_protocol }}
+      - name: main
+        keepAliveTraffic: 10kb/5m
+{{- end }}
+{{- if .Vars.rcon_port }}
+      - name: rcon
+{{- end }}
+      mounts:
+      - path: "/runtime"
+        sub_path: "."
+      working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+{{- if .Vars.lua_query_game_name }}
+        DRUID_PORT_{{ upper (or .Vars.lua_query_port "query") }}_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_COLDSTARTER_VAR_{{ env "GameName" }}: "{{ .Vars.lua_query_game_name }}"
+        DRUID_COLDSTARTER_VAR_{{ env "GameSteamFolder" }}: "{{ .Vars.lua_query_folder }}"
+        DRUID_COLDSTARTER_VAR_{{ env "GameSteamId" }}: "0"
+        DRUID_COLDSTARTER_VAR_{{ env "MapName" }}: "{{ .Vars.lua_query_map }}"
+        DRUID_COLDSTARTER_VAR_{{ env "ServerListName" }}: "{{ .Vars.lua_query_servername }}"
 {{- if .Vars.lua_query_keywords }}
-      - name: GameKeywords
-        value: "{{ .Vars.lua_query_keywords }}"
+        DRUID_COLDSTARTER_VAR_{{ env "GameKeywords" }}: "{{ .Vars.lua_query_keywords }}"
 {{- end }}
 {{- if .Vars.lua_query_version }}
-      - name: GameVersion
-        value: "{{ .Vars.lua_query_version }}"
+        DRUID_COLDSTARTER_VAR_{{ env "GameVersion" }}: "{{ .Vars.lua_query_version }}"
 {{- end }}
 {{- if .Vars.lua_query_version_prefix }}
-      - name: GameVersionPrefix
-        value: "{{ .Vars.lua_query_version_prefix }}"
+        DRUID_COLDSTARTER_VAR_{{ env "GameVersionPrefix" }}: "{{ .Vars.lua_query_version_prefix }}"
 {{- end }}
 {{- if .Vars.lua_query_start_on_unknown_packet }}
-      - name: StartOnUnknownPacket
-        value: "{{ .Vars.lua_query_start_on_unknown_packet }}"
+        DRUID_COLDSTARTER_VAR_{{ env "StartOnUnknownPacket" }}: "{{ .Vars.lua_query_start_on_unknown_packet }}"
 {{- end }}
 {{- if .Vars.lua_steam_app_id }}
-      - name: SteamAppId
-        value: "{{ .Vars.lua_steam_app_id }}"
+        DRUID_COLDSTARTER_VAR_{{ env "SteamAppId" }}: "{{ .Vars.lua_steam_app_id }}"
 {{- end }}
 {{- end }}
 {{- if .Vars.main_port_protocol }}
-  - name: main
-    description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
-    protocol: {{ .Vars.main_port_protocol }}
-    start_delay: {{ or .Vars.start_delay 0 }}
-    finish_after_command: install
-    sleep_handler: generic
-    check_activity: true
+        DRUID_PORT_MAIN_COLDSTARTER: "generic"
 {{- end }}
 {{- if .Vars.rcon_port }}
-  - name: rcon
-    protocol: tcp
+        DRUID_PORT_RCON_COLDSTARTER: "generic"
 {{- end }}
+      command:
+      - druid-coldstarter
+    - id: start
+      image: highcard/druid:stable-steamcmd
+      expectedPorts:
+{{- if .Vars.lua_query_game_name }}
+      - name: {{ or .Vars.lua_query_port  "query" }}
+        keepAliveTraffic: 10kb/5m
 {{- end }}
-init: "console"
-commands:
-  console:
-    needs: [start]
-    run: restart
-{{- if index .Vars "dependencies" }}
-    dependencies:
-{{- range split ";" (index .Vars "dependencies") }}
-      - {{ . }}
+{{- if .Vars.main_port_protocol }}
+      - name: main
+        keepAliveTraffic: 10kb/5m
 {{- end }}
-{{- end }}
-    procedures:
-      - mode: stdin
-        wait: 5
-        data:
-          - 'console.1'
-          - "\r"
-      - mode: exec-tty
-        data:
-          - ./{{ .Version }}
-          - console
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      tty: true
+      command:
+      - ./{{ .Version }}
+      - console
   start:
-    needs: [install]
-{{- if index .Vars "dependencies" }}
-    dependencies:
-{{- range split ";" (index .Vars "dependencies") }}
-      - {{ . }}
-{{- end }}
-{{- end }}
+    needs:
+    - install
     procedures:
-      - mode: exec
-        ignore_failure: true
-        data:
-          - ./{{ .Version }}
-          - update
-      - mode: exec
-        data:
-          - ./{{ .Version }}
-          - start
+    - ignore_failure: true
+      image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - ./{{ .Version }}
+      - update
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - ./{{ .Version }}
+      - start
   stop:
+    run: always
     procedures:
-      - mode: exec
-        data:
-          - ./{{ .Version }}
-          - stop
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - ./{{ .Version }}
+      - stop
   restart:
-{{- if index .Vars "dependencies" }}
-    dependencies:
-{{- range split ";" (index .Vars "dependencies") }}
-      - {{ . }}
-{{- end }}
-{{- end }}
     procedures:
-      - mode: exec
-        data:
-          - echo
-          - "Restarting server..."
-      - mode: exec
-        data:
-          - ./{{ .Version }}
-          - restart
-      - mode: command
-        data: console
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - echo
+      - Restarting server...
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - ./{{ .Version }}
+      - restart
   install:
-{{- if index .Vars "dependencies" }}
-    dependencies:
-{{- range split ";" (index .Vars "dependencies") }}
-      - {{ . }}
-{{- end }}
-{{- end }}
     run: once
     procedures:
-      - mode: exec
-        data:
-          - echo
-          - "Installing LGSM..."
-      - mode: exec
-        data:
-          - sh
-          - install-lgsm.sh
-      - mode: exec
-        data:
-          - ./linuxgsm.sh
-          - {{ .Version }}
-      - mode: exec
-        data:
-          - ./{{ .Version }}
-          - auto-install
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - echo
+      - Installing LGSM...
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - install-lgsm.sh
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - ./linuxgsm.sh
+      - {{ .Version }}
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - ./{{ .Version }}
+      - auto-install
 {{- if eq .Vars.postinstall "enabled" }}
-      - mode: exec
-        data:
-          - bash
-          - postinstall.sh
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - bash
+      - postinstall.sh
 {{- end }}
-cronjobs:
-  - name: Restart every 6 hours
-    schedule: "0 */6 * * *"
-    command: restart
-{{- if eq .Vars.rcon "enabled" }}
-plugins:
-  rcon: {}
-{{- end }}
+serve: console
