@@ -16,7 +16,10 @@ jobs:
         with:
           go-version: ">=1.19.3"
       - run: apt update && apt install -y make
-      - run: make build-tree
+      - name: Build scroll tree
+        env:
+          DRUID_COLDSTARTER_IMAGE: artifacts.druid.gg/druid-team-experimental/druid:stable-pr${{ github.event.pull_request.number }}
+        run: make build-tree
       - name: Checkout druid-cli
         uses: actions/checkout@v3
         with:

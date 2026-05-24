@@ -20,6 +20,7 @@ type TemplateVars struct {
 	Artifact           string
 	Version            string
 	VersionEscaped     string
+	ColdstarterImage   string
 	Artifacts          map[string]string
 	ArtifactsUnescaped map[string]string
 	Vars               map[string]string
@@ -91,6 +92,10 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	coldstarterImage := os.Getenv("DRUID_COLDSTARTER_IMAGE")
+	if coldstarterImage == "" {
+		coldstarterImage = "artifacts.druid.gg/druid-team/druid:stable"
+	}
 
 	//iterate through artifacts and generate scroll.yaml files
 	for version, artifact := range artifacts {
@@ -99,6 +104,7 @@ func main() {
 		templateVars.Artifact = artifact
 		templateVars.Version = version
 		templateVars.VersionEscaped = strings.Replace(version, ".", "-", -1)
+		templateVars.ColdstarterImage = coldstarterImage
 		templateVars.Artifacts = GetArtifactsAbove(version, artifacts, true)
 		templateVars.ArtifactsUnescaped = GetArtifactsAbove(version, artifacts, false)
 		if varsBytes != nil && vars[version] == nil {
