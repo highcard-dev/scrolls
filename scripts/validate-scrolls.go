@@ -78,12 +78,16 @@ func validateScroll(file string, validateColdstarterFiles bool) error {
 	if !ok || len(commands) == 0 {
 		return errors.New("missing commands")
 	}
+	commandNames := make(map[string]bool, len(commands))
+	for commandName := range commands {
+		commandNames[commandName] = true
+	}
 	for commandName, rawCommand := range commands {
 		command, ok := asMap(rawCommand)
 		if !ok {
 			return fmt.Errorf("command %s must be an object", commandName)
 		}
-		if err := validateCommand(filepath.Dir(file), commandName, command, portNames, validateColdstarterFiles); err != nil {
+		if err := validateCommand(filepath.Dir(file), commandName, command, commandNames, portNames, validateColdstarterFiles); err != nil {
 			return err
 		}
 	}
@@ -121,17 +125,32 @@ func validatePorts(raw any) (map[string]bool, error) {
 		if protocol != "" && protocol != "tcp" && protocol != "udp" && protocol != "http" && protocol != "https" {
 			return nil, fmt.Errorf("port %q has unsupported protocol %q", name, protocol)
 		}
+		if _, hasPort := port["port"]; hasPort {
+			portNumber, ok := asInt(port["port"])
+			if !ok {
+				return nil, fmt.Errorf("port %q has non-numeric port", name)
+			}
+			if portNumber < 1 || portNumber > 65535 {
+				return nil, fmt.Errorf("port %q has invalid port %d", name, portNumber)
+			}
+		}
 	}
 	return names, nil
 }
 
-func validateCommand(root string, name string, command map[string]any, portNames map[string]bool, validateColdstarterFiles bool) error {
+func validateCommand(root string, name string, command map[string]any, commandNames map[string]bool, portNames map[string]bool, validateColdstarterFiles bool) error {
 	run := optionalString(command["run"])
 	if run != "" && run != "always" && run != "once" && run != "restart" && run != "persistent" {
 		return fmt.Errorf("command %s has unsupported run mode %q", name, run)
 	}
-	if _, err := asStringList(command["needs"]); err != nil {
+	needs, err := asStringList(command["needs"])
+	if err != nil {
 		return fmt.Errorf("command %s needs: %w", name, err)
+	}
+	for _, need := range needs {
+		if !commandNames[need] {
+			return fmt.Errorf("command %s needs unknown command %q", name, need)
+		}
 	}
 	procedures, ok := asList(command["procedures"])
 	if !ok || len(procedures) == 0 {
@@ -174,7 +193,11 @@ func validateProcedure(root string, command string, index int, procedure map[str
 			}
 		}
 	}
-	if expectedPorts, ok := asList(procedure["expectedPorts"]); ok {
+	rawExpectedPorts, hasExpectedPorts := procedure["expectedPorts"]
+	if hasExpectedPorts && rawExpectedPorts == nil {
+		return fmt.Errorf("%s expectedPorts must be a list", prefix)
+	}
+	if expectedPorts, ok := asList(rawExpectedPorts); ok {
 		for portIndex, rawPort := range expectedPorts {
 			port, ok := asMap(rawPort)
 			if !ok {
@@ -188,6 +211,8 @@ func validateProcedure(root string, command string, index int, procedure map[str
 				return fmt.Errorf("%s expectedPorts[%d] references unknown port %q", prefix, portIndex, name)
 			}
 		}
+	} else if hasExpectedPorts {
+		return fmt.Errorf("%s expectedPorts must be a list", prefix)
 	}
 	return nil
 }
@@ -242,6 +267,22 @@ func asStringList(value any) ([]string, error) {
 		out = append(out, text)
 	}
 	return out, nil
+}
+
+func asInt(value any) (int, bool) {
+	switch typed := value.(type) {
+	case int:
+		return typed, true
+	case int64:
+		return int(typed), true
+	case float64:
+		if typed == float64(int(typed)) {
+			return int(typed), true
+		}
+		return 0, false
+	default:
+		return 0, false
+	}
 }
 
 func asStringMap(value any) (map[string]string, bool) {

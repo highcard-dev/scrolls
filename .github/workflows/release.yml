@@ -14,13 +14,14 @@ jobs:
       SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
       SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
       SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
+      DRUID_CLI_VERSION: v0.1.226
     steps:
       - uses: actions/checkout@v3
       - name: Get registry binary
         uses: robinraju/release-downloader@v1.7
         with:
           repository: "highcard-dev/druid-cli"
-          latest: true
+          tag: ${{ env.DRUID_CLI_VERSION }}
           fileName: "druid"
           token: ${{ secrets.GO_REPO_TOKEN }}
       - run: chmod +x druid

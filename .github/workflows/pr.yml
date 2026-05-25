@@ -11,6 +11,7 @@ jobs:
       SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
       SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
       SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
+      DRUID_CLI_VERSION: pr-76
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
@@ -33,8 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GO_REPO_TOKEN }}
         run: |
-          tag="$(gh api repos/highcard-dev/druid-cli/releases --jq '[.[] | select(.prerelease)][0].tag_name')"
-          gh release download "$tag" --repo highcard-dev/druid-cli --pattern druid --clobber
+          gh release download "$DRUID_CLI_VERSION" --repo highcard-dev/druid-cli --pattern druid --clobber
       - name: Install druid
         if: github.event.pull_request.head.repo.full_name == github.repository
         run: |
