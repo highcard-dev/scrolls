@@ -3,13 +3,8 @@ on:
   pull_request:
     branches: [master]
 jobs:
-  build-deploy:
+  validate:
     runs-on: self-hosted
-    env:
-      SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
-      SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
-      SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
-      SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
@@ -17,70 +12,16 @@ jobs:
           go-version: ">=1.19.3"
       - run: apt update && apt install -y make
       - name: Build scroll tree
-        env:
-          DRUID_COLDSTARTER_IMAGE: artifacts.druid.gg/druid-team-experimental/druid:stable-pr${{ github.event.pull_request.number }}
         run: make build-tree
-      - name: Checkout druid-cli
-        uses: actions/checkout@v3
+      - name: Get druid binary
+        uses: robinraju/release-downloader@v1.7
         with:
-          repository: highcard-dev/druid-cli
-          ref: feat/druid-k8s-runtime-owner
-          path: .ci/druid-cli
+          repository: "highcard-dev/druid-cli"
+          latest: true
+          fileName: "druid"
           token: ${{ secrets.GO_REPO_TOKEN }}
-      - name: Build druid
-        working-directory: .ci/druid-cli
-        run: make build
+      - run: chmod +x ./druid
       - name: Install druid
-        run: |
-          install .ci/druid-cli/bin/druid /usr/local/bin/druid
+        run: mv ./druid /usr/local/bin/druid
       - name: Validate all scrolls
-        run: |
-          set -euo pipefail
-          for dir in $(find ./scrolls -type f -name scroll.yaml -exec dirname {} \; | sort); do
-            [ -f "$dir/scroll.yaml" ] || continue
-            druid validate --strict "$dir"
-          done
-      - name: Login to registry
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        run: druid login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
-      - name: Ensure experimental registry project
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        shell: bash
-        run: |
-          set -euo pipefail
-          registry_host="${{ secrets.SCROLL_REGISTRY_HOST }}"
-          registry_host="${registry_host#http://}"
-          registry_host="${registry_host#https://}"
-          registry_host="${registry_host%%/*}"
-          status="$(curl -sS -o /tmp/druid-project-create.json -w '%{http_code}' \
-            -u '${{ secrets.SCROLL_REGISTRY_USER }}:${{ secrets.SCROLL_REGISTRY_PASSWORD }}' \
-            -H 'Content-Type: application/json' \
-            -X POST "https://${registry_host}/api/v2.0/projects" \
-            --data '{"project_name":"druid-team-experimental","metadata":{"public":"false"},"storage_limit":-1}')"
-          case "$status" in
-            201|409) ;;
-            *) cat /tmp/druid-project-create.json; exit 1 ;;
-          esac
-      - name: Push experimental Minecraft Vanilla artifacts
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        shell: bash
-        run: |
-          set -euo pipefail
-          pr_number="${{ github.event.pull_request.number }}"
-          for dir in ./scrolls/minecraft/minecraft-vanilla/*; do
-            [ -f "$dir/scroll.yaml" ] || continue
-            version="$(basename "$dir")"
-            druid push "artifacts.druid.gg/druid-team-experimental/scroll-minecraft-vanilla:${version}-pr${pr_number}" "$dir" \
-              -p main=25565 -p rcon=25575 \
-              -i artifacts.druid.gg/druid-team/druid:stable-nix \
-              --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 \
-              --smart --category minecraft
-
-            if [ "$version" = "1.21.7" ]; then
-              druid push "artifacts.druid.gg/druid-team-experimental/scroll-minecraft-vanilla:latest-pr${pr_number}" "$dir" \
-                -p main=25565 -p rcon=25575 \
-                -i artifacts.druid.gg/druid-team/druid:stable-nix \
-                --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 \
-                --smart --category minecraft
-            fi
-          done
+        run: ./scripts/validate_all_scrolls.sh
