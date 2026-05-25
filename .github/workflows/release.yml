@@ -17,6 +17,9 @@ jobs:
       DRUID_CLI_VERSION: v0.1.226
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.19.3"
       - name: Get registry binary
         uses: robinraju/release-downloader@v1.7
         with:
