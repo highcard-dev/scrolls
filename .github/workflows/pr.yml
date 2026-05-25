@@ -3,8 +3,14 @@ on:
   pull_request:
     branches: [master]
 jobs:
-  validate:
+  build-deploy:
     runs-on: self-hosted
+    env:
+      SCROLL_REGISTRY_PR_NAMESPACE: druid-team-experimental
+      SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
+      SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
+      SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
+      SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
@@ -12,6 +18,35 @@ jobs:
           go-version: ">=1.19.3"
       - run: apt update && apt install -y make
       - name: Build scroll tree
-        run: make build-tree
+        env:
+          SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.full_name }}" = "${{ github.repository }}" ]; then
+            registry_host="${SCROLL_REGISTRY_HOST#http://}"
+            registry_host="${registry_host#https://}"
+            registry_host="${registry_host%%/*}"
+            export DRUID_COLDSTARTER_IMAGE="${registry_host}/${SCROLL_REGISTRY_PR_NAMESPACE}/druid:stable-pr${{ github.event.pull_request.number }}"
+          fi
+          make build-tree
+      - name: Get registry binary
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ secrets.GO_REPO_TOKEN }}
+        run: |
+          tag="$(gh api repos/highcard-dev/druid-cli/releases --jq '[.[] | select(.prerelease)][0].tag_name')"
+          gh release download "$tag" --repo highcard-dev/druid-cli --pattern druid --clobber
+      - name: Install druid
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          chmod +x druid
+          mv druid /usr/local/bin/druid
       - name: Validate all scrolls
         run: ./scripts/validate_all_scrolls.sh
+      - name: Login to registry
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        run: druid login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+      - name: Push experimental PR tags
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
+        run: ./scripts/push.sh "${{ github.event.pull_request.number }}"

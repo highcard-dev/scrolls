@@ -151,4 +151,3 @@ jobs:
 
           druid push --cwd ./scrolls/hytale/hytale-standalone -p main=5520/udp -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 10Gi --min-ram 4Gi --min-cpu 1 -m --smart --category hytale
           druid push --cwd ./scrolls/hytale/hytale-druid-gg -p main=5520/udp -i artifacts.druid.gg/druid-team/druid:stable-nix --min-disk 10Gi --min-ram 4Gi --min-cpu 1 -m --smart --category hytale
-
