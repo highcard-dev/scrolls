@@ -3,54 +3,72 @@ desc: Hytale
 version: 0.0.1
 app_version: latest
 ports:
-  - name: main
-    protocol: udp
-    port: 5520
-init: "start"
+- name: main
+  protocol: udp
+  port: 5520
 commands:
   install:
     run: once
-    dependencies: [wget, cacert]
     procedures:
-      - mode: exec
-        data:
-          - wget
-          - -q
-          - -O
-          - update-server.sh
-          - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-update-hytale-server.sh
-      - mode: exec
-        data:
-          - wget
-          - -q
-          - -O
-          - start-server.sh
-          - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-start-hytale-server.sh
-      - mode: exec
-        data:
-          - chmod
-          - "+x"
-          - update-server.sh
-          - start-server.sh
+    - image: artifacts.druid.gg/druid-team/druid:stable
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - wget
+      - "-q"
+      - "-O"
+      - update-server.sh
+      - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-update-hytale-server.sh
+    - image: artifacts.druid.gg/druid-team/druid:stable
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - wget
+      - "-q"
+      - "-O"
+      - start-server.sh
+      - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-start-hytale-server.sh
+    - image: artifacts.druid.gg/druid-team/druid:stable
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - chmod
+      - "+x"
+      - update-server.sh
+      - start-server.sh
   install-server:
     run: once
-    needs: [install]
-    dependencies: [wget, cacert, unzip]
+    needs:
+    - install
     procedures:
-      - mode: exec
-        data:
-          - bash
-          - -c
-          - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) ./update-server.sh
+    - image: eclipse-temurin:25-jre
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - "-c"
+      - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+        ./update-server.sh
   start:
-    needs: [install-server]
-    dependencies: [jdk25]
+    needs:
+    - install-server
     procedures:
-      - mode: exec
-        data:
-          - bash
-          - -c
-          - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) ./start-server.sh
-
-plugins:
-  rcon: {}
+    - image: eclipse-temurin:25-jre
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - "-c"
+      - HSM_URL="https://hytale.druid.gg" JWT_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+        ./start-server.sh
+      id: start
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+    run: restart
+serve: start

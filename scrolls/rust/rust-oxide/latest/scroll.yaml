@@ -3,78 +3,110 @@ desc: Rust Oxide
 version: 0.10.7
 app_version: latest
 ports:
-  - name: main
-    protocol: udp
-    sleep_handler: generic
-  - name: query
-    protocol: udp
-    description: Steam Query Port. Use this to connect via the Steam client.
-    finish_after_command: install
-    sleep_handler: packet_handler/query.lua
-    vars:
-      - name: GameName
-        value: "Rust"
-      - name: GameSteamFolder
-        value: rust
-      - name: GameSteamId
-        value: "0"
-      - name: MapName
-        value: Procedual Map
-      - name: ServerListName
-        value: "Druid Gameserver (idle) - Start server by joining"
-      - name: GameVersion
-        value: "1337"
-      - name: GameKeywords
-        value: mp0,cp0,ptrak,qp0,$r?,v2592,born0,gmrust,cs1337420
-  - name: rustplus
-    protocol: tcp
-  - name: rcon
-    protocol: tcp
-init: "start"
+- name: main
+  protocol: udp
+  port: 28015
+- name: query
+  protocol: udp
+  description: Steam Query Port. Use this to connect via the Steam client.
+  port: 28017
+- name: rustplus
+  protocol: tcp
+  port: 28082
+- name: rcon
+  protocol: tcp
+  port: 28016
 commands:
   start:
-    needs: [install]
+    needs:
+    - install
     run: restart
     procedures:
-      - mode: exec
-        data:
-          - sh
-          - ./start.sh
+    - id: coldstart
+      image: artifacts.druid.gg/druid-team/druid:stable
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      - name: query
+        keepAliveTraffic: 10kb/5m
+      mounts:
+      - path: "/runtime"
+        sub_path: "."
+      working_dir: "/runtime"
+      env:
+        DRUID_ROOT: "/runtime"
+        DRUID_PORT_MAIN_COLDSTARTER: "generic"
+        DRUID_PORT_QUERY_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_COLDSTARTER_VAR_GAME_NAME: "Rust"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "rust"
+        DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
+        DRUID_COLDSTARTER_VAR_MAP_NAME: "Procedual Map"
+        DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid Gameserver (idle) - Start server by joining"
+        DRUID_COLDSTARTER_VAR_GAME_VERSION: "1337"
+        DRUID_COLDSTARTER_VAR_GAME_KEYWORDS: "mp0,cp0,ptrak,qp0,$r?,v2592,born0,gmrust,cs1337420"
+      command:
+      - druid-coldstarter
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - "./start.sh"
+      id: start
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      - name: query
+        keepAliveTraffic: 10kb/5m
+      - name: rustplus
+        keepAliveTraffic: 10kb/5m
   stop:
-    type: stop
     procedures:
-      - mode: rcon_web_rust
-        data: quit
+    - type: signal
+      target: start
+      signal: SIGTERM
+    run: always
   install:
     run: once
-    dependencies: [wget, cacert, unzip]
     procedures:
-      - mode: exec
-        data:
-          - steamcmd
-          - +force_install_dir
-          - /app/resources/deployment
-          - +login
-          - anonymous
-          - +app_update
-          - "258550"
-          - +quit
-      - mode: exec
-        data:
-          - wget
-          - -O
-          - oxide.zip
-          - https://umod.org/games/rust/download/develop
-      - mode: exec
-        data:
-          - unzip
-          - -o
-          - oxide.zip
-          - -d
-          - /app/resources/deployment
-      - mode: exec
-        data:
-          - rm
-          - oxide.zip
-plugins:
-  rcon_web_rust: {}
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - steamcmd
+      - "+force_install_dir"
+      - "/server"
+      - "+login"
+      - anonymous
+      - "+app_update"
+      - '258550'
+      - "+quit"
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - wget
+      - "-O"
+      - oxide.zip
+      - https://umod.org/games/rust/download/develop
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - unzip
+      - "-o"
+      - oxide.zip
+      - "-d"
+      - "/server"
+    - image: highcard/druid:stable-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - rm
+      - oxide.zip
+serve: start

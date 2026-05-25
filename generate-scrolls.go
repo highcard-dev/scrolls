@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"unicode"
 
 	cp "github.com/otiai10/copy"
 
@@ -19,6 +20,7 @@ type TemplateVars struct {
 	Artifact           string
 	Version            string
 	VersionEscaped     string
+	ColdstarterImage   string
 	Artifacts          map[string]string
 	ArtifactsUnescaped map[string]string
 	Vars               map[string]string
@@ -69,11 +71,30 @@ func main() {
 		"split": func(sep, s string) []string {
 			return strings.Split(s, sep)
 		},
+		"upper": strings.ToUpper,
+		"env": func(value string) string {
+			var out strings.Builder
+			for i, r := range value {
+				if i > 0 && unicode.IsUpper(r) {
+					out.WriteByte('_')
+				}
+				if r == '-' || r == ' ' {
+					out.WriteByte('_')
+					continue
+				}
+				out.WriteRune(unicode.ToUpper(r))
+			}
+			return out.String()
+		},
 	}
 	scollYamltemplate, err := template.New(filepath.Base(scrollYamlTemplate)).Funcs(funcMap).ParseFiles(scrollYamlTemplate)
 	// Capture any error
 	if err != nil {
 		log.Fatalln(err)
+	}
+	coldstarterImage := os.Getenv("DRUID_COLDSTARTER_IMAGE")
+	if coldstarterImage == "" {
+		coldstarterImage = "artifacts.druid.gg/druid-team/druid:stable"
 	}
 
 	//iterate through artifacts and generate scroll.yaml files
@@ -83,6 +104,7 @@ func main() {
 		templateVars.Artifact = artifact
 		templateVars.Version = version
 		templateVars.VersionEscaped = strings.Replace(version, ".", "-", -1)
+		templateVars.ColdstarterImage = coldstarterImage
 		templateVars.Artifacts = GetArtifactsAbove(version, artifacts, true)
 		templateVars.ArtifactsUnescaped = GetArtifactsAbove(version, artifacts, false)
 		if varsBytes != nil && vars[version] == nil {

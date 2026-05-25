@@ -1,10 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-ALL_SCROLL_DIRS=$(find . -type f -name "scroll.yaml" -exec dirname {} \; | sort | uniq)
-
-for SCROLL_DIR in $ALL_SCROLL_DIRS; do
-    echo "Validating $SCROLL_DIR"
-    druid scroll validate "$SCROLL_DIR"
-done
+if command -v druid >/dev/null 2>&1; then
+  while IFS= read -r file; do
+    dir="${file%/scroll.yaml}"
+    echo "Validating ${dir}"
+    druid validate --strict "$dir"
+  done < <(find ./scrolls -type f -name scroll.yaml | sort)
+else
+  go run ./scripts/validate-scrolls.go
+fi

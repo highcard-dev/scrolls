@@ -229,7 +229,7 @@ function pingResponse()
     local snapshotMode = get_snapshot_mode()
     local snapshotPercentage = get_snapshot_percentage()
 
-    if snapshotMode ~= "noop" then
+    if snapshotMode ~= "idle" then
         if snapshotMode == "restore" then
             if snapshotPercentage == nil or snapshotPercentage == 100 then
                 obj.version.name = "§2▶ Extracting snapshot..."
