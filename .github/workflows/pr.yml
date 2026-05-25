@@ -13,15 +13,5 @@ jobs:
       - run: apt update && apt install -y make
       - name: Build scroll tree
         run: make build-tree
-      - name: Get druid binary
-        uses: robinraju/release-downloader@v1.7
-        with:
-          repository: "highcard-dev/druid-cli"
-          latest: true
-          fileName: "druid"
-          token: ${{ secrets.GO_REPO_TOKEN }}
-      - run: chmod +x ./druid
-      - name: Install druid
-        run: mv ./druid /usr/local/bin/druid
       - name: Validate all scrolls
         run: ./scripts/validate_all_scrolls.sh
