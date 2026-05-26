@@ -34,6 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
       - run: go install github.com/ericchiang/pup@latest
       - run: ./scrolls/minecraft/forge/fetch.sh ${{ matrix.version }}
       - run: mkdir -p forge && mv forge-${{ matrix.version }}.jar forge/forge-${{ matrix.version }}.jar
