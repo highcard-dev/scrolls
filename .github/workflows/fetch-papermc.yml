@@ -36,11 +36,18 @@ jobs:
       - name: Fetch latest builds
         run: wget -O builds.json https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds
       - name: Fetch latest stable
-        run: echo "BUILD_NUMBER=$(cat builds.json | jq '[ .builds[] | select(.channel == "default") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
-      - name: Fetch Experimental if no stable found
-        run: echo "BUILD_NUMBER=$(cat builds.json | jq '[ .builds[] | select(.channel == "experimental") ] | sort_by(.build) | .[-1].build')" >> $GITHUB_ENV
-        if: env.BUILD_NUMBER == 'null'
-      - run: wget -O paper-${{ matrix.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/paper-${{ matrix.version }}-${{ env.BUILD_NUMBER }}.jar
+        run: |
+          build=$(jq -c '[.builds[] | select(.channel == "STABLE")] | sort_by(.build) | .[-1] | select(. != null) | {number: .build, name: .downloads.application.name}' builds.json)
+          if [ -z "$build" ] || [ "$build" = "null" ]; then
+            build=$(jq -c '[.builds[] | select(.channel == "ALPHA" or .channel == "EXPERIMENTAL")] | sort_by(.build) | .[-1] | select(. != null) | {number: .build, name: .downloads.application.name}' builds.json)
+          fi
+          if [ -z "$build" ] || [ "$build" = "null" ]; then
+            echo "No PaperMC build found for ${{ matrix.version }}" >&2
+            exit 1
+          fi
+          echo "BUILD_NUMBER=$(echo "$build" | jq -r '.number')" >> $GITHUB_ENV
+          echo "BUILD_NAME=$(echo "$build" | jq -r '.name')" >> $GITHUB_ENV
+      - run: wget -O paper-${{ matrix.version }}.jar https://api.papermc.io/v2/projects/paper/versions/${{ matrix.version }}/builds/${{ env.BUILD_NUMBER }}/downloads/${{ env.BUILD_NAME }}
       - run: mkdir -p papermc && mv paper-${{ matrix.version }}.jar papermc/paper-${{ matrix.version }}.jar
       - uses: jakejarvis/s3-sync-action@master
         env:
