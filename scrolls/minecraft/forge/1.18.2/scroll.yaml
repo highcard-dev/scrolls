@@ -43,6 +43,7 @@ commands:
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
+      - name: rcon
       mounts:
       - path: "/server"
       working_dir: "/server"
