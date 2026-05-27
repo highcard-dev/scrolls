@@ -1,7 +1,7 @@
 set -e
 
-wget https://codeload.github.com/GameServerManagers/LinuxGSM/zip/refs/heads/master -O lgsm.zip
-unzip lgsm.zip
+wget https://codeload.github.com/GameServerManagers/LinuxGSM/tar.gz/refs/heads/master -O lgsm.tar.gz
+tar -xzf lgsm.tar.gz
 
 #recreate lgsm dir
 #rm -rf lgsm
@@ -13,4 +13,4 @@ mv LinuxGSM-master/lgsm/modules/ lgsm
 chmod -R +x lgsm/modules/
 
 rm -rf LinuxGSM-master
-rm lgsm.zip
+rm lgsm.tar.gz
