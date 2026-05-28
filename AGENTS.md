@@ -12,6 +12,7 @@ Context for humans and coding agents working in this repository.
 
 - `.github/workflows/release.yml` installs `druid` from [highcard-dev/druid-cli](https://github.com/highcard-dev/druid-cli), validates scrolls, logs into the registry, pushes **categories**, then pushes individual scrolls.
 - When adding a new scroll family, you usually need both a **Push Categories** line (for that family’s `.meta`) and **Pushing new scrolls** lines for each version directory.
+- All production scroll/artifact changes must go through CI/CD. Do not manually push production scrolls or mutate production registry state unless explicitly authorized for an emergency; follow up with a repo change so CI is source of truth again.
 
 ## `druid registry push category` — three positional arguments
 
