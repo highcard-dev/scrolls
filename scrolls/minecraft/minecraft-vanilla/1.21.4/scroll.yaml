@@ -19,7 +19,6 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:stable
       expectedPorts:
       - name: main
-        keepAliveTraffic: 10kb/5m
       - name: rcon
       mounts:
       - path: "/runtime"
@@ -35,7 +34,7 @@ commands:
       image: eclipse-temurin:21-jre
       expectedPorts:
       - name: main
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: 1b/60m
       - name: rcon
       mounts:
       - path: "/server"
