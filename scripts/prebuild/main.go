@@ -169,12 +169,35 @@ func runProcedure(root string, spec prebuildSpec, mounts *dockerMountSet, index 
 	if proc.WorkingDir != "" {
 		args = append(args, "-w", proc.WorkingDir)
 	}
-	args = append(args, "--entrypoint", proc.Command[0], proc.Image)
-	args = append(args, proc.Command[1:]...)
+	entrypoint, commandArgs := prebuildCommand(proc.Command)
+	args = append(args, "--entrypoint", entrypoint, proc.Image)
+	args = append(args, commandArgs...)
 
 	fmt.Printf("Running install procedure %d with %s\n", index, proc.Image)
 	return run("docker", args...)
 }
+
+func prebuildCommand(command []string) (string, []string) {
+	if len(command) >= 2 && isShell(command[0]) && !strings.HasPrefix(command[1], "-") && filepath.Ext(command[1]) == ".sh" {
+		args := []string{"-lc", templateBackedScriptWrapper, command[0]}
+		args = append(args, command[1:]...)
+		return "sh", args
+	}
+	return command[0], command[1:]
+}
+
+func isShell(value string) bool {
+	base := filepath.Base(value)
+	return base == "sh" || base == "bash"
+}
+
+const templateBackedScriptWrapper = `script="$1"
+shift
+if [ ! -f "$script" ] && [ -f "$script.scroll_template" ]; then
+  cp "$script.scroll_template" "$script"
+  chmod +x "$script"
+fi
+exec "$0" "$script" "$@"`
 
 func mountHostPath(root string, m mount) string {
 	if m.SubPath == "." {
