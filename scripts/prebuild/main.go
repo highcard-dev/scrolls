@@ -76,7 +76,7 @@ func runSpec(spec prebuildSpec) error {
 		defer os.RemoveAll(root)
 	}
 
-	if err := cp.Copy(spec.Source, root); err != nil {
+	if err := copyScrollSource(spec.Source, root); err != nil {
 		return fmt.Errorf("copy scroll source: %w", err)
 	}
 
@@ -103,6 +103,19 @@ func runSpec(spec prebuildSpec) error {
 		return nil
 	}
 	return pushArtifact(root, spec)
+}
+
+func copyScrollSource(source, root string) error {
+	entries, err := os.ReadDir(source)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if err := cp.Copy(filepath.Join(source, entry.Name()), filepath.Join(root, entry.Name())); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func runProcedure(root string, spec prebuildSpec, index int, proc procedure) error {
