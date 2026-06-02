@@ -3,6 +3,7 @@
 .env
 scrolls-registry/.builds
 .builds
+.prebuild-tmp
 *.tar.gz
 
 scroll-builder

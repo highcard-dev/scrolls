@@ -66,7 +66,7 @@ func main() {
 }
 
 func runSpec(spec prebuildSpec) error {
-	root, err := os.MkdirTemp("", "druid-prebuild-"+spec.Target+"-")
+	root, err := createPrebuildRoot(spec.Target)
 	if err != nil {
 		return err
 	}
@@ -103,6 +103,21 @@ func runSpec(spec prebuildSpec) error {
 		return nil
 	}
 	return pushArtifact(root, spec)
+}
+
+func createPrebuildRoot(target string) (string, error) {
+	parent := os.Getenv("PREBUILD_TMP_PARENT")
+	if parent == "" {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+		parent = filepath.Join(cwd, ".prebuild-tmp")
+	}
+	if err := os.MkdirAll(parent, 0o755); err != nil {
+		return "", err
+	}
+	return os.MkdirTemp(parent, "druid-prebuild-"+target+"-")
 }
 
 func copyScrollSource(source, root string) error {
