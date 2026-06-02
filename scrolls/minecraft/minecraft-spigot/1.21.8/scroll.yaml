@@ -1,14 +1,14 @@
-name: artifacts.druid.gg/druid-team/scroll-minecraft-cuberite
-desc: Cuberite
+name: artifacts.druid.gg/druid-team/scroll-minecraft-spigot
+desc: Minecraft Spigot
 version: 0.0.1
-app_version: latest
+app_version: "1.21.8"
 ports:
 - name: main
   protocol: tcp
   port: 25565
-- name: webpanel
+- name: rcon
   protocol: tcp
-  port: 8080
+  port: 25575
 commands:
   start:
     needs:
@@ -20,6 +20,7 @@ commands:
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
+      - name: rcon
       mounts:
       - path: "/runtime"
         sub_path: "."
@@ -27,31 +28,31 @@ commands:
       env:
         DRUID_ROOT: "/runtime"
         DRUID_PORT_MAIN_COLDSTARTER: "packet_handler/minecraft.lua"
+        DRUID_PORT_RCON_COLDSTARTER: "generic"
       command:
       - druid-coldstarter
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.243
+    - id: start
+      image: eclipse-temurin:21-jre
+      expectedPorts:
+      - name: main
+        keepAliveTraffic: 10kb/5m
+      - name: rcon
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - "./start.sh"
-      id: start
-      expectedPorts:
-      - name: main
-        keepAliveTraffic: 10kb/5m
-      - name: webpanel
-        keepAliveTraffic: 10kb/5m
   stop:
+    run: always
     procedures:
     - type: signal
       target: start
       signal: SIGTERM
-    run: always
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.243
+    - image: alpine:3.20
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -59,16 +60,16 @@ commands:
       - wget
       - "-q"
       - "-O"
-      - Cuberite.tar.gz
-      - https://download.cuberite.org/linux-x86_64/Cuberite.tar.gz
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.243
+      - spigot.jar
+      - http://192.168.100.200:9000/snapshot-cache/minecraft/spigot/spigot-1.21.8.jar
+    - image: alpine:3.20
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - tar
-      - "-xzf"
-      - Cuberite.tar.gz
+      - sh
+      - "-c"
+      - echo eula=true > eula.txt
   update:
     procedures:
     - image: alpine:3.20
@@ -79,4 +80,12 @@ commands:
       - sh
       - "-c"
       - apk add --no-cache jq yq moreutils && ./update.sh
+    - image: alpine:3.20
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - "-c"
+      - echo eula=true > eula.txt
 serve: start
