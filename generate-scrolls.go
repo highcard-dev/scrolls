@@ -21,6 +21,7 @@ type TemplateVars struct {
 	Version            string
 	VersionEscaped     string
 	ColdstarterImage   string
+	SteamImage         string
 	Artifacts          map[string]string
 	ArtifactsUnescaped map[string]string
 	Vars               map[string]string
@@ -94,7 +95,11 @@ func main() {
 	}
 	coldstarterImage := os.Getenv("DRUID_COLDSTARTER_IMAGE")
 	if coldstarterImage == "" {
-		coldstarterImage = "artifacts.druid.gg/druid-team/druid:stable"
+		coldstarterImage = "artifacts.druid.gg/druid-team/druid:v0.1.243"
+	}
+	steamImage := os.Getenv("DRUID_STEAM_RUNTIME_IMAGE")
+	if steamImage == "" {
+		steamImage = "artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd"
 	}
 
 	//iterate through artifacts and generate scroll.yaml files
@@ -105,6 +110,7 @@ func main() {
 		templateVars.Version = version
 		templateVars.VersionEscaped = strings.Replace(version, ".", "-", -1)
 		templateVars.ColdstarterImage = coldstarterImage
+		templateVars.SteamImage = steamImage
 		templateVars.Artifacts = GetArtifactsAbove(version, artifacts, true)
 		templateVars.ArtifactsUnescaped = GetArtifactsAbove(version, artifacts, false)
 		if varsBytes != nil && vars[version] == nil {

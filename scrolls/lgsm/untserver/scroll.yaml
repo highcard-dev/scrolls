@@ -14,7 +14,7 @@ commands:
     run: restart
     procedures:
     - id: coldstart
-      image: artifacts.druid.gg/druid-team/druid:stable
+      image: artifacts.druid.gg/druid-team/druid:v0.1.243
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
@@ -35,7 +35,7 @@ commands:
       command:
       - druid-coldstarter
     - id: start
-      image: highcard/druid:stable-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
@@ -51,14 +51,14 @@ commands:
     - install
     procedures:
     - ignore_failure: true
-      image: highcard/druid:stable-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - ./untserver
       - update
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -68,7 +68,7 @@ commands:
   stop:
     run: always
     procedures:
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -77,14 +77,14 @@ commands:
       - stop
   restart:
     procedures:
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - echo
       - Restarting server...
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -94,28 +94,28 @@ commands:
   install:
     run: once
     procedures:
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - echo
       - Installing LGSM...
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - install-lgsm.sh
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - ./linuxgsm.sh
       - untserver
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
