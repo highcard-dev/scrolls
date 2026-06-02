@@ -1,9 +1,11 @@
 {
   "arkserver": "artifacts.druid.gg/druid-team/scroll-lgsm:arkserver",
+  "csgoserver": "artifacts.druid.gg/druid-team/scroll-lgsm:csgoserver",
   "cs2server": "artifacts.druid.gg/druid-team/scroll-lgsm:cs2server",
   "dayzserver": "artifacts.druid.gg/druid-team/scroll-lgsm:dayzserver",
   "gmodserver": "artifacts.druid.gg/druid-team/scroll-lgsm:gmodserver",
   "pwserver": "artifacts.druid.gg/druid-team/scroll-lgsm:pwserver",
   "pzserver": "artifacts.druid.gg/druid-team/scroll-lgsm:pzserver",
+  "sdtdserver": "artifacts.druid.gg/druid-team/scroll-lgsm:sdtdserver",
   "untserver": "artifacts.druid.gg/druid-team/scroll-lgsm:untserver"
 }

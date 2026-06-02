@@ -14,12 +14,12 @@ Context for humans and coding agents working in this repository.
 - When adding a new scroll family, you usually need both a **Push Categories** line (for that family’s `.meta`) and **Pushing new scrolls** lines for each version directory.
 - All production scroll/artifact changes must go through CI/CD. Do not manually push production scrolls or mutate production registry state unless explicitly authorized for an emergency; follow up with a repo change so CI is source of truth again.
 
-## `druid registry push category` — three positional arguments
+## `druid push category` — three positional arguments
 
 The command signature is:
 
 ```text
-druid registry push category <repo> <category> [<scrollDir>]
+druid push category <repo> <category> [<scrollDir>]
 ```
 
 | Position | Meaning |
@@ -30,7 +30,7 @@ druid registry push category <repo> <category> [<scrollDir>]
 
 **Common mistake:** passing only two arguments after `category`, where the second looks like a path (for example `./scrolls/minecraft/foo/.meta`). Then that string is treated as the category label, `scrollDir` stays `.`, and the CLI errors with no files matching the locale pattern.
 
-**Convention here:** use the same short category string as `druid registry push ... --category <name>` for that product in the same workflow (for example `minecraft`, `rust`, `palworld`, `hytale`).
+**Convention here:** use the same short category string as `druid push ... --category <name>` for that product in the same workflow (for example `minecraft`, `rust`, `palworld`, `hytale`).
 
 ## Validation
 

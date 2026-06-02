@@ -1,26 +1,18 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-TAG=$1
-echo "Tag: $TAG"
+targets="${1:-all-steam}"
 
-DRUID_CLI_VERSION=${DRUID_CLI_VERSION:-v0.1.227}
-echo "Druid CLI Version: $DRUID_CLI_VERSION"
+: "${SCROLL_REGISTRY_HOST:?SCROLL_REGISTRY_HOST is required}"
+: "${SCROLL_REGISTRY_USER:?SCROLL_REGISTRY_USER is required}"
+: "${SCROLL_REGISTRY_PASSWORD:?SCROLL_REGISTRY_PASSWORD is required}"
 
-TMP_VOLUME_NAME=lgsm-prebuild-$(date +%s)
+export DRUID_RUNTIME_IMAGE="${DRUID_RUNTIME_IMAGE:-artifacts.druid.gg/druid-team/druid:v0.1.243}"
+export DRUID_STEAM_RUNTIME_IMAGE="${DRUID_STEAM_RUNTIME_IMAGE:-artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd}"
+export PREBUILD_DOCKER_PLATFORM="${PREBUILD_DOCKER_PLATFORM:-linux/amd64}"
 
-docker volume rm $TMP_VOLUME_NAME || true
+echo "Targets: ${targets}"
+echo "Runtime image: ${DRUID_RUNTIME_IMAGE}"
+echo "Steam runtime image: ${DRUID_STEAM_RUNTIME_IMAGE}"
 
-docker run --rm -v $TMP_VOLUME_NAME:/app/resources -e CHANNEL="$DRUID_CLI_VERSION" bash sh -c 'wget -O /app/resources/druid-install-command.sh "https://github.com/highcard-dev/druid-cli/releases/download/${CHANNEL}/druid-install-command.sh" && mkdir -p /app/resources/deployment && chmod +x /app/resources/druid-install-command.sh && chown 1000:1000 -R /app/resources/'
-
-echo "Pulling scroll"
-docker run --rm -v $TMP_VOLUME_NAME:/app/resources --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druid:latest-nix-steamcmd registry pull artifacts.druid.gg/druid-team/scroll-lgsm:${TAG}server
-
-echo "Running scroll install script"
-docker run --rm -v $TMP_VOLUME_NAME:/app/resources --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druid:latest-nix-steamcmd run install
-
-echo "Pushing scroll to registry"
-docker run --rm -v $TMP_VOLUME_NAME:/app/resources -e DRUID_REGISTRY_HOST="${SCROLL_REGISTRY_HOST}" -e DRUID_REGISTRY_USER="${SCROLL_REGISTRY_USER}" -e DRUID_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD}" --entrypoint /app/resources/druid-install-command.sh -w /app/resources/deployment artifacts.druid.gg/druid-team/druid:latest-nix-steamcmd registry push -m artifacts.druid.gg/druid-team/scroll-lgsm:${TAG}server-prebuild
-echo "Prebuild uploaded"
-
-docker volume rm $TMP_VOLUME_NAME || true
+go run ./scripts/prebuild --targets "${targets}"

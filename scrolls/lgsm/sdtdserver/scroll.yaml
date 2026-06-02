@@ -2,16 +2,14 @@ name: artifacts.druid.gg/druid-team/scroll-lgsm
 desc: sdtdserver
 version: 0.0.2
 app_version: sdtdserver
+keepAlivePPM: 5
 ports:
 - name: query
   protocol: udp
   description: Steam Query Port. Use this to connect via the Steam client.
-  port: 26900
 - name: main
-  description: Main game port. Use this port inside of your game client to connect
-    to the server. Depending on the game you might need the query port to connect.
+  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
   protocol: udp
-  port: 26900
 commands:
   console:
     needs:
@@ -19,7 +17,7 @@ commands:
     run: restart
     procedures:
     - id: coldstart
-      image: artifacts.druid.gg/druid-team/druid:stable
+      image: artifacts.druid.gg/druid-team/druid:v0.1.243
       expectedPorts:
       - name: query
         keepAliveTraffic: 10kb/5m
@@ -32,103 +30,103 @@ commands:
       env:
         DRUID_ROOT: "/runtime"
         DRUID_PORT_QUERY_COLDSTARTER: "packet_handler/query.lua"
-        DRUID_PORT_MAIN_COLDSTARTER: "generic"
         DRUID_COLDSTARTER_VAR_GAME_NAME: "7 Days To Die"
         DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "7DTD"
         DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
         DRUID_COLDSTARTER_VAR_MAP_NAME: "server idle"
         DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid.gg Server (idle) - join to start"
         DRUID_COLDSTARTER_VAR_STEAM_APP_ID: "251570"
+        DRUID_PORT_MAIN_COLDSTARTER: "generic"
       command:
       - druid-coldstarter
-    - image: highcard/druid:stable-steamcmd
-      mounts:
-      - path: "/server"
-      working_dir: "/server"
-      tty: true
-      command:
-      - "./sdtdserver"
-      - console
-      id: start
+    - id: start
+      image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       expectedPorts:
       - name: query
         keepAliveTraffic: 10kb/5m
       - name: main
         keepAliveTraffic: 10kb/5m
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      tty: true
+      command:
+      - ./sdtdserver
+      - console
   start:
     needs:
     - install
     procedures:
     - ignore_failure: true
-      image: highcard/druid:stable-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./sdtdserver"
+      - ./sdtdserver
       - update
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./sdtdserver"
+      - ./sdtdserver
       - start
   stop:
+    run: always
     procedures:
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./sdtdserver"
+      - ./sdtdserver
       - stop
-    run: always
   restart:
     procedures:
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - echo
       - Restarting server...
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./sdtdserver"
+      - ./sdtdserver
       - restart
   install:
     run: once
     procedures:
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - echo
       - Installing LGSM...
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - install-lgsm.sh
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./linuxgsm.sh"
+      - ./linuxgsm.sh
       - sdtdserver
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - "./sdtdserver"
+      - ./sdtdserver
       - auto-install
 serve: console

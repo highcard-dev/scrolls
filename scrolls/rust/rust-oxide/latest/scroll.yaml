@@ -23,7 +23,7 @@ commands:
     run: restart
     procedures:
     - id: coldstart
-      image: artifacts.druid.gg/druid-team/druid:stable
+      image: artifacts.druid.gg/druid-team/druid:v0.1.243
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
@@ -46,7 +46,7 @@ commands:
         DRUID_COLDSTARTER_VAR_GAME_KEYWORDS: "mp0,cp0,ptrak,qp0,$r?,v2592,born0,gmrust,cs1337420"
       command:
       - druid-coldstarter
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -70,7 +70,7 @@ commands:
   install:
     run: once
     procedures:
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -83,7 +83,7 @@ commands:
       - "+app_update"
       - '258550'
       - "+quit"
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -92,7 +92,7 @@ commands:
       - "-O"
       - oxide.zip
       - https://umod.org/games/rust/download/develop
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -102,7 +102,7 @@ commands:
       - oxide.zip
       - "-d"
       - "/server"
-    - image: highcard/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"

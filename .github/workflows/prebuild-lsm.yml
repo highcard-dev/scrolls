@@ -1,41 +1,49 @@
-name: Prebuild LGSM
+name: Prebuild Steam Scrolls
 on:
   workflow_dispatch:
     inputs:
-      image:
-        description: "Image"
+      targets:
+        description: "one scroll, comma-separated scrolls, or all-steam"
         required: false
-        default: ""
+        default: "all-steam"
   schedule:
     - cron: "0 3 * * *"
 jobs:
-  build-lgsm:
+  build-steam:
     runs-on: [self-hosted, nauen]
-    strategy:
-      matrix:
-        image: ["ark", "cs2"]
+    env:
+      DRUID_CLI_VERSION: v0.1.243
+      DRUID_RUNTIME_IMAGE: artifacts.druid.gg/druid-team/druid:v0.1.243
+      DRUID_STEAM_RUNTIME_IMAGE: artifacts.druid.gg/druid-team/druid:v0.1.243-steamcmd
+      PREBUILD_DOCKER_PLATFORM: linux/amd64
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.22.3"
+      - name: Build scroll tree
+        run: make build-tree
+      - name: Get druid binary
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: "highcard-dev/druid-cli"
+          tag: ${{ env.DRUID_CLI_VERSION }}
+          fileName: "druid"
+          token: ${{ secrets.GO_REPO_TOKEN }}
+      - name: Install druid
+        run: |
+          chmod +x druid
+          mv druid /usr/local/bin/druid
+      - name: Validate all scrolls
+        run: ./scripts/validate_all_scrolls.sh
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           registry: artifacts.druid.gg
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
-      - uses: actions/setup-go@v5
-        with:
-          go-version: ">=1.22.3"
-
-      #      - name: Setup tmate session
-      #        uses: mxschmitt/action-tmate@v3
-      #        env:
-      #          PRESIGN_ACCESS_KEY: ${{ secrets.PRESIGN_ACCESS_KEY }}
-      #          PRESIGN_BUCKET_NAME: ${{ secrets.PRESIGN_BUCKET_NAME }}
-      #          PRESIGN_S3_ENDPOINT: ${{ secrets.PRESIGN_S3_ENDPOINT }}
-      #          PRESIGN_SECRET_KEY: ${{ secrets.PRESIGN_SECRET_KEY }}
-      #          BACKUP_ADDITIONAL_ARGS: "--insecure"
-      - name: Prebuild and upload Image ${{ matrix.image }}
-        run: ./scripts/prebuild/prebuild.sh ${{ matrix.image }}
+      - name: Prebuild and upload
+        run: ./scripts/prebuild/prebuild.sh "${{ inputs.targets || 'all-steam' }}"
         env:
           SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
           SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
