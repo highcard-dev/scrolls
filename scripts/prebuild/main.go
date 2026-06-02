@@ -89,11 +89,18 @@ func runSpec(spec prebuildSpec) error {
 		return errors.New("scroll has no install command")
 	}
 
+	mounts := newDockerMountSet(root, spec.Target)
+	defer mounts.cleanup()
+
 	fmt.Printf("Prebuilding %s from %s\n", spec.Artifact, spec.Source)
 	for index, proc := range install.Procedures {
-		if err := runProcedure(root, spec, index, proc); err != nil {
+		if err := runProcedure(root, spec, mounts, index, proc); err != nil {
+			_ = mounts.copyBack()
 			return err
 		}
+	}
+	if err := mounts.copyBack(); err != nil {
+		return err
 	}
 	if err := validateInstalledRoot(root); err != nil {
 		return err
@@ -133,23 +140,24 @@ func copyScrollSource(source, root string) error {
 	return nil
 }
 
-func runProcedure(root string, spec prebuildSpec, index int, proc procedure) error {
+func runProcedure(root string, spec prebuildSpec, mounts *dockerMountSet, index int, proc procedure) error {
 	if proc.Image == "" {
 		proc.Image = spec.Image
 	}
 	if len(proc.Command) == 0 {
 		return fmt.Errorf("install procedure %d has no command", index)
 	}
+
 	args := []string{"run", "--rm"}
 	if platform := os.Getenv("PREBUILD_DOCKER_PLATFORM"); platform != "" {
 		args = append(args, "--platform", platform)
 	}
 	for _, m := range proc.Mounts {
-		hostPath := mountHostPath(root, m)
-		if err := os.MkdirAll(hostPath, 0o755); err != nil {
+		volumeName, err := mounts.volumeFor(proc.Image, m)
+		if err != nil {
 			return err
 		}
-		args = append(args, "-v", hostPath+":"+m.Path)
+		args = append(args, "-v", volumeName+":"+m.Path)
 	}
 	for key, value := range proc.Env {
 		args = append(args, "-e", key+"="+value)
@@ -177,6 +185,128 @@ func mountHostPath(root string, m mount) string {
 		subPath = "data"
 	}
 	return filepath.Join(root, subPath)
+}
+
+type dockerMountSet struct {
+	root    string
+	target  string
+	volumes map[string]dockerMountVolume
+}
+
+type dockerMountVolume struct {
+	HostPath string
+	Name     string
+	Image    string
+}
+
+func newDockerMountSet(root, target string) *dockerMountSet {
+	return &dockerMountSet{
+		root:    root,
+		target:  target,
+		volumes: map[string]dockerMountVolume{},
+	}
+}
+
+func (m *dockerMountSet) volumeFor(image string, mount mount) (string, error) {
+	hostPath := mountHostPath(m.root, mount)
+	if existing, ok := m.volumes[hostPath]; ok {
+		return existing.Name, nil
+	}
+	if err := os.MkdirAll(hostPath, 0o755); err != nil {
+		return "", err
+	}
+
+	name := fmt.Sprintf("druid-prebuild-%s-%d-%d", sanitizeName(m.target), len(m.volumes), os.Getpid())
+	if err := run("docker", "volume", "create", name); err != nil {
+		return "", err
+	}
+	volume := dockerMountVolume{HostPath: hostPath, Name: name, Image: image}
+	m.volumes[hostPath] = volume
+
+	helper := name + "-seed"
+	removeContainer(helper)
+	if err := run("docker", helperCreateArgs(helper, image, name)...); err != nil {
+		return "", err
+	}
+	if err := run("docker", "cp", hostPath+"/.", helper+":/volume"); err != nil {
+		removeContainer(helper)
+		return "", err
+	}
+	if err := removeContainer(helper); err != nil {
+		return "", err
+	}
+
+	chownArgs := []string{"run", "--rm"}
+	if platform := os.Getenv("PREBUILD_DOCKER_PLATFORM"); platform != "" {
+		chownArgs = append(chownArgs, "--platform", platform)
+	}
+	chownArgs = append(chownArgs, "--user", "root", "-v", name+":/volume", "--entrypoint", "chown", image, "-R", "1000:1000", "/volume")
+	if err := run("docker", chownArgs...); err != nil {
+		return "", err
+	}
+	return name, nil
+}
+
+func (m *dockerMountSet) copyBack() error {
+	for _, volume := range m.volumes {
+		if err := copyVolumeToHost(volume); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (m *dockerMountSet) cleanup() {
+	for _, volume := range m.volumes {
+		_ = run("docker", "volume", "rm", "-f", volume.Name)
+	}
+}
+
+func copyVolumeToHost(volume dockerMountVolume) error {
+	helper := volume.Name + "-copy"
+	removeContainer(helper)
+	if err := run("docker", helperCreateArgs(helper, volume.Image, volume.Name)...); err != nil {
+		return err
+	}
+	if err := os.RemoveAll(volume.HostPath); err != nil {
+		removeContainer(helper)
+		return err
+	}
+	if err := os.MkdirAll(volume.HostPath, 0o755); err != nil {
+		removeContainer(helper)
+		return err
+	}
+	if err := run("docker", "cp", helper+":/volume/.", volume.HostPath); err != nil {
+		removeContainer(helper)
+		return err
+	}
+	return removeContainer(helper)
+}
+
+func helperCreateArgs(name, image, volume string) []string {
+	args := []string{"create", "--name", name}
+	if platform := os.Getenv("PREBUILD_DOCKER_PLATFORM"); platform != "" {
+		args = append(args, "--platform", platform)
+	}
+	return append(args, "-v", volume+":/volume", "--entrypoint", "true", image)
+}
+
+func removeContainer(name string) error {
+	cmd := exec.Command("docker", "rm", "-f", name)
+	cmd.Stdout = os.Stdout
+	return cmd.Run()
+}
+
+func sanitizeName(value string) string {
+	var b strings.Builder
+	for _, r := range value {
+		if r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '-' || r == '_' || r == '.' {
+			b.WriteRune(r)
+			continue
+		}
+		b.WriteByte('-')
+	}
+	return b.String()
 }
 
 func pushArtifact(root string, spec prebuildSpec) error {
