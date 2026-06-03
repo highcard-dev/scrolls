@@ -28,7 +28,6 @@ jobs:
             { java-version: "21", spigot-version: "1.21.4" },
             { java-version: "21", spigot-version: "1.21.5" },
             { java-version: "21", spigot-version: "1.21.6" },
-            { java-version: "21", spigot-version: "1.21.7" },
             { java-version: "21", spigot-version: "1.21.8" },
           ]
     runs-on: ubuntu-latest
@@ -44,7 +43,19 @@ jobs:
           java-version: "${{ matrix.version.java-version }}"
       - run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
       - run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
-      - run: mkdir -p spigot && mv spigot-*jar spigot/spigot-${{ matrix.version.spigot-version }}.jar
+      - name: Stage verified Spigot jar
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ matrix.version.spigot-version }}"
+          jar="spigot-${version}.jar"
+          if [[ ! -f "${jar}" ]]; then
+            echo "::error::BuildTools did not produce ${jar}; refusing to publish a mislabeled cache artifact."
+            ls -la spigot-*.jar || true
+            exit 1
+          fi
+          mkdir -p spigot
+          mv "${jar}" "spigot/${jar}"
       - uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: ${{ secrets.PRESIGN_BUCKET_NAME }}

@@ -9,8 +9,32 @@ on:
   schedule:
     - cron: "0 3 * * *"
 jobs:
-  build-steam:
+  resolve-targets:
     runs-on: [self-hosted, nauen]
+    outputs:
+      targets: ${{ steps.targets.outputs.targets }}
+    env:
+      SELECTED_TARGETS: ${{ github.event_name == 'workflow_dispatch' && inputs.targets || 'all-steam' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.22.3"
+      - name: Resolve prebuild targets
+        id: targets
+        run: |
+          set -euo pipefail
+          targets="$(go run ./scripts/prebuild --targets "${SELECTED_TARGETS}" --list-targets)"
+          echo "targets=${targets}" >> "$GITHUB_OUTPUT"
+          echo "Resolved targets: ${targets}"
+
+  build-steam:
+    needs: resolve-targets
+    runs-on: [self-hosted, nauen]
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.resolve-targets.outputs.targets) }}
     env:
       DRUID_CLI_VERSION: v0.1.243
       DRUID_RUNTIME_IMAGE: artifacts.druid.gg/druid-team/druid:v0.1.243
@@ -43,7 +67,7 @@ jobs:
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
       - name: Prebuild and upload
-        run: ./scripts/prebuild/prebuild.sh "${{ inputs.targets || 'all-steam' }}"
+        run: ./scripts/prebuild/prebuild.sh "${{ matrix.target }}"
         env:
           SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
           SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
