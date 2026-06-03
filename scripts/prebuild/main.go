@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -52,11 +53,24 @@ type mount struct {
 
 func main() {
 	targets := flag.String("targets", "all-steam", "one target, comma-separated targets, or all-steam")
+	listTargets := flag.Bool("list-targets", false, "print selected targets as a JSON array and exit")
 	flag.Parse()
 
 	specs, err := selectSpecs(*targets)
 	if err != nil {
 		fail(err)
+	}
+	if *listTargets {
+		names := make([]string, 0, len(specs))
+		for _, spec := range specs {
+			names = append(names, spec.Target)
+		}
+		payload, err := json.Marshal(names)
+		if err != nil {
+			fail(err)
+		}
+		fmt.Println(string(payload))
+		return
 	}
 	for _, spec := range specs {
 		if err := runSpec(spec); err != nil {

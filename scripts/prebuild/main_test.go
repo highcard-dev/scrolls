@@ -34,3 +34,31 @@ func TestPrebuildCommandLeavesShellFlagsUntouched(t *testing.T) {
 		t.Fatalf("args = %#v", args)
 	}
 }
+
+func TestSelectSpecsSupportsCommaSeparatedTargets(t *testing.T) {
+	specs, err := selectSpecs("arkserver,rust-oxide")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(specs) != 2 {
+		t.Fatalf("specs = %#v, want two specs", specs)
+	}
+	if specs[0].Target != "arkserver" || specs[1].Target != "rust-oxide" {
+		t.Fatalf("targets = %#v, want arkserver and rust-oxide", []string{specs[0].Target, specs[1].Target})
+	}
+}
+
+func TestSelectSpecsAllSteamReturnsIndependentTargets(t *testing.T) {
+	specs, err := selectSpecs("all-steam")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(specs) < 10 {
+		t.Fatalf("spec count = %d, want all steam targets", len(specs))
+	}
+	for _, spec := range specs {
+		if spec.Target == "all-steam" {
+			t.Fatalf("all-steam should resolve to concrete targets: %#v", specs)
+		}
+	}
+}
