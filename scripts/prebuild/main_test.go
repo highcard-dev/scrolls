@@ -69,3 +69,31 @@ func TestSelectSpecsAllSteamReturnsIndependentTargets(t *testing.T) {
 		t.Fatalf("all-steam should include dayzserver: %#v", specs)
 	}
 }
+
+func TestDayZPrebuildRequiresSteamCredentials(t *testing.T) {
+	specs, err := selectSpecs("dayzserver")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(specs) != 1 {
+		t.Fatalf("specs = %#v, want one spec", specs)
+	}
+	if len(specs[0].RequiredEnv) != 2 || specs[0].RequiredEnv[0] != "STEAM_USER" || specs[0].RequiredEnv[1] != "STEAM_PASS" {
+		t.Fatalf("required env = %#v, want STEAM_USER and STEAM_PASS", specs[0].RequiredEnv)
+	}
+}
+
+func TestValidateRequiredEnvFailsBeforePrebuild(t *testing.T) {
+	t.Setenv("PREBUILD_TEST_REQUIRED", "")
+	err := validateRequiredEnv(prebuildSpec{Target: "test", RequiredEnv: []string{"PREBUILD_TEST_REQUIRED"}})
+	if err == nil {
+		t.Fatal("validateRequiredEnv returned nil, want missing env error")
+	}
+}
+
+func TestValidateRequiredEnvAcceptsPresentEnv(t *testing.T) {
+	t.Setenv("PREBUILD_TEST_REQUIRED", "present")
+	if err := validateRequiredEnv(prebuildSpec{Target: "test", RequiredEnv: []string{"PREBUILD_TEST_REQUIRED"}}); err != nil {
+		t.Fatal(err)
+	}
+}
