@@ -451,7 +451,7 @@ func selectSpecs(raw string) ([]prebuildSpec, error) {
 }
 
 func allSpecs() []prebuildSpec {
-	steamImage := getenv("DRUID_STEAM_RUNTIME_IMAGE", "artifacts.druid.gg/druid-team/druid:v0.1.245-steamcmd")
+	steamImage := getenv("DRUID_STEAM_RUNTIME_IMAGE", "artifacts.druid.gg/druid-team/druid:v0.1.246-steamcmd")
 	specs := []prebuildSpec{
 		{Target: "pwserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:pwserver-prebuild", Source: "./scrolls/lgsm/pwserver", Image: steamImage, Ports: []string{"main=8211/udp", "rcon=25575"}, MinDisk: "7Gi", MinRAM: "2Gi", MinCPU: "0.5", Category: "palworld", Smart: true, PackMeta: true},
 		{Target: "arkserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:arkserver-prebuild", Source: "./scrolls/lgsm/arkserver", Image: steamImage, Ports: []string{"main=/udp", "query=/udp", "rcon"}, MinDisk: "25Gi", MinRAM: "7Gi", MinCPU: "0.5", Category: "ark", Smart: true, PackMeta: true},
