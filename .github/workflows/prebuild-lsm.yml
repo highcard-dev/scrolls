@@ -78,6 +78,8 @@ jobs:
           SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
           SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
           SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+          STEAM_USER: ${{ secrets.STEAM_USER }}
+          STEAM_PASS: ${{ secrets.STEAM_PASS }}
       - name: Check disk after prebuild
         if: always()
         run: |

@@ -17,17 +17,18 @@ import (
 )
 
 type prebuildSpec struct {
-	Target   string
-	Artifact string
-	Source   string
-	Image    string
-	Ports    []string
-	MinDisk  string
-	MinRAM   string
-	MinCPU   string
-	Category string
-	Smart    bool
-	PackMeta bool
+	Target      string
+	Artifact    string
+	Source      string
+	Image       string
+	Ports       []string
+	MinDisk     string
+	MinRAM      string
+	MinCPU      string
+	Category    string
+	Smart       bool
+	PackMeta    bool
+	RequiredEnv []string
 }
 
 type scrollFile struct {
@@ -80,6 +81,10 @@ func main() {
 }
 
 func runSpec(spec prebuildSpec) error {
+	if err := validateRequiredEnv(spec); err != nil {
+		return err
+	}
+
 	root, err := createPrebuildRoot(spec.Target)
 	if err != nil {
 		return err
@@ -175,6 +180,9 @@ func runProcedure(root string, spec prebuildSpec, mounts *dockerMountSet, index 
 	for key, value := range proc.Env {
 		args = append(args, "-e", key+"="+value)
 	}
+	for _, key := range spec.RequiredEnv {
+		args = append(args, "-e", key)
+	}
 	args = append(args,
 		"-e", "DRUID_RUNTIME_BACKEND=docker",
 		"-e", "DRUID_ROOT=/scroll",
@@ -197,6 +205,19 @@ func prebuildCommand(command []string) (string, []string) {
 		return "sh", args
 	}
 	return command[0], command[1:]
+}
+
+func validateRequiredEnv(spec prebuildSpec) error {
+	var missing []string
+	for _, key := range spec.RequiredEnv {
+		if os.Getenv(key) == "" {
+			missing = append(missing, key)
+		}
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("missing required env for %s prebuild: %s", spec.Target, strings.Join(missing, ", "))
+	}
+	return nil
 }
 
 func isShell(value string) bool {
@@ -454,7 +475,7 @@ func allSpecs() []prebuildSpec {
 	specs := []prebuildSpec{
 		{Target: "pwserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:pwserver-prebuild", Source: "./scrolls/lgsm/pwserver", Image: steamImage, Ports: []string{"main=8211/udp", "rcon=25575"}, MinDisk: "7Gi", MinRAM: "2Gi", MinCPU: "0.5", Category: "palworld", Smart: true, PackMeta: true},
 		{Target: "arkserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:arkserver-prebuild", Source: "./scrolls/lgsm/arkserver", Image: steamImage, Ports: []string{"main=7777/udp", "query=27015/udp", "rcon=27020"}, MinDisk: "25Gi", MinRAM: "7Gi", MinCPU: "0.5", Category: "ark", Smart: true, PackMeta: true},
-		{Target: "dayzserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:dayzserver-prebuild", Source: "./scrolls/lgsm/dayzserver", Image: steamImage, Ports: []string{"main=2302/udp", "battle-eye=2304/udp", "query=27016/udp"}, MinDisk: "7Gi", MinRAM: "5Gi", MinCPU: "1", Category: "dayz", PackMeta: true},
+		{Target: "dayzserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:dayzserver-prebuild", Source: "./scrolls/lgsm/dayzserver", Image: steamImage, Ports: []string{"main=2302/udp", "battle-eye=2304/udp", "query=27016/udp"}, MinDisk: "7Gi", MinRAM: "5Gi", MinCPU: "1", Category: "dayz", PackMeta: true, RequiredEnv: []string{"STEAM_USER", "STEAM_PASS"}},
 		{Target: "untserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:untserver-prebuild", Source: "./scrolls/lgsm/untserver", Image: steamImage, Ports: []string{"main=27015/udp", "mainv6=27016"}, MinDisk: "7Gi", MinRAM: "1Gi", MinCPU: "0.5", Category: "unturned", Smart: true, PackMeta: true},
 		{Target: "sdtdserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:sdtdserver-prebuild", Source: "./scrolls/lgsm/sdtdserver", Image: steamImage, Ports: []string{"query=26900/udp", "main=26900/udp", "main2=26902/udp", "maintcp=26900"}, MinDisk: "20Gi", MinRAM: "2Gi", MinCPU: "0.5", Category: "7days", PackMeta: true},
 		{Target: "gmodserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:gmodserver-prebuild", Source: "./scrolls/lgsm/gmodserver", Image: steamImage, Ports: []string{"query=27005/udp", "main=27015/udp", "sourcetv=27020/udp", "steam=27015"}, MinDisk: "8Gi", MinRAM: "512Mi", MinCPU: "0.25", Category: "gmod", Smart: true, PackMeta: true},
