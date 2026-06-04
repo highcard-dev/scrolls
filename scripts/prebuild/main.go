@@ -109,7 +109,6 @@ func runSpec(spec prebuildSpec) error {
 	fmt.Printf("Prebuilding %s from %s\n", spec.Artifact, spec.Source)
 	for index, proc := range install.Procedures {
 		if err := runProcedure(root, spec, mounts, index, proc); err != nil {
-			_ = mounts.copyBack()
 			return err
 		}
 	}
