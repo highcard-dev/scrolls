@@ -175,6 +175,13 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+      - sh
+      - patch-lgsm-permissions.sh
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.246-steamcmd
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
       - ./cs2server
       - auto-install
     - image: artifacts.druid.gg/druid-team/druid:v0.1.246-steamcmd

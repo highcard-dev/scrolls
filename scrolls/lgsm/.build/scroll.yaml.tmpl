@@ -171,6 +171,13 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+      - sh
+      - patch-lgsm-permissions.sh
+    - image: {{ .SteamImage }}
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
       - ./{{ .Version }}
       - auto-install
 {{- if eq .Vars.postinstall "enabled" }}
