@@ -45,8 +45,20 @@ jobs:
       - name: Login to registry
         if: github.event.pull_request.head.repo.full_name == github.repository
         run: druid login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+      - name: Check scroll changes
+        id: scroll-changes
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          if git diff --quiet "origin/${{ github.base_ref }}"..HEAD -- scrolls; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No scroll source changes; skipping preview push."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Scroll source changed; publishing previews."
+          fi
       - name: Push experimental PR tags
-        if: github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event.pull_request.head.repo.full_name == github.repository && steps.scroll-changes.outputs.changed == 'true'
         env:
           SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
         run: ./scripts/push.sh "${{ github.event.pull_request.number }}"

@@ -53,15 +53,19 @@ func TestSelectSpecsAllSteamReturnsIndependentTargets(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(specs) < 9 {
+	if len(specs) < 11 {
 		t.Fatalf("spec count = %d, want all steam targets", len(specs))
 	}
+	hasDayZ := false
 	for _, spec := range specs {
 		if spec.Target == "all-steam" {
 			t.Fatalf("all-steam should resolve to concrete targets: %#v", specs)
 		}
 		if spec.Target == "dayzserver" {
-			t.Fatalf("dayzserver requires Steam credentials and must not be auto-prebuilt")
+			hasDayZ = true
 		}
+	}
+	if !hasDayZ {
+		t.Fatalf("all-steam should include dayzserver: %#v", specs)
 	}
 }
