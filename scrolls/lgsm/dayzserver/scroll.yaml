@@ -45,8 +45,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./dayzserver
-      - console
+      - sh
+      - -lc
+      - ./dayzserver start && exec ./dayzserver console
   start:
     needs:
     - install

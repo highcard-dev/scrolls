@@ -59,8 +59,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./csgoserver
-      - console
+      - sh
+      - -lc
+      - ./csgoserver start && exec ./csgoserver console
   start:
     needs:
     - install

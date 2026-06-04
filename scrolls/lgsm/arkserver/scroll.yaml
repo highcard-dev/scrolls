@@ -97,8 +97,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./arkserver
-      - console
+      - sh
+      - -lc
+      - ./arkserver start && exec ./arkserver console
   start:
     needs:
     - install

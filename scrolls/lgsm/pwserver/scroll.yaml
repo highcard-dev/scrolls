@@ -41,8 +41,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./pwserver
-      - console
+      - sh
+      - -lc
+      - ./pwserver start && exec ./pwserver console
   start:
     needs:
     - install

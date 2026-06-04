@@ -51,8 +51,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./pzserver
-      - console
+      - sh
+      - -lc
+      - ./pzserver start && exec ./pzserver console
   start:
     needs:
     - install

@@ -48,8 +48,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./untserver
-      - console
+      - sh
+      - -lc
+      - ./untserver start && exec ./untserver console
   start:
     needs:
     - install
