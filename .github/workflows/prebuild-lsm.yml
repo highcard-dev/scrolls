@@ -67,9 +67,20 @@ jobs:
           registry: artifacts.druid.gg
           username: ${{ secrets.IMAGE_REGISTRY_USER }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
+      - name: Check disk before prebuild
+        run: |
+          set -euo pipefail
+          df -h / "$GITHUB_WORKSPACE" /var/lib/docker 2>/dev/null || true
+          docker system df || true
       - name: Prebuild and upload
         run: ./scripts/prebuild/prebuild.sh "${{ matrix.target }}"
         env:
           SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
           SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
           SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+      - name: Check disk after prebuild
+        if: always()
+        run: |
+          set -euo pipefail
+          df -h / "$GITHUB_WORKSPACE" /var/lib/docker 2>/dev/null || true
+          docker system df || true
