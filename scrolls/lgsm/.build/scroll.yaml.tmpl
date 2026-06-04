@@ -90,8 +90,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./{{ .Version }}
-      - console
+      - sh
+      - -lc
+      - ./{{ .Version }} start && exec ./{{ .Version }} console
   start:
     needs:
     - install

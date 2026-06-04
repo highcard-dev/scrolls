@@ -103,8 +103,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./cs2server
-      - console
+      - sh
+      - -lc
+      - ./cs2server start && exec ./cs2server console
   start:
     needs:
     - install

@@ -58,8 +58,9 @@ commands:
       working_dir: "/server"
       tty: true
       command:
-      - ./gmodserver
-      - console
+      - sh
+      - -lc
+      - ./gmodserver start && exec ./gmodserver console
   start:
     needs:
     - install
