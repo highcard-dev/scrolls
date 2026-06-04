@@ -6,10 +6,18 @@ keepAlivePPM: 5
 ports:
 - name: query
   protocol: udp
+  port: 26900
   description: Steam Query Port. Use this to connect via the Steam client.
 - name: main
-  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
   protocol: udp
+  port: 26900
+  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
+- name: main2
+  protocol: udp
+  port: 26902
+- name: maintcp
+  protocol: tcp
+  port: 26900
 commands:
   console:
     needs:

@@ -5,8 +5,16 @@ app_version: dayzserver
 keepAlivePPM: 5
 ports:
 - name: main
-  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
   protocol: udp
+  port: 2302
+  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
+- name: battle-eye
+  protocol: udp
+  port: 2304
+- name: query
+  protocol: udp
+  port: 27016
+  description: Steam Query Port. Use this to connect via the Steam client.
 commands:
   console:
     needs:

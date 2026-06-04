@@ -1,7 +1,7 @@
 {
   "arkserver": {
     "rcon": "enabled",
-    "port": "main=/udp;query=/udp;rcon",
+    "port": "main=7777/udp;query=27015/udp;rcon=27020",
     "lua_query_game_name": "ARK: Survival Evolved",
     "lua_query_folder": "ark_survival_evolved",
     "lua_query_map": "server idle",
@@ -32,7 +32,7 @@
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   },
   "gmodserver": {
-    "port": "query=27005/udp;main=/udp;sourcetv=27020/udp;steam=27015",
+    "port": "query=27005/udp;main=27015/udp;sourcetv=27020/udp;steam=27015",
     "lua_query_game_name": "Idle Druid Server",
     "lua_query_folder": "garrysmod",
     "lua_query_keywords": " ver:250717",
@@ -46,7 +46,7 @@
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   },
   "sdtdserver": {
-    "port": "main=26900/udp;main2=26902/udp;maintcp=26900",
+    "port": "query=26900/udp;main=26900/udp;main2=26902/udp;maintcp=26900",
     "lua_query_game_name": "7 Days To Die",
     "lua_query_folder": "7DTD",
     "lua_query_map": "server idle",
@@ -94,7 +94,7 @@
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   },
   "pzserver": {
-    "port": "main=26900/udp;main2=26902/udp;maintcp=26900",
+    "port": "main=16261/udp;main2=16262/udp;maintcp=16261",
     "lua_query_game_name": "Project Zomboid",
     "lua_query_folder": "zomboid",
     "lua_query_map": "server idle",

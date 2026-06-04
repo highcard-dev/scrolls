@@ -25,7 +25,15 @@ type TemplateVars struct {
 	Artifacts          map[string]string
 	ArtifactsUnescaped map[string]string
 	Vars               map[string]string
+	Ports              []PortSpec
 	ChunksYaml         string
+}
+
+type PortSpec struct {
+	Name        string
+	Port        string
+	Protocol    string
+	Description string
 }
 
 func main() {
@@ -118,6 +126,7 @@ func main() {
 		} else {
 			templateVars.Vars = vars[version]
 		}
+		templateVars.Ports = ParsePorts(templateVars.Vars["port"])
 
 		chunksYaml, err := ioutil.ReadFile(filepath.Join(buildPath, "versions", version, "chunks.yaml"))
 		if err == nil {
@@ -199,6 +208,54 @@ func main() {
 
 	}
 
+}
+
+func ParsePorts(spec string) []PortSpec {
+	var ports []PortSpec
+	for _, part := range strings.Split(spec, ";") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		name := part
+		value := ""
+		if strings.Contains(part, "=") {
+			pieces := strings.SplitN(part, "=", 2)
+			name = strings.TrimSpace(pieces[0])
+			value = strings.TrimSpace(pieces[1])
+		}
+		if name == "" {
+			continue
+		}
+		port := value
+		protocol := "tcp"
+		if strings.Contains(value, "/") {
+			pieces := strings.SplitN(value, "/", 2)
+			port = strings.TrimSpace(pieces[0])
+			protocol = strings.TrimSpace(pieces[1])
+		}
+		if protocol == "" {
+			protocol = "tcp"
+		}
+		ports = append(ports, PortSpec{
+			Name:        name,
+			Port:        port,
+			Protocol:    protocol,
+			Description: PortDescription(name),
+		})
+	}
+	return ports
+}
+
+func PortDescription(name string) string {
+	switch name {
+	case "query":
+		return "Steam Query Port. Use this to connect via the Steam client."
+	case "main":
+		return "Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect."
+	default:
+		return ""
+	}
 }
 
 func RenderScrollSwitch(dir string, filename string, filecontent string, artifact string, version string) {

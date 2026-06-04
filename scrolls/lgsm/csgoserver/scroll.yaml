@@ -6,10 +6,18 @@ keepAlivePPM: 600
 ports:
 - name: query
   protocol: udp
+  port: 27005
   description: Steam Query Port. Use this to connect via the Steam client.
 - name: main
-  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
   protocol: udp
+  port: 27015
+  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
+- name: sourcetv
+  protocol: udp
+  port: 27020
+- name: steam
+  protocol: tcp
+  port: 27015
 commands:
   console:
     needs:
