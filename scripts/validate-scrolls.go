@@ -125,14 +125,16 @@ func validatePorts(raw any) (map[string]bool, error) {
 		if protocol != "" && protocol != "tcp" && protocol != "udp" && protocol != "http" && protocol != "https" {
 			return nil, fmt.Errorf("port %q has unsupported protocol %q", name, protocol)
 		}
-		if _, hasPort := port["port"]; hasPort {
-			portNumber, ok := asInt(port["port"])
-			if !ok {
-				return nil, fmt.Errorf("port %q has non-numeric port", name)
-			}
-			if portNumber < 1 || portNumber > 65535 {
-				return nil, fmt.Errorf("port %q has invalid port %d", name, portNumber)
-			}
+		rawPortNumber, hasPort := port["port"]
+		if !hasPort {
+			return nil, fmt.Errorf("port %q missing port", name)
+		}
+		portNumber, ok := asInt(rawPortNumber)
+		if !ok {
+			return nil, fmt.Errorf("port %q has non-numeric port", name)
+		}
+		if portNumber < 1 || portNumber > 65535 {
+			return nil, fmt.Errorf("port %q has invalid port %d", name, portNumber)
 		}
 	}
 	return names, nil

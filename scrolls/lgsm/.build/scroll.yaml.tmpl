@@ -5,21 +5,16 @@ app_version: {{ .Version }}
 keepAlivePPM: {{ or .Vars.ppm 5 }}
 {{- if .ChunksYaml }}
 {{ .ChunksYaml }}{{- end }}
-{{- if or .Vars.lua_query_game_name .Vars.main_port_protocol .Vars.rcon_port }}
+{{- $queryPort := or .Vars.lua_query_port "query" }}
+{{- if .Ports }}
 ports:
-{{- if .Vars.lua_query_game_name }}
-- name: {{ or .Vars.lua_query_port  "query" }}
-  protocol: udp
-  description: Steam Query Port. Use this to connect via the Steam client.
+{{- range .Ports }}
+- name: {{ .Name }}
+  protocol: {{ .Protocol }}
+  port: {{ .Port }}
+{{- if .Description }}
+  description: {{ .Description }}
 {{- end }}
-{{- if .Vars.main_port_protocol }}
-- name: main
-  description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
-  protocol: {{ .Vars.main_port_protocol }}
-{{- end }}
-{{- if .Vars.rcon_port }}
-- name: rcon
-  protocol: tcp
 {{- end }}
 {{- end }}
 commands:
@@ -32,10 +27,10 @@ commands:
       image: {{ .ColdstarterImage }}
       expectedPorts:
 {{- if .Vars.lua_query_game_name }}
-      - name: {{ or .Vars.lua_query_port  "query" }}
+      - name: {{ $queryPort }}
         keepAliveTraffic: 10kb/5m
 {{- end }}
-{{- if .Vars.main_port_protocol }}
+{{- if and .Vars.main_port_protocol (ne $queryPort "main") }}
       - name: main
         keepAliveTraffic: 10kb/5m
 {{- end }}
@@ -49,7 +44,7 @@ commands:
       env:
         DRUID_ROOT: "/runtime"
 {{- if .Vars.lua_query_game_name }}
-        DRUID_PORT_{{ upper (or .Vars.lua_query_port "query") }}_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_PORT_{{ upper $queryPort }}_COLDSTARTER: "packet_handler/query.lua"
         DRUID_COLDSTARTER_VAR_{{ env "GameName" }}: "{{ .Vars.lua_query_game_name }}"
         DRUID_COLDSTARTER_VAR_{{ env "GameSteamFolder" }}: "{{ .Vars.lua_query_folder }}"
         DRUID_COLDSTARTER_VAR_{{ env "GameSteamId" }}: "0"
@@ -71,7 +66,7 @@ commands:
         DRUID_COLDSTARTER_VAR_{{ env "SteamAppId" }}: "{{ .Vars.lua_steam_app_id }}"
 {{- end }}
 {{- end }}
-{{- if .Vars.main_port_protocol }}
+{{- if and .Vars.main_port_protocol (not (and .Vars.lua_query_game_name (eq $queryPort "main"))) }}
         DRUID_PORT_MAIN_COLDSTARTER: "generic"
 {{- end }}
 {{- if .Vars.rcon_port }}
@@ -83,10 +78,10 @@ commands:
       image: {{ .SteamImage }}
       expectedPorts:
 {{- if .Vars.lua_query_game_name }}
-      - name: {{ or .Vars.lua_query_port  "query" }}
+      - name: {{ $queryPort }}
         keepAliveTraffic: 10kb/5m
 {{- end }}
-{{- if .Vars.main_port_protocol }}
+{{- if and .Vars.main_port_protocol (ne $queryPort "main") }}
       - name: main
         keepAliveTraffic: 10kb/5m
 {{- end }}
