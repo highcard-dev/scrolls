@@ -16,7 +16,7 @@ commands:
     run: restart
     procedures:
     - id: coldstart
-      image: artifacts.druid.gg/druid-team/druid:v0.1.243
+      image: artifacts.druid.gg/druid-team/druid:v0.1.245
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
@@ -29,7 +29,7 @@ commands:
         DRUID_PORT_MAIN_COLDSTARTER: "packet_handler/minecraft.lua"
       command:
       - druid-coldstarter
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.243
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.245
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -51,7 +51,7 @@ commands:
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.243
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.245
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -61,7 +61,7 @@ commands:
       - "-O"
       - Cuberite.tar.gz
       - https://download.cuberite.org/linux-x86_64/Cuberite.tar.gz
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.243
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.245
       mounts:
       - path: "/server"
       working_dir: "/server"

@@ -16,7 +16,7 @@ commands:
     run: restart
     procedures:
     - id: coldstart
-      image: artifacts.druid.gg/druid-team/druid:v0.1.243
+      image: artifacts.druid.gg/druid-team/druid:v0.1.245
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
