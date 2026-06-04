@@ -1,1 +1,0 @@
-startparameters="-servername ${selfname} -adminpassword {{ randAlphaNum 20  }} -port {{ env "DRUID_PORT_MAIN_1" | default "16261" }} -udpport {{ env "DRUID_PORT_MAIN2_1" | default "16262" }}"
