@@ -20,6 +20,7 @@ commands:
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
+      - name: webpanel
       mounts:
       - path: "/runtime"
         sub_path: "."
@@ -27,6 +28,7 @@ commands:
       env:
         DRUID_ROOT: "/runtime"
         DRUID_PORT_MAIN_COLDSTARTER: "packet_handler/minecraft.lua"
+        DRUID_PORT_WEBPANEL_COLDSTARTER: "generic"
       command:
       - druid-coldstarter
     - image: artifacts.druid.gg/druid-team/druid:v0.1.246
