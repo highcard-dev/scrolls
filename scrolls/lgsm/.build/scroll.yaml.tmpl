@@ -92,7 +92,11 @@ commands:
       command:
       - sh
       - -lc
+{{- if eq .Version "pzserver" }}
+      - sh configure-pzserver.sh && ./{{ .Version }} start && exec ./{{ .Version }} console
+{{- else }}
       - ./{{ .Version }} start && exec ./{{ .Version }} console
+{{- end }}
   start:
     needs:
     - install
@@ -110,8 +114,14 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+{{- if eq .Version "pzserver" }}
+      - sh
+      - -lc
+      - sh configure-pzserver.sh && ./{{ .Version }} start
+{{- else }}
       - ./{{ .Version }}
       - start
+{{- end }}
   stop:
     run: always
     procedures:

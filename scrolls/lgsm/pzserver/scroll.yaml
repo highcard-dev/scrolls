@@ -53,7 +53,7 @@ commands:
       command:
       - sh
       - -lc
-      - ./pzserver start && exec ./pzserver console
+      - sh configure-pzserver.sh && ./pzserver start && exec ./pzserver console
   start:
     needs:
     - install
@@ -71,8 +71,9 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
-      - ./pzserver
-      - start
+      - sh
+      - -lc
+      - sh configure-pzserver.sh && ./pzserver start
   stop:
     run: always
     procedures:
