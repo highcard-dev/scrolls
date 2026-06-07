@@ -178,6 +178,7 @@ function handle(ctx, data)
     end
 
     debug_print("Unknown Packet: " .. hex)
+    finish()
 
 end
 
