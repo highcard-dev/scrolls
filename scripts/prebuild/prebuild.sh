@@ -7,8 +7,8 @@ targets="${1:-all-steam}"
 : "${SCROLL_REGISTRY_USER:?SCROLL_REGISTRY_USER is required}"
 : "${SCROLL_REGISTRY_PASSWORD:?SCROLL_REGISTRY_PASSWORD is required}"
 
-export DRUID_RUNTIME_IMAGE="${DRUID_RUNTIME_IMAGE:-artifacts.druid.gg/druid-team/druid:v0.1.246}"
-export DRUID_STEAM_RUNTIME_IMAGE="${DRUID_STEAM_RUNTIME_IMAGE:-artifacts.druid.gg/druid-team/druid:v0.1.246-steamcmd}"
+export DRUID_RUNTIME_IMAGE="${DRUID_RUNTIME_IMAGE:-artifacts.druid.gg/druid-team/druid:v0.1.247}"
+export DRUID_STEAM_RUNTIME_IMAGE="${DRUID_STEAM_RUNTIME_IMAGE:-artifacts.druid.gg/druid-team/druid:v0.1.247-steamcmd}"
 export PREBUILD_DOCKER_PLATFORM="${PREBUILD_DOCKER_PLATFORM:-linux/amd64}"
 
 echo "Targets: ${targets}"
