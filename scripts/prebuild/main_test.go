@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 func TestPrebuildCommandWrapsTemplateBackedScripts(t *testing.T) {
@@ -146,5 +148,54 @@ func TestSanitizeInstalledRootKeepsInternalSymlinks(t *testing.T) {
 	}
 	if target != "shared/config.txt" {
 		t.Fatalf("link target = %q, want shared/config.txt", target)
+	}
+}
+
+func TestRewriteInstallForPrebuildMakesInstallNoop(t *testing.T) {
+	root := t.TempDir()
+	scrollPath := filepath.Join(root, "scroll.yaml")
+	content := []byte(`name: test
+version: 1
+app_version: test
+commands:
+  install:
+    run: once
+    procedures:
+    - image: old
+      command: ["real-install"]
+  start:
+    needs: ["install"]
+    procedures:
+    - image: old
+      command: ["start"]
+`)
+	if err := os.WriteFile(scrollPath, content, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := rewriteInstallForPrebuild(root, prebuildSpec{Image: "runtime-image"}); err != nil {
+		t.Fatal(err)
+	}
+
+	updated, err := os.ReadFile(scrollPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var scroll map[string]any
+	if err := yaml.Unmarshal(updated, &scroll); err != nil {
+		t.Fatal(err)
+	}
+	install := scroll["commands"].(map[string]any)["install"].(map[string]any)
+	procedures := install["procedures"].([]any)
+	procedure := procedures[0].(map[string]any)
+	if install["run"] != "once" {
+		t.Fatalf("install run = %v, want once", install["run"])
+	}
+	if procedure["id"] != "prebuild" || procedure["image"] != "runtime-image" {
+		t.Fatalf("procedure = %#v", procedure)
+	}
+	command := procedure["command"].([]any)
+	if len(command) != 3 || command[0] != "sh" || command[1] != "-lc" {
+		t.Fatalf("command = %#v", command)
 	}
 }

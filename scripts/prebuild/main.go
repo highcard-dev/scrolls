@@ -123,6 +123,9 @@ func runSpec(spec prebuildSpec) error {
 	if err := sanitizeInstalledRoot(root); err != nil {
 		return err
 	}
+	if err := rewriteInstallForPrebuild(root, spec); err != nil {
+		return err
+	}
 	if err := validateInstalledRoot(root); err != nil {
 		return err
 	}
@@ -484,6 +487,37 @@ func symlinkEscapesRoot(absRoot string, linkPath string, target string) bool {
 		return true
 	}
 	return rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) || filepath.IsAbs(rel)
+}
+
+func rewriteInstallForPrebuild(root string, spec prebuildSpec) error {
+	scrollPath := filepath.Join(root, "scroll.yaml")
+	content, err := os.ReadFile(scrollPath)
+	if err != nil {
+		return err
+	}
+	var scroll map[string]any
+	if err := yaml.Unmarshal(content, &scroll); err != nil {
+		return err
+	}
+	commands, ok := scroll["commands"].(map[string]any)
+	if !ok {
+		return errors.New("scroll commands are missing or malformed")
+	}
+	install, ok := commands["install"].(map[string]any)
+	if !ok {
+		return errors.New("scroll install command is missing or malformed")
+	}
+	install["run"] = "once"
+	install["procedures"] = []map[string]any{{
+		"id":      "prebuild",
+		"image":   spec.Image,
+		"command": []string{"sh", "-lc", "echo Prebuilt server data already installed"},
+	}}
+	out, err := yaml.Marshal(scroll)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(scrollPath, out, 0644)
 }
 
 func loadScroll(path string) (*scrollFile, error) {
