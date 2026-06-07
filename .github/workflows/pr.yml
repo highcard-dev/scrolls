@@ -31,10 +31,12 @@ jobs:
           make build-tree
       - name: Get registry binary
         if: github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          GH_TOKEN: ${{ secrets.GO_REPO_TOKEN }}
-        run: |
-          gh release download "$DRUID_CLI_VERSION" --repo highcard-dev/druid-cli --pattern druid --clobber
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: "highcard-dev/druid-cli"
+          tag: ${{ env.DRUID_CLI_VERSION }}
+          fileName: "druid"
+          token: ${{ secrets.GO_REPO_TOKEN }}
       - name: Install druid
         if: github.event.pull_request.head.repo.full_name == github.repository
         run: |
