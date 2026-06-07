@@ -16,8 +16,6 @@ chunks:
     path: log
   - name: postinstall
     path: postinstall.sh
-  - name: postinstall-template
-    path: postinstall.sh.scroll_template
   - name: patch-lgsm-permissions
     path: patch-lgsm-permissions.sh
   - name: serverfiles
