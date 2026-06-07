@@ -1,3 +1,0 @@
-rcon_web_rust:
-  password: {{ randAlphaNum 50  }}
-  port: 25575
