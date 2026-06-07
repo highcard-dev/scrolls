@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -eu
 
 config_file="serverfiles/game/csgo/cfg/server.cfg"
 password_file=".druid-rcon-password"
@@ -9,7 +9,11 @@ if [ -n "${CS2_RCON_PASSWORD:-}" ]; then
 elif [ -f "$password_file" ]; then
   rcon_password="$(cat "$password_file")"
 else
-  rcon_password="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 50)"
+  rcon_password="$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 50 || true)"
+  if [ "${#rcon_password}" -ne 50 ]; then
+    echo "failed to generate rcon password" >&2
+    exit 1
+  fi
   printf '%s\n' "$rcon_password" > "$password_file"
   chmod 600 "$password_file"
 fi
