@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 func TestPrebuildCommandWrapsTemplateBackedScripts(t *testing.T) {
 	entrypoint, args := prebuildCommand([]string{"bash", "postinstall.sh"})
@@ -95,5 +99,52 @@ func TestValidateRequiredEnvAcceptsPresentEnv(t *testing.T) {
 	t.Setenv("PREBUILD_TEST_REQUIRED", "present")
 	if err := validateRequiredEnv(prebuildSpec{Target: "test", RequiredEnv: []string{"PREBUILD_TEST_REQUIRED"}}); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestSanitizeInstalledRootRemovesEscapingSymlinks(t *testing.T) {
+	root := t.TempDir()
+	dataRoot := filepath.Join(root, "data")
+	if err := os.MkdirAll(filepath.Join(dataRoot, "Zomboid"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	link := filepath.Join(dataRoot, "Zomboid", "Logs")
+	if err := os.Symlink("/home/druid/Zomboid/Logs", link); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := sanitizeInstalledRoot(root); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := os.Lstat(link); !os.IsNotExist(err) {
+		t.Fatalf("escaping symlink still exists or returned unexpected error: %v", err)
+	}
+}
+
+func TestSanitizeInstalledRootKeepsInternalSymlinks(t *testing.T) {
+	root := t.TempDir()
+	dataRoot := filepath.Join(root, "data")
+	if err := os.MkdirAll(filepath.Join(dataRoot, "shared"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dataRoot, "shared", "config.txt"), []byte("ok"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	link := filepath.Join(dataRoot, "config-link")
+	if err := os.Symlink("shared/config.txt", link); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := sanitizeInstalledRoot(root); err != nil {
+		t.Fatal(err)
+	}
+
+	target, err := os.Readlink(link)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if target != "shared/config.txt" {
+		t.Fatalf("link target = %q, want shared/config.txt", target)
 	}
 }

@@ -120,6 +120,9 @@ func runSpec(spec prebuildSpec) error {
 	if err := mounts.copyBack(); err != nil {
 		return err
 	}
+	if err := sanitizeInstalledRoot(root); err != nil {
+		return err
+	}
 	if err := validateInstalledRoot(root); err != nil {
 		return err
 	}
@@ -430,6 +433,57 @@ func validateInstalledRoot(root string) error {
 		return errors.New("data directory is empty after prebuild")
 	}
 	return nil
+}
+
+func sanitizeInstalledRoot(root string) error {
+	dataRoot := filepath.Join(root, "data")
+	info, err := os.Stat(dataRoot)
+	if err != nil || !info.IsDir() {
+		return nil
+	}
+	absDataRoot, err := filepath.Abs(dataRoot)
+	if err != nil {
+		return err
+	}
+	return filepath.WalkDir(dataRoot, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.Type()&fs.ModeSymlink == 0 {
+			return nil
+		}
+		target, err := os.Readlink(path)
+		if err != nil {
+			return err
+		}
+		if !symlinkEscapesRoot(absDataRoot, path, target) {
+			return nil
+		}
+		targetInfo, statErr := os.Stat(path)
+		if err := os.Remove(path); err != nil {
+			return err
+		}
+		if statErr == nil && targetInfo.IsDir() {
+			return os.MkdirAll(path, targetInfo.Mode().Perm())
+		}
+		return nil
+	})
+}
+
+func symlinkEscapesRoot(absRoot string, linkPath string, target string) bool {
+	if filepath.IsAbs(target) {
+		return true
+	}
+	targetPath := filepath.Clean(filepath.Join(filepath.Dir(linkPath), target))
+	absTargetPath, err := filepath.Abs(targetPath)
+	if err != nil {
+		return true
+	}
+	rel, err := filepath.Rel(absRoot, absTargetPath)
+	if err != nil {
+		return true
+	}
+	return rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) || filepath.IsAbs(rel)
 }
 
 func loadScroll(path string) (*scrollFile, error) {
