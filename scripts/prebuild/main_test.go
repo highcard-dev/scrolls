@@ -89,11 +89,36 @@ func TestDayZPrebuildRequiresSteamCredentials(t *testing.T) {
 	}
 }
 
+func TestRustPrebuildPortsAreConcrete(t *testing.T) {
+	specs, err := selectSpecs("rust-vanilla,rust-oxide")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, spec := range specs {
+		for _, port := range spec.Ports {
+			if port == "main=/udp" || port == "query=/udp" || port == "rcon" || port == "rustplus" {
+				t.Fatalf("%s has non-concrete port %q", spec.Target, port)
+			}
+		}
+	}
+}
+
 func TestValidateRequiredEnvFailsBeforePrebuild(t *testing.T) {
 	t.Setenv("PREBUILD_TEST_REQUIRED", "")
 	err := validateRequiredEnv(prebuildSpec{Target: "test", RequiredEnv: []string{"PREBUILD_TEST_REQUIRED"}})
 	if err == nil {
 		t.Fatal("validateRequiredEnv returned nil, want missing env error")
+	}
+}
+
+func TestParseSizeBytesSupportsBinaryUnits(t *testing.T) {
+	got, err := parseSizeBytes("1.5Gi")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := uint64(1610612736)
+	if got != want {
+		t.Fatalf("bytes = %d, want %d", got, want)
 	}
 }
 
