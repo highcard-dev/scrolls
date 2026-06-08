@@ -220,7 +220,7 @@ func validateProcedure(root string, command string, index int, procedure map[str
 }
 
 func shouldValidateColdstarterFiles(file string) bool {
-	return strings.Contains(filepath.ToSlash(file), "/minecraft/")
+	return true
 }
 
 func requiredString(values map[string]any, key string) string {
