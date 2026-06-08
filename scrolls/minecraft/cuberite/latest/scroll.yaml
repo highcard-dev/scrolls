@@ -16,7 +16,7 @@ commands:
     run: restart
     procedures:
     - id: coldstart
-      image: artifacts.druid.gg/druid-team/druid:v0.1.248
+      image: artifacts.druid.gg/druid-team/druid:v0.1.249
       expectedPorts:
       - name: main
         keepAliveTraffic: 10kb/5m
@@ -31,7 +31,7 @@ commands:
         DRUID_PORT_WEBPANEL_COLDSTARTER: "generic"
       command:
       - druid-coldstarter
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.248
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.249
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -53,7 +53,7 @@ commands:
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.248
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.249
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -63,7 +63,7 @@ commands:
       - "-O"
       - Cuberite.tar.gz
       - https://download.cuberite.org/linux-x86_64/Cuberite.tar.gz
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.248
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.249
       mounts:
       - path: "/server"
       working_dir: "/server"
