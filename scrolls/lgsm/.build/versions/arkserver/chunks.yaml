@@ -7,6 +7,8 @@ chunks:
     path: linuxgsm.sh
   - name: lgsm
     path: lgsm
+  - name: patch-lgsm-permissions
+    path: patch-lgsm-permissions.sh
   - name: serverfiles
     path: serverfiles
     chunks:

@@ -18,6 +18,7 @@ ports:
 {{- end }}
 {{- end }}
 commands:
+{{- $keepAliveTraffic := or .Vars.keep_alive_traffic "10kb/5m" }}
   console:
     needs:
     - start
@@ -28,11 +29,11 @@ commands:
       expectedPorts:
 {{- if .Vars.lua_query_game_name }}
       - name: {{ $queryPort }}
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: {{ $keepAliveTraffic }}
 {{- end }}
 {{- if and .Vars.main_port_protocol (ne $queryPort "main") }}
       - name: main
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: {{ $keepAliveTraffic }}
 {{- end }}
 {{- if .Vars.rcon_port }}
       - name: rcon
@@ -79,11 +80,11 @@ commands:
       expectedPorts:
 {{- if .Vars.lua_query_game_name }}
       - name: {{ $queryPort }}
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: {{ $keepAliveTraffic }}
 {{- end }}
 {{- if and .Vars.main_port_protocol (ne $queryPort "main") }}
       - name: main
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: {{ $keepAliveTraffic }}
 {{- end }}
       mounts:
       - path: "/server"
