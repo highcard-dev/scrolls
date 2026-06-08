@@ -10,7 +10,7 @@ registry_host="${registry_host%%/*}"
 
 namespace="${SCROLL_REGISTRY_PR_NAMESPACE:-druid-team-experimental}"
 runtime_namespace="${SCROLL_REGISTRY_RUNTIME_NAMESPACE:-druid-team}"
-runtime_image="${DRUID_SCROLL_RUNTIME_IMAGE:-${registry_host}/${runtime_namespace}/druid:v0.1.248}"
+runtime_image="${DRUID_SCROLL_RUNTIME_IMAGE:-${registry_host}/${runtime_namespace}/druid:v0.1.249}"
 roots="${SCROLL_PR_ROOTS:-}"
 
 yaml_value() {
