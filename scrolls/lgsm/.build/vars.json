@@ -48,10 +48,12 @@
   },
   "sdtdserver": {
     "port": "query=26900/udp;main=26900/udp;main2=26902/udp;maintcp=26900",
+    "lua_query_port": "main",
     "lua_query_game_name": "7 Days To Die",
     "lua_query_folder": "7DTD",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
+    "lua_query_start_on_unknown_packet": "yes",
     "main_port_protocol": "udp",
     "lua_steam_app_id": "251570",
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
