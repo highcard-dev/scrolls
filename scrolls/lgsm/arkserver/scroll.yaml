@@ -66,9 +66,9 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:v0.1.248
       expectedPorts:
       - name: query
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: 1mb/5m
       - name: main
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: 1mb/5m
       - name: rcon
       mounts:
       - path: "/runtime"
@@ -91,9 +91,9 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:v0.1.248-steamcmd
       expectedPorts:
       - name: query
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: 1mb/5m
       - name: main
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: 1mb/5m
       mounts:
       - path: "/server"
       working_dir: "/server"
