@@ -27,8 +27,6 @@ commands:
     - id: coldstart
       image: artifacts.druid.gg/druid-team/druid:v0.1.248
       expectedPorts:
-      - name: query
-        keepAliveTraffic: 10kb/5m
       - name: main
         keepAliveTraffic: 10kb/5m
       mounts:
@@ -37,21 +35,19 @@ commands:
       working_dir: "/runtime"
       env:
         DRUID_ROOT: "/runtime"
-        DRUID_PORT_QUERY_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_PORT_MAIN_COLDSTARTER: "packet_handler/query.lua"
         DRUID_COLDSTARTER_VAR_GAME_NAME: "Counter-Strike: Global Offensive"
         DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "csgo"
         DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
         DRUID_COLDSTARTER_VAR_MAP_NAME: "server idle"
         DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid.gg Server (idle) - join to start"
+        DRUID_COLDSTARTER_VAR_START_ON_UNKNOWN_PACKET: "yes"
         DRUID_COLDSTARTER_VAR_STEAM_APP_ID: "730"
-        DRUID_PORT_MAIN_COLDSTARTER: "generic"
       command:
       - druid-coldstarter
     - id: start
       image: artifacts.druid.gg/druid-team/druid:v0.1.248-steamcmd
       expectedPorts:
-      - name: query
-        keepAliveTraffic: 10kb/5m
       - name: main
         keepAliveTraffic: 10kb/5m
       mounts:

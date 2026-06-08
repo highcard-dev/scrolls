@@ -78,7 +78,8 @@
     "lua_query_folder": "csgo",
     "lua_query_map": "server idle",
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
-    "main_port_protocol": "udp",
+    "lua_query_port": "main",
+    "lua_query_start_on_unknown_packet": "yes",
     "ppm": "600",
     "lua_steam_app_id": "730",
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
