@@ -57,10 +57,22 @@ jobs:
             echo "No scroll source changes; skipping preview push."
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Scroll source changed; publishing previews."
+            roots="$(
+              git diff --name-only "origin/${{ github.base_ref }}"..HEAD -- scrolls \
+                | awk -F/ '$1 == "scrolls" && $2 != "" && $3 != "" && $3 != ".build" && $3 != ".sample" { print "./"$1"/"$2"/"$3 }' \
+                | sort -u \
+                | tr '\n' ' '
+            )"
+            echo "roots=${roots}" >> "$GITHUB_OUTPUT"
+            if [ -n "$roots" ]; then
+              echo "Scroll source changed; publishing previews for: ${roots}"
+            else
+              echo "Scroll source changed; publishing all previews."
+            fi
           fi
       - name: Push experimental PR tags
         if: github.event.pull_request.head.repo.full_name == github.repository && steps.scroll-changes.outputs.changed == 'true'
         env:
           SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
+          SCROLL_PR_ROOTS: ${{ steps.scroll-changes.outputs.roots }}
         run: ./scripts/push.sh "${{ github.event.pull_request.number }}"

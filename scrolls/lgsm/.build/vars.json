@@ -61,6 +61,7 @@
   "dayzserver": {
     "port": "main=2302/udp;battle-eye=2304/udp;query=27016/udp",
     "main_port_protocol": "udp",
+    "keep_alive_traffic": "10kb/5m",
     "lua_steam_app_id": "221100",
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   },
