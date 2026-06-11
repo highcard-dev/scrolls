@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+go run ./scripts/validate-release-workflow
+
 if command -v druid >/dev/null 2>&1 && druid validate --help >/dev/null 2>&1; then
   while IFS= read -r file; do
     dir="${file%/scroll.yaml}"

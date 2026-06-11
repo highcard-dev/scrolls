@@ -3,6 +3,31 @@ desc: pzserver
 version: 0.0.2
 app_version: pzserver
 keepAlivePPM: 5
+chunks:
+  - name: configure-pzserver
+    path: configure-pzserver.sh
+  - name: install-lgsm
+    path: install-lgsm.sh
+  - name: lgsm
+    path: lgsm
+  - name: linuxgsm
+    path: linuxgsm.sh
+  - name: log
+    path: log
+  - name: patch-lgsm-permissions
+    path: patch-lgsm-permissions.sh
+  - name: pzserver
+    path: pzserver
+  - name: serverfiles
+    path: serverfiles
+    chunks:
+      - name: media
+        path: media
+      - name: steamapps
+        path: steamapps
+      - name: zombie
+        path: zombie
+
 ports:
 - name: main
   protocol: udp
