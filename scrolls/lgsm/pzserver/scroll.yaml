@@ -50,6 +50,9 @@ commands:
       expectedPorts:
       - name: main
         keepAliveTraffic: 1mb/5m
+      - name: main2
+        keepAliveTraffic: 1mb/5m
+      - name: maintcp
       mounts:
       - path: "/runtime"
         sub_path: "."
@@ -64,6 +67,8 @@ commands:
         DRUID_COLDSTARTER_VAR_SERVER_LIST_NAME: "Druid.gg Server (idle) - join to start"
         DRUID_COLDSTARTER_VAR_START_ON_UNKNOWN_PACKET: "yes"
         DRUID_COLDSTARTER_VAR_STEAM_APP_ID: "108600"
+        DRUID_PORT_MAIN2_COLDSTARTER: "generic"
+        DRUID_PORT_MAINTCP_COLDSTARTER: "generic"
       command:
       - druid-coldstarter
     - id: start
@@ -71,6 +76,9 @@ commands:
       expectedPorts:
       - name: main
         keepAliveTraffic: 1mb/5m
+      - name: main2
+        keepAliveTraffic: 1mb/5m
+      - name: maintcp
       mounts:
       - path: "/server"
       working_dir: "/server"

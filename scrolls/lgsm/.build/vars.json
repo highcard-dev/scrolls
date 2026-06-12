@@ -107,6 +107,8 @@
     "lua_query_servername": "Druid.gg Server (idle) - join to start",
     "lua_query_port": "main",
     "lua_query_start_on_unknown_packet": "yes",
+    "extra_expected_keepalive_ports": "main2",
+    "extra_expected_ports": "maintcp",
     "lua_steam_app_id": "108600",
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   }

@@ -35,6 +35,17 @@ commands:
       - name: main
         keepAliveTraffic: {{ $keepAliveTraffic }}
 {{- end }}
+{{- if .Vars.extra_expected_keepalive_ports }}
+{{- range split ";" .Vars.extra_expected_keepalive_ports }}
+      - name: {{ . }}
+        keepAliveTraffic: {{ $keepAliveTraffic }}
+{{- end }}
+{{- end }}
+{{- if .Vars.extra_expected_ports }}
+{{- range split ";" .Vars.extra_expected_ports }}
+      - name: {{ . }}
+{{- end }}
+{{- end }}
 {{- if .Vars.rcon_port }}
       - name: rcon
 {{- end }}
@@ -73,6 +84,16 @@ commands:
 {{- if .Vars.rcon_port }}
         DRUID_PORT_RCON_COLDSTARTER: "generic"
 {{- end }}
+{{- if .Vars.extra_expected_keepalive_ports }}
+{{- range split ";" .Vars.extra_expected_keepalive_ports }}
+        DRUID_PORT_{{ upper . }}_COLDSTARTER: "generic"
+{{- end }}
+{{- end }}
+{{- if .Vars.extra_expected_ports }}
+{{- range split ";" .Vars.extra_expected_ports }}
+        DRUID_PORT_{{ upper . }}_COLDSTARTER: "generic"
+{{- end }}
+{{- end }}
       command:
       - druid-coldstarter
     - id: start
@@ -85,6 +106,17 @@ commands:
 {{- if and .Vars.main_port_protocol (ne $queryPort "main") }}
       - name: main
         keepAliveTraffic: {{ $keepAliveTraffic }}
+{{- end }}
+{{- if .Vars.extra_expected_keepalive_ports }}
+{{- range split ";" .Vars.extra_expected_keepalive_ports }}
+      - name: {{ . }}
+        keepAliveTraffic: {{ $keepAliveTraffic }}
+{{- end }}
+{{- end }}
+{{- if .Vars.extra_expected_ports }}
+{{- range split ";" .Vars.extra_expected_ports }}
+      - name: {{ . }}
+{{- end }}
 {{- end }}
       mounts:
       - path: "/server"
