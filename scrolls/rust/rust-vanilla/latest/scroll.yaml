@@ -29,6 +29,8 @@ commands:
         keepAliveTraffic: 500kb/5m
       - name: query
         keepAliveTraffic: 500kb/5m
+      - name: rustplus
+        keepAliveTraffic: 500kb/5m
       mounts:
       - path: "/runtime"
         sub_path: "."
@@ -37,6 +39,7 @@ commands:
         DRUID_ROOT: "/runtime"
         DRUID_PORT_MAIN_COLDSTARTER: "generic"
         DRUID_PORT_QUERY_COLDSTARTER: "packet_handler/query.lua"
+        DRUID_PORT_RUSTPLUS_COLDSTARTER: "generic"
         DRUID_COLDSTARTER_VAR_GAME_NAME: "Rust"
         DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "rust"
         DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
