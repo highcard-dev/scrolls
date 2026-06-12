@@ -1,15 +1,15 @@
 set -e
 
+rm -rf LinuxGSM-master
 wget https://codeload.github.com/GameServerManagers/LinuxGSM/tar.gz/refs/heads/master -O lgsm.tar.gz
 tar -xzf lgsm.tar.gz
 
-#recreate lgsm dir
-#rm -rf lgsm
 mkdir -p lgsm
 
-
+rm -f linuxgsm.sh
+rm -rf lgsm/modules
 mv LinuxGSM-master/linuxgsm.sh .
-mv LinuxGSM-master/lgsm/modules/ lgsm
+mv LinuxGSM-master/lgsm/modules lgsm/modules
 chmod -R +x lgsm/modules/
 
 rm -rf LinuxGSM-master
