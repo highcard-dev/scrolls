@@ -49,9 +49,9 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:v0.1.249
       expectedPorts:
       - name: main
-        keepAliveTraffic: 1mb/30m
+        keepAliveTraffic: 6mb/30m
       - name: main2
-        keepAliveTraffic: 1mb/30m
+        keepAliveTraffic: 6mb/30m
       - name: maintcp
       mounts:
       - path: "/runtime"
@@ -75,9 +75,9 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
       expectedPorts:
       - name: main
-        keepAliveTraffic: 1mb/30m
+        keepAliveTraffic: 6mb/30m
       - name: main2
-        keepAliveTraffic: 1mb/30m
+        keepAliveTraffic: 6mb/30m
       - name: maintcp
       mounts:
       - path: "/server"

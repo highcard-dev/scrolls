@@ -25,7 +25,7 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:v0.1.249
       expectedPorts:
       - name: main
-        keepAliveTraffic: 10kb/30m
+        keepAliveTraffic: 60kb/30m
       mounts:
       - path: "/runtime"
         sub_path: "."
@@ -39,7 +39,7 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
       expectedPorts:
       - name: main
-        keepAliveTraffic: 10kb/30m
+        keepAliveTraffic: 60kb/30m
       mounts:
       - path: "/server"
       working_dir: "/server"

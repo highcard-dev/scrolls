@@ -19,7 +19,7 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:v0.1.249
       expectedPorts:
       - name: main
-        keepAliveTraffic: 10kb/30m
+        keepAliveTraffic: 6mb/30m
       - name: webpanel
       mounts:
       - path: "/runtime"
@@ -41,9 +41,9 @@ commands:
       id: start
       expectedPorts:
       - name: main
-        keepAliveTraffic: 10kb/30m
+        keepAliveTraffic: 6mb/30m
       - name: webpanel
-        keepAliveTraffic: 10kb/30m
+        keepAliveTraffic: 6mb/30m
   stop:
     procedures:
     - type: signal
