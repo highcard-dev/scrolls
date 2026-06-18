@@ -34,7 +34,7 @@ commands:
       image: eclipse-temurin:17-jre
       expectedPorts:
       - name: main
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: 10kb/30m
       - name: rcon
       mounts:
       - path: "/server"

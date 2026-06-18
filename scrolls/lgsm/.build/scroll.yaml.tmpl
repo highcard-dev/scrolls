@@ -18,7 +18,7 @@ ports:
 {{- end }}
 {{- end }}
 commands:
-{{- $keepAliveTraffic := or .Vars.keep_alive_traffic "1mb/5m" }}
+{{- $keepAliveTraffic := or .Vars.keep_alive_traffic "1mb/30m" }}
   console:
     needs:
     - start

@@ -28,7 +28,7 @@
   "pwserver": {
     "port": "main=8211/udp;rcon=25575",
     "main_port_protocol": "udp",
-    "keep_alive_traffic": "1mb/5m",
+    "keep_alive_traffic": "1mb/30m",
     "lua_steam_app_id": "1623730",
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   },
@@ -61,7 +61,7 @@
   "dayzserver": {
     "port": "main=2302/udp;battle-eye=2304/udp;query=27016/udp",
     "main_port_protocol": "udp",
-    "keep_alive_traffic": "10kb/5m",
+    "keep_alive_traffic": "10kb/30m",
     "lua_steam_app_id": "221100",
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   },
@@ -100,7 +100,7 @@
   },
   "pzserver": {
     "port": "main=16261/udp;main2=16262/udp;maintcp=16261",
-    "keep_alive_traffic": "1mb/5m",
+    "keep_alive_traffic": "1mb/30m",
     "lua_query_game_name": "Project Zomboid",
     "lua_query_folder": "zomboid",
     "lua_query_map": "server idle",
