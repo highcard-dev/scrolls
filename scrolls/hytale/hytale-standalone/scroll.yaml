@@ -54,6 +54,6 @@ commands:
       id: start
       expectedPorts:
       - name: main
-        keepAliveTraffic: 10kb/5m
+        keepAliveTraffic: 60kb/30m
     run: restart
 serve: start

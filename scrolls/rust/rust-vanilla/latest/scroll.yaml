@@ -26,11 +26,11 @@ commands:
       image: artifacts.druid.gg/druid-team/druid:v0.1.249
       expectedPorts:
       - name: main
-        keepAliveTraffic: 500kb/5m
+        keepAliveTraffic: 3mb/30m
       - name: query
-        keepAliveTraffic: 500kb/5m
+        keepAliveTraffic: 3mb/30m
       - name: rustplus
-        keepAliveTraffic: 500kb/5m
+        keepAliveTraffic: 3mb/30m
       mounts:
       - path: "/runtime"
         sub_path: "."
@@ -59,11 +59,11 @@ commands:
       id: start
       expectedPorts:
       - name: main
-        keepAliveTraffic: 500kb/5m
+        keepAliveTraffic: 3mb/30m
       - name: query
-        keepAliveTraffic: 500kb/5m
+        keepAliveTraffic: 3mb/30m
       - name: rustplus
-        keepAliveTraffic: 500kb/5m
+        keepAliveTraffic: 3mb/30m
   stop:
     procedures:
     - type: signal
