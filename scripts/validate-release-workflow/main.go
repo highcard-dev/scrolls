@@ -27,7 +27,7 @@ var (
 )
 
 func main() {
-	path := ".github/workflows/release.yml"
+	path := "scripts/push.sh"
 	if len(os.Args) > 1 {
 		path = os.Args[1]
 	}
