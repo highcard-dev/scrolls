@@ -92,7 +92,7 @@ assert_equals "$expected_artifacts" "$actual_artifacts" \
   "parallel mode must invoke every artifact push exactly once"
 
 last_category_end="$(grep -n '^end category ' "$tmp_dir/state/events.log" | tail -n 1 | cut -d: -f1)"
-first_artifact_start="$(grep -n '^start artifact ' "$tmp_dir/state/events.log" | head -n 1 | cut -d: -f1)"
+first_artifact_start="$(grep -m 1 -n '^start artifact ' "$tmp_dir/state/events.log" | cut -d: -f1)"
 ((last_category_end < first_artifact_start)) || \
   fail "artifact pushes started before all category pushes completed"
 
