@@ -16,6 +16,12 @@ SCROLL_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD:-}"
 DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.249}"
 SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
+SCROLL_PUSH_JOBS="${SCROLL_PUSH_JOBS:-1}"
+
+if [[ ! "$SCROLL_PUSH_JOBS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "SCROLL_PUSH_JOBS must be a positive integer (got: $SCROLL_PUSH_JOBS)" >&2
+  exit 2
+fi
 
 # Used by PR CI to publish the same catalog as preview tags, for example:
 # SCROLL_REGISTRY_NAMESPACE=druid-team-experimental SCROLL_TAG_SUFFIX=-pr123.
@@ -29,6 +35,28 @@ runtime_namespace="${SCROLL_REGISTRY_RUNTIME_NAMESPACE:-${SCROLL_REGISTRY_NAMESP
 runtime_prefix="${registry_host}/${runtime_namespace}"
 runtime_image="${DRUID_SCROLL_RUNTIME_IMAGE:-${runtime_prefix}/druid:${DRUID_CLI_VERSION}}"
 steamcmd_image="${DRUID_SCROLL_STEAMCMD_IMAGE:-${runtime_image}-steamcmd}"
+
+push_pids=()
+push_phase_failed=0
+
+wait_for_oldest_push() {
+  local pid="${push_pids[0]}"
+
+  if ! wait "$pid"; then
+    push_phase_failed=1
+  fi
+  push_pids=("${push_pids[@]:1}")
+}
+
+wait_for_push_phase() {
+  while ((${#push_pids[@]} > 0)); do
+    wait_for_oldest_push
+  done
+
+  local failed="$push_phase_failed"
+  push_phase_failed=0
+  return "$failed"
+}
 
 login_if_configured() {
   if [[ "$SCROLL_PUSH_DRY_RUN" = "1" ]]; then
@@ -68,7 +96,17 @@ run() {
   if [[ "$SCROLL_PUSH_DRY_RUN" = "1" ]]; then
     return 0
   fi
-  eval "$command"
+
+  if ((SCROLL_PUSH_JOBS == 1)); then
+    eval "$command"
+    return
+  fi
+
+  eval "$command" &
+  push_pids+=("$!")
+  if ((${#push_pids[@]} >= SCROLL_PUSH_JOBS)); then
+    wait_for_oldest_push
+  fi
 }
 
 push_release_categories() {
@@ -193,8 +231,16 @@ login_if_configured
 
 if [[ "$SCROLL_PUSH_CATEGORIES" = "1" ]]; then
   push_release_categories
+  if ! wait_for_push_phase; then
+    echo "One or more category pushes failed." >&2
+    exit 1
+  fi
 fi
 
 if [[ "$SCROLL_PUSH_ARTIFACTS" = "1" ]]; then
   push_release_artifacts
+  if ! wait_for_push_phase; then
+    echo "One or more artifact pushes failed." >&2
+    exit 1
+  fi
 fi
