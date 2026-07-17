@@ -237,6 +237,9 @@ func ParsePorts(spec string) []PortSpec {
 		if protocol == "" {
 			protocol = "tcp"
 		}
+		if port == "0" {
+			port = ""
+		}
 		ports = append(ports, PortSpec{
 			Name:        name,
 			Port:        port,
