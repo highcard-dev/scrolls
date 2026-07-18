@@ -19,9 +19,8 @@ var (
 	}
 	portOverrideNamePattern = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_-]*$`)
 	pzserverRequiredPorts   = map[string]string{
-		"main":    "16261/udp",
-		"main2":   "16262/udp",
-		"maintcp": "16261",
+		"main":  "/udp",
+		"main2": "/udp",
 	}
 )
 
