@@ -47,15 +47,12 @@ chunks:
 ports:
 - name: main
   protocol: udp
-  port: 7777
   description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
 - name: query
   protocol: udp
-  port: 27015
   description: Steam Query Port. Use this to connect via the Steam client.
 - name: rcon
   protocol: tcp
-  port: 27020
 commands:
   console:
     needs:
@@ -94,6 +91,7 @@ commands:
         keepAliveTraffic: 6mb/30m
       - name: main
         keepAliveTraffic: 6mb/30m
+      - name: rcon
       mounts:
       - path: "/server"
       working_dir: "/server"

@@ -89,17 +89,47 @@ func TestDayZPrebuildRequiresSteamCredentials(t *testing.T) {
 	}
 }
 
-func TestRustPrebuildPortsAreConcrete(t *testing.T) {
+func TestRustPrebuildPortsAreDynamic(t *testing.T) {
 	specs, err := selectSpecs("rust-vanilla,rust-oxide")
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, spec := range specs {
-		for _, port := range spec.Ports {
-			if port == "main=/udp" || port == "query=/udp" || port == "rcon" || port == "rustplus" {
-				t.Fatalf("%s has non-concrete port %q", spec.Target, port)
+		want := []string{"main=/udp", "query=/udp", "rcon", "rustplus"}
+		if len(spec.Ports) != len(want) {
+			t.Fatalf("%s ports = %#v", spec.Target, spec.Ports)
+		}
+		for index := range want {
+			if spec.Ports[index] != want[index] {
+				t.Fatalf("%s ports = %#v, want %#v", spec.Target, spec.Ports, want)
 			}
 		}
+	}
+}
+
+func TestSharedPortPrebuildsRemainConcrete(t *testing.T) {
+	tests := []struct {
+		target string
+		want   []string
+	}{
+		{target: "cs2server", want: []string{"main=27015/udp", "rcon=27015"}},
+		{target: "pzserver", want: []string{"main=16261/udp", "main2=16262/udp", "maintcp=16261"}},
+	}
+	for _, test := range tests {
+		t.Run(test.target, func(t *testing.T) {
+			specs, err := selectSpecs(test.target)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(specs) != 1 || len(specs[0].Ports) != len(test.want) {
+				t.Fatalf("specs = %#v", specs)
+			}
+			for index := range test.want {
+				if specs[0].Ports[index] != test.want[index] {
+					t.Fatalf("ports = %#v, want %#v", specs[0].Ports, test.want)
+				}
+			}
+		})
 	}
 }
 

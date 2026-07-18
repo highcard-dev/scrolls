@@ -127,7 +127,10 @@ func validatePorts(raw any) (map[string]bool, error) {
 		}
 		rawPortNumber, hasPort := port["port"]
 		if !hasPort {
-			return nil, fmt.Errorf("port %q missing port", name)
+			if protocol == "http" || protocol == "https" {
+				return nil, fmt.Errorf("port %q uses %s and requires a fixed port", name, protocol)
+			}
+			continue
 		}
 		portNumber, ok := asInt(rawPortNumber)
 		if !ok {

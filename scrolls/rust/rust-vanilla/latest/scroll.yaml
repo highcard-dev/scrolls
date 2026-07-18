@@ -5,17 +5,13 @@ app_version: latest
 ports:
 - name: main
   protocol: udp
-  port: 28015
 - name: query
   protocol: udp
   description: Steam Query Port. Use this to connect via the Steam client.
-  port: 28017
 - name: rustplus
   protocol: tcp
-  port: 28082
 - name: rcon
   protocol: tcp
-  port: 28016
 commands:
   start:
     needs:
@@ -31,6 +27,7 @@ commands:
         keepAliveTraffic: 3mb/30m
       - name: rustplus
         keepAliveTraffic: 3mb/30m
+      - name: rcon
       mounts:
       - path: "/runtime"
         sub_path: "."
@@ -40,6 +37,7 @@ commands:
         DRUID_PORT_MAIN_COLDSTARTER: "generic"
         DRUID_PORT_QUERY_COLDSTARTER: "packet_handler/query.lua"
         DRUID_PORT_RUSTPLUS_COLDSTARTER: "generic"
+        DRUID_PORT_RCON_COLDSTARTER: "generic"
         DRUID_COLDSTARTER_VAR_GAME_NAME: "Rust"
         DRUID_COLDSTARTER_VAR_GAME_STEAM_FOLDER: "rust"
         DRUID_COLDSTARTER_VAR_GAME_STEAM_ID: "0"
@@ -64,6 +62,7 @@ commands:
         keepAliveTraffic: 3mb/30m
       - name: rustplus
         keepAliveTraffic: 3mb/30m
+      - name: rcon
   stop:
     procedures:
     - type: signal

@@ -11,7 +11,9 @@ ports:
 {{- range .Ports }}
 - name: {{ .Name }}
   protocol: {{ .Protocol }}
+{{- if .Port }}
   port: {{ .Port }}
+{{- end }}
 {{- if .Description }}
   description: {{ .Description }}
 {{- end }}
@@ -117,6 +119,9 @@ commands:
 {{- range split ";" .Vars.extra_expected_ports }}
       - name: {{ . }}
 {{- end }}
+{{- end }}
+{{- if .Vars.rcon_port }}
+      - name: rcon
 {{- end }}
       mounts:
       - path: "/server"
