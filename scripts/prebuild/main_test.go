@@ -56,33 +56,22 @@ func TestSelectSpecsAllSteamReturnsIndependentTargets(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(specs) < 11 {
+	if len(specs) < 10 {
 		t.Fatalf("spec count = %d, want all steam targets", len(specs))
 	}
-	hasDayZ := false
 	for _, spec := range specs {
 		if spec.Target == "all-steam" {
 			t.Fatalf("all-steam should resolve to concrete targets: %#v", specs)
 		}
 		if spec.Target == "dayzserver" {
-			hasDayZ = true
+			t.Fatalf("all-steam should exclude dayzserver: %#v", specs)
 		}
-	}
-	if !hasDayZ {
-		t.Fatalf("all-steam should include dayzserver: %#v", specs)
 	}
 }
 
-func TestDayZPrebuildRequiresSteamCredentials(t *testing.T) {
-	specs, err := selectSpecs("dayzserver")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(specs) != 1 {
-		t.Fatalf("specs = %#v, want one spec", specs)
-	}
-	if len(specs[0].RequiredEnv) != 2 || specs[0].RequiredEnv[0] != "STEAM_USER" || specs[0].RequiredEnv[1] != "STEAM_PASS" {
-		t.Fatalf("required env = %#v, want STEAM_USER and STEAM_PASS", specs[0].RequiredEnv)
+func TestSelectSpecsRejectsDayZ(t *testing.T) {
+	if _, err := selectSpecs("dayzserver"); err == nil {
+		t.Fatal("selectSpecs(dayzserver) returned nil error")
 	}
 }
 
