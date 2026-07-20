@@ -15,6 +15,13 @@ import (
 var envNamePattern = regexp.MustCompile(`^[A-Z][A-Z0-9_]*$`)
 
 func main() {
+	legacyTemplates, err := findLegacyRuntimeTemplates(".")
+	if err != nil {
+		fail(err)
+	}
+	if len(legacyTemplates) > 0 {
+		fail(fmt.Errorf("legacy .scroll_template files are unsupported:\n%s", strings.Join(legacyTemplates, "\n")))
+	}
 	files, err := findScrollFiles(".")
 	if err != nil {
 		fail(err)
@@ -28,6 +35,28 @@ func main() {
 			fail(fmt.Errorf("%s: %w", file, err))
 		}
 	}
+}
+
+func findLegacyRuntimeTemplates(root string) ([]string, error) {
+	var files []string
+	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			name := d.Name()
+			if name == ".git" || name == "node_modules" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if strings.HasSuffix(d.Name(), ".scroll_template") {
+			files = append(files, path)
+		}
+		return nil
+	})
+	sort.Strings(files)
+	return files, err
 }
 
 func findScrollFiles(root string) ([]string, error) {

@@ -132,6 +132,8 @@ commands:
       - -lc
 {{- if eq .Version "pzserver" }}
       - sh configure-pzserver.sh && ./{{ .Version }} start && exec ./{{ .Version }} console
+{{- else if .Vars.runtime_config_script }}
+      - sh {{ .Vars.runtime_config_script }} && ./{{ .Version }} start && exec ./{{ .Version }} console
 {{- else }}
       - ./{{ .Version }} start && exec ./{{ .Version }} console
 {{- end }}
@@ -147,6 +149,19 @@ commands:
       command:
       - ./{{ .Version }}
       - update
+{{- if .Vars.runtime_config_script }}
+    - image: {{ .SteamImage }}
+      expectedPorts:
+{{- range .Ports }}
+      - name: {{ .Name }}
+{{- end }}
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - {{ .Vars.runtime_config_script }}
+{{- end }}
     - image: {{ .SteamImage }}
       mounts:
       - path: "/server"
@@ -179,6 +194,19 @@ commands:
       command:
       - echo
       - Restarting server...
+{{- if .Vars.runtime_config_script }}
+    - image: {{ .SteamImage }}
+      expectedPorts:
+{{- range .Ports }}
+      - name: {{ .Name }}
+{{- end }}
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - {{ .Vars.runtime_config_script }}
+{{- end }}
     - image: {{ .SteamImage }}
       mounts:
       - path: "/server"
@@ -232,5 +260,18 @@ commands:
       command:
       - bash
       - postinstall.sh
+{{- end }}
+{{- if .Vars.runtime_config_script }}
+    - image: {{ .SteamImage }}
+      expectedPorts:
+{{- range .Ports }}
+      - name: {{ .Name }}
+{{- end }}
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - {{ .Vars.runtime_config_script }}
 {{- end }}
 serve: console
