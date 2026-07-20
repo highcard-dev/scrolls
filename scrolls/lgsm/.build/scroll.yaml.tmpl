@@ -261,17 +261,4 @@ commands:
       - bash
       - postinstall.sh
 {{- end }}
-{{- if .Vars.runtime_config_script }}
-    - image: {{ .SteamImage }}
-      expectedPorts:
-{{- range .Ports }}
-      - name: {{ .Name }}
-{{- end }}
-      mounts:
-      - path: "/server"
-      working_dir: "/server"
-      command:
-      - sh
-      - {{ .Vars.runtime_config_script }}
-{{- end }}
 serve: console

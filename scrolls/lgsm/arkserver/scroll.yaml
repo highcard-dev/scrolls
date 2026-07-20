@@ -205,15 +205,4 @@ commands:
       command:
       - ./arkserver
       - auto-install
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
-      expectedPorts:
-      - name: main
-      - name: query
-      - name: rcon
-      mounts:
-      - path: "/server"
-      working_dir: "/server"
-      command:
-      - sh
-      - configure-runtime.sh
 serve: console

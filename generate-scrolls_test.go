@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"slices"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -36,6 +37,15 @@ func TestGeneratedARKHandsRCONToRuntimeServer(t *testing.T) {
 		procedure := findGeneratedProcedure(t, console.Procedures, procedureID)
 		if !hasGeneratedExpectedPort(procedure.ExpectedPorts, "rcon") {
 			t.Fatalf("%s expectedPorts = %#v, want rcon", procedureID, procedure.ExpectedPorts)
+		}
+	}
+}
+
+func TestGeneratedARKDefersRuntimeConfigUntilStart(t *testing.T) {
+	scroll := readGeneratedScroll(t, "scrolls/lgsm/arkserver/scroll.yaml")
+	for _, procedure := range scroll.Commands["install"].Procedures {
+		if slices.Contains(procedure.Command, "configure-runtime.sh") {
+			t.Fatalf("install procedure runs runtime-only configuration: %#v", procedure.Command)
 		}
 	}
 }
@@ -87,6 +97,7 @@ type generatedCommand struct {
 type generatedProcedure struct {
 	ID            string                  `yaml:"id"`
 	ExpectedPorts []generatedExpectedPort `yaml:"expectedPorts"`
+	Command       []string                `yaml:"command"`
 }
 
 type generatedExpectedPort struct {
