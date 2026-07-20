@@ -10,6 +10,7 @@
     "keep_alive_traffic": "6mb/30m",
     "start_delay": "0",
     "rcon_port": "true",
+    "runtime_config_script": "configure-runtime.sh",
     "lua_steam_app_id": "346110",
     "dependencies": "bc;binutils;bzip2;cpio;file;jq;pkgsi686Linux.gcc;netcat;pigz;python3;tmux;unzip;util-linux;moreutils;iproute2"
   },

@@ -99,7 +99,7 @@ commands:
       command:
       - sh
       - -lc
-      - ./arkserver start && exec ./arkserver console
+      - sh configure-runtime.sh && ./arkserver start && exec ./arkserver console
   start:
     needs:
     - install
@@ -112,6 +112,17 @@ commands:
       command:
       - ./arkserver
       - update
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+      expectedPorts:
+      - name: main
+      - name: query
+      - name: rcon
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - configure-runtime.sh
     - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
       mounts:
       - path: "/server"
@@ -138,6 +149,17 @@ commands:
       command:
       - echo
       - Restarting server...
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+      expectedPorts:
+      - name: main
+      - name: query
+      - name: rcon
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - configure-runtime.sh
     - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
       mounts:
       - path: "/server"
@@ -183,4 +205,15 @@ commands:
       command:
       - ./arkserver
       - auto-install
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+      expectedPorts:
+      - name: main
+      - name: query
+      - name: rcon
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - configure-runtime.sh
 serve: console

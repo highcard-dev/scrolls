@@ -8,15 +8,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func TestPrebuildCommandWrapsTemplateBackedScripts(t *testing.T) {
+func TestPrebuildCommandLeavesScriptsUntouched(t *testing.T) {
 	entrypoint, args := prebuildCommand([]string{"bash", "postinstall.sh"})
-	if entrypoint != "sh" {
-		t.Fatalf("entrypoint = %q, want sh", entrypoint)
+	if entrypoint != "bash" {
+		t.Fatalf("entrypoint = %q, want bash", entrypoint)
 	}
-	if len(args) != 4 {
-		t.Fatalf("args = %#v", args)
-	}
-	if args[0] != "-lc" || args[1] != templateBackedScriptWrapper || args[2] != "bash" || args[3] != "postinstall.sh" {
+	if len(args) != 1 || args[0] != "postinstall.sh" {
 		t.Fatalf("args = %#v", args)
 	}
 }
