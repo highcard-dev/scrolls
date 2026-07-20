@@ -103,11 +103,11 @@ func main() {
 	}
 	coldstarterImage := os.Getenv("DRUID_COLDSTARTER_IMAGE")
 	if coldstarterImage == "" {
-		coldstarterImage = "artifacts.druid.gg/druid-team/druid:v0.1.249"
+		coldstarterImage = "artifacts.druid.gg/druid-team/druid:v0.1.256"
 	}
 	steamImage := os.Getenv("DRUID_STEAM_RUNTIME_IMAGE")
 	if steamImage == "" {
-		steamImage = "artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd"
+		steamImage = "artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd"
 	}
 
 	//iterate through artifacts and generate scroll.yaml files

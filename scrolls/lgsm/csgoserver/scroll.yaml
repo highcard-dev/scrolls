@@ -25,7 +25,7 @@ commands:
     run: restart
     procedures:
     - id: coldstart
-      image: artifacts.druid.gg/druid-team/druid:v0.1.249
+      image: artifacts.druid.gg/druid-team/druid:v0.1.256
       expectedPorts:
       - name: main
         keepAliveTraffic: 6mb/30m
@@ -46,7 +46,7 @@ commands:
       command:
       - druid-coldstarter
     - id: start
-      image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       expectedPorts:
       - name: main
         keepAliveTraffic: 6mb/30m
@@ -63,14 +63,14 @@ commands:
     - install
     procedures:
     - ignore_failure: true
-      image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - ./csgoserver
       - update
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -80,7 +80,7 @@ commands:
   stop:
     run: always
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -89,14 +89,14 @@ commands:
       - stop
   restart:
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - echo
       - Restarting server...
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -106,35 +106,35 @@ commands:
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - echo
       - Installing LGSM...
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - install-lgsm.sh
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - ./linuxgsm.sh
       - csgoserver
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - patch-lgsm-permissions.sh
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
