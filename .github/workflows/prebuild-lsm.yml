@@ -37,9 +37,9 @@ jobs:
       matrix:
         target: ${{ fromJson(needs.resolve-targets.outputs.targets) }}
     env:
-      DRUID_CLI_VERSION: v0.1.256
-      DRUID_RUNTIME_IMAGE: artifacts.druid.gg/druid-team/druid:v0.1.256
-      DRUID_STEAM_RUNTIME_IMAGE: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
+      DRUID_CLI_VERSION: v0.1.257
+      DRUID_RUNTIME_IMAGE: artifacts.druid.gg/druid-team/druid:v0.1.257
+      DRUID_STEAM_RUNTIME_IMAGE: artifacts.druid.gg/druid-team/druid:v0.1.257-steamcmd
       PREBUILD_DOCKER_PLATFORM: linux/amd64
     steps:
       - uses: actions/checkout@v3
