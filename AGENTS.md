@@ -13,6 +13,7 @@ Context for humans and coding agents working in this repository.
 - `.github/workflows/release.yml` installs `druid` from [highcard-dev/druid-cli](https://github.com/highcard-dev/druid-cli), validates scrolls, logs into the registry, pushes **categories**, then pushes individual scrolls.
 - When adding a new scroll family, you usually need both a **Push Categories** line (for that family’s `.meta`) and **Pushing new scrolls** lines for each version directory.
 - All production scroll/artifact changes must go through CI/CD. Do not manually push production scrolls or mutate production registry state unless explicitly authorized for an emergency; follow up with a repo change so CI is source of truth again.
+- Druid CLI production deployment is owned by the monorepo workflow `.github/workflows/redeploy-druid-cli.yml` in that repository. Never deploy it with local Helm or treat the chart in the CLI repository as the production chart.
 
 ## `druid push category` — three positional arguments
 
