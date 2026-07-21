@@ -56,6 +56,14 @@ mkdir -p "$(dirname "$instance_config")"
     printf 'publicip="%s"\n' "$DRUID_IP"
   fi
 } > "$instance_config"
+
+# LGSM replaces publicip with its cached egress address after loading config.
+if [ -n "${DRUID_IP:-}" ]; then
+  mkdir -p lgsm/tmp
+  printf '{"ip":"%s","country":"","countryCode":"","apiurl":"druid"}\n' \
+    "$DRUID_IP" > lgsm/tmp/publicip.json
+fi
+
 {
   printf 'RCONEnabled=True\n'
   printf 'RCONPort=%s\n' "$rcon_port"
