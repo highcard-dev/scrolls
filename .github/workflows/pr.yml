@@ -44,6 +44,8 @@ jobs:
           mv druid /usr/local/bin/druid
       - name: Validate all scrolls
         run: ./scripts/validate_all_scrolls.sh
+      - name: Test bounded push parallelism
+        run: bash ./scripts/tests/push-parallel.test.sh
       - name: Login to registry
         if: github.event.pull_request.head.repo.full_name == github.repository
         run: druid login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
