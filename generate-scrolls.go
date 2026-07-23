@@ -20,6 +20,8 @@ type TemplateVars struct {
 	Artifact           string
 	Version            string
 	VersionEscaped     string
+	ProgressImage      string
+	ProgressSteamImage string
 	ColdstarterImage   string
 	SteamImage         string
 	Artifacts          map[string]string
@@ -101,6 +103,14 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	progressImage := os.Getenv("DRUID_PROGRESS_RUNTIME_IMAGE")
+	if progressImage == "" {
+		progressImage = "artifacts.druid.gg/druid-team/druid:stable"
+	}
+	progressSteamImage := os.Getenv("DRUID_PROGRESS_STEAM_RUNTIME_IMAGE")
+	if progressSteamImage == "" {
+		progressSteamImage = "artifacts.druid.gg/druid-team/druid:stable-steamcmd"
+	}
 	coldstarterImage := os.Getenv("DRUID_COLDSTARTER_IMAGE")
 	if coldstarterImage == "" {
 		coldstarterImage = "artifacts.druid.gg/druid-team/druid:v0.1.256"
@@ -117,6 +127,8 @@ func main() {
 		templateVars.Artifact = artifact
 		templateVars.Version = version
 		templateVars.VersionEscaped = strings.Replace(version, ".", "-", -1)
+		templateVars.ProgressImage = progressImage
+		templateVars.ProgressSteamImage = progressSteamImage
 		templateVars.ColdstarterImage = coldstarterImage
 		templateVars.SteamImage = steamImage
 		templateVars.Artifacts = GetArtifactsAbove(version, artifacts, true)

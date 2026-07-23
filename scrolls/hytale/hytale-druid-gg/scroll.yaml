@@ -10,25 +10,33 @@ commands:
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:stable
+    - id: download-hytale-updater
+      image: artifacts.druid.gg/druid-team/druid:stable
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - wget
-      - "-q"
-      - "-O"
+      - druid
+      - progress
+      - download
+      - --output
       - update-server.sh
+      - --label
+      - Downloading Hytale updater
       - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-update-hytale-server.sh
-    - image: artifacts.druid.gg/druid-team/druid:stable
+    - id: download-hytale-launcher
+      image: artifacts.druid.gg/druid-team/druid:stable
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - wget
-      - "-q"
-      - "-O"
+      - druid
+      - progress
+      - download
+      - --output
       - start-server.sh
+      - --label
+      - Downloading Hytale launcher
       - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-start-hytale-server.sh
     - image: artifacts.druid.gg/druid-team/druid:stable
       mounts:
@@ -44,7 +52,8 @@ commands:
     needs:
     - install
     procedures:
-    - image: eclipse-temurin:25-jre
+    - id: install-hytale-server
+      image: eclipse-temurin:25-jre
       mounts:
       - path: "/server"
       working_dir: "/server"

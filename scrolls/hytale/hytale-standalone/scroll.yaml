@@ -22,7 +22,8 @@ commands:
     needs:
     - install-hsm
     procedures:
-    - image: eclipse-temurin:25-jre
+    - id: authenticate-hytale
+      image: eclipse-temurin:25-jre
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -33,7 +34,8 @@ commands:
     needs:
     - login
     procedures:
-    - image: eclipse-temurin:25-jre
+    - id: install-hytale-server
+      image: eclipse-temurin:25-jre
       mounts:
       - path: "/server"
       working_dir: "/server"

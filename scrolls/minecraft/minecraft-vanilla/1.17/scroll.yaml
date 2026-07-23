@@ -52,6 +52,20 @@ commands:
   install:
     run: once
     procedures:
+    - id: download-server-files
+      image: artifacts.druid.gg/druid-team/druid:stable
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - druid
+      - progress
+      - download
+      - --output
+      - server.jar
+      - --label
+      - Downloading Minecraft server files
+      - https://launcher.mojang.com/v1/objects/0a269b5f2c5b93b1712d0f5dc43b6182b9ab254e/server.jar
     - image: alpine:3.20
       mounts:
       - path: "/server"
@@ -59,10 +73,7 @@ commands:
       command:
       - sh
       - "-c"
-      - >-
-        apk add --no-cache ca-certificates wget
-        && wget -q -O server.jar https://launcher.mojang.com/v1/objects/0a269b5f2c5b93b1712d0f5dc43b6182b9ab254e/server.jar
-        && echo eula=true > eula.txt
+      - echo eula=true > eula.txt
   update:
     procedures:
     - image: alpine:3.20

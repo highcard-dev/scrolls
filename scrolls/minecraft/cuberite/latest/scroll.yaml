@@ -53,15 +53,19 @@ commands:
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.256
+    - id: download-server-files
+      image: artifacts.druid.gg/druid-team/druid:stable
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - wget
-      - "-q"
-      - "-O"
+      - druid
+      - progress
+      - download
+      - --output
       - Cuberite.tar.gz
+      - --label
+      - Downloading Cuberite server files
       - https://download.cuberite.org/linux-x86_64/Cuberite.tar.gz
     - image: artifacts.druid.gg/druid-team/druid:v0.1.256
       mounts:

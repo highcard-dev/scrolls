@@ -51,15 +51,19 @@ commands:
   install:
     run: once
     procedures:
-    - image: alpine:3.20
+    - id: download-server-files
+      image: artifacts.druid.gg/druid-team/druid:stable
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - wget
-      - "-q"
-      - "-O"
+      - druid
+      - progress
+      - download
+      - --output
       - paper.jar
+      - --label
+      - Downloading Minecraft server files
       - http://192.168.100.200:9000/snapshot-cache/minecraft/papermc/paper-1.19.2.jar
     - image: alpine:3.20
       mounts:

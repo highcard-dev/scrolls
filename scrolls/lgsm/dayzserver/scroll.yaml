@@ -52,11 +52,15 @@ commands:
     - install
     procedures:
     - ignore_failure: true
-      image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
+      - druid
+      - progress
+      - steamcmd
+      - --
       - ./dayzserver
       - update
     - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
@@ -102,7 +106,7 @@ commands:
       command:
       - echo
       - Installing LGSM...
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -123,11 +127,15 @@ commands:
       command:
       - sh
       - patch-lgsm-permissions.sh
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
+      - druid
+      - progress
+      - steamcmd
+      - --
       - ./dayzserver
       - auto-install
 serve: console

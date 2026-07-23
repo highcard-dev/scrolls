@@ -142,11 +142,15 @@ commands:
     - install
     procedures:
     - ignore_failure: true
-      image: {{ .SteamImage }}
+      image: {{ .ProgressSteamImage }}
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
+      - druid
+      - progress
+      - steamcmd
+      - --
       - ./{{ .Version }}
       - update
 {{- if .Vars.runtime_config_script }}
@@ -224,7 +228,7 @@ commands:
       command:
       - echo
       - Installing LGSM...
-    - image: {{ .SteamImage }}
+    - image: {{ .ProgressSteamImage }}
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -245,11 +249,15 @@ commands:
       command:
       - sh
       - patch-lgsm-permissions.sh
-    - image: {{ .SteamImage }}
+    - image: {{ .ProgressSteamImage }}
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
+      - druid
+      - progress
+      - steamcmd
+      - --
       - ./{{ .Version }}
       - auto-install
 {{- if eq .Vars.postinstall "enabled" }}

@@ -25,6 +25,6 @@ else
 fi
 
 echo "Downloading hsm ${VERSION} for ${OS}/${ARCH}..."
-wget -q -O hsm "$URL"
+druid progress download --output hsm --label "Downloading Hytale server manager" "$URL"
 chmod +x hsm
 echo "Done"

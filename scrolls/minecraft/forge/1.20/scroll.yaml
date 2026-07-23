@@ -59,17 +59,22 @@ commands:
   install:
     run: once
     procedures:
-    - image: alpine:3.20
+    - id: download-forge-installer
+      image: artifacts.druid.gg/druid-team/druid:stable
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - wget
-      - "-q"
-      - "-O"
+      - druid
+      - progress
+      - download
+      - --output
       - forge-installer.jar
+      - --label
+      - Downloading Forge installer
       - http://192.168.100.200:9000/snapshot-cache/minecraft/forge/forge-1.20.jar
-    - image: eclipse-temurin:21-jre
+    - id: install-forge-server
+      image: eclipse-temurin:21-jre
       mounts:
       - path: "/server"
       working_dir: "/server"

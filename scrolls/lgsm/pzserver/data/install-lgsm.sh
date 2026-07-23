@@ -1,7 +1,8 @@
 set -e
 
 rm -rf LinuxGSM-master
-wget https://codeload.github.com/GameServerManagers/LinuxGSM/tar.gz/refs/heads/master -O lgsm.tar.gz
+druid progress download --output lgsm.tar.gz --label "Downloading LinuxGSM" \
+  https://codeload.github.com/GameServerManagers/LinuxGSM/tar.gz/refs/heads/master
 tar -xzf lgsm.tar.gz
 
 mkdir -p lgsm

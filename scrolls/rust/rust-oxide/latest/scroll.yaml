@@ -72,11 +72,15 @@ commands:
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:stable-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
+      - druid
+      - progress
+      - steamcmd
+      - --
       - steamcmd
       - "+force_install_dir"
       - "/server"
@@ -85,14 +89,18 @@ commands:
       - "+app_update"
       - '258550'
       - "+quit"
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:stable
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
-      - wget
-      - "-O"
+      - druid
+      - progress
+      - download
+      - --output
       - oxide.zip
+      - --label
+      - Downloading Oxide server files
       - https://umod.org/games/rust/download/develop
     - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:

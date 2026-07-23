@@ -2,7 +2,10 @@ package main
 
 import (
 	"os"
+	"path/filepath"
+	"regexp"
 	"slices"
+	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -80,6 +83,65 @@ func TestGeneratedSharedPortsRemainConcrete(t *testing.T) {
 	}
 }
 
+func TestReleasedScrollsHaveTruthfulInstallProgress(t *testing.T) {
+	for _, path := range releasedScrollPaths(t) {
+		path := path
+		t.Run(path, func(t *testing.T) {
+			scroll := readGeneratedScroll(t, filepath.Join(path, "scroll.yaml"))
+			commands := allGeneratedProcedureCommands(scroll)
+			for _, command := range commands {
+				joined := strings.Join(command, " ")
+				if rawDownloadCommandPattern.MatchString(joined) &&
+					!generatedCommandHasPrefix(command, "druid", "progress") {
+					t.Fatalf("raw payload download has no structured progress: %q", joined)
+				}
+			}
+			requireCompatibleProgressImages(t, scroll)
+			rejectRawDownloadScripts(t, path)
+
+			switch {
+			case strings.Contains(path, "/lgsm/"):
+				requireGeneratedCommandPrefix(t, commands, "druid", "progress", "steamcmd", "--")
+				requireGeneratedProcedureImage(
+					t,
+					scroll,
+					[]string{"sh", "install-lgsm.sh"},
+					"artifacts.druid.gg/druid-team/druid:stable-steamcmd",
+				)
+			case strings.Contains(path, "/rust/"):
+				requireGeneratedCommandPrefix(t, commands, "druid", "progress", "steamcmd", "--")
+				if strings.Contains(path, "rust-oxide") {
+					requireGeneratedCommandPrefix(t, commands, "druid", "progress", "download")
+				}
+			case strings.Contains(path, "/minecraft/"):
+				requireGeneratedCommandPrefix(t, commands, "druid", "progress", "download")
+				if strings.Contains(path, "/forge/") {
+					findGeneratedProcedure(t, scroll.Commands["install"].Procedures, "install-forge-server")
+				}
+			case strings.Contains(path, "/hytale/hytale-druid-gg"):
+				requireGeneratedCommandPrefix(t, commands, "druid", "progress", "download")
+				findGeneratedProcedure(t, scroll.Commands["install-server"].Procedures, "install-hytale-server")
+			case strings.Contains(path, "/hytale/hytale-standalone"):
+				installScript, err := os.ReadFile(filepath.Join(path, "data", "install.sh"))
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !strings.Contains(string(installScript), "druid progress download") {
+					t.Fatal("Hytale standalone HSM download has no structured progress")
+				}
+				requireGeneratedProcedureImage(
+					t,
+					scroll,
+					[]string{"sh", "install.sh"},
+					"artifacts.druid.gg/druid-team/druid:stable",
+				)
+				findGeneratedProcedure(t, scroll.Commands["login"].Procedures, "authenticate-hytale")
+				findGeneratedProcedure(t, scroll.Commands["update"].Procedures, "install-hytale-server")
+			}
+		})
+	}
+}
+
 type generatedScroll struct {
 	Ports    []generatedPort             `yaml:"ports"`
 	Commands map[string]generatedCommand `yaml:"commands"`
@@ -96,6 +158,7 @@ type generatedCommand struct {
 
 type generatedProcedure struct {
 	ID            string                  `yaml:"id"`
+	Image         string                  `yaml:"image"`
 	ExpectedPorts []generatedExpectedPort `yaml:"expectedPorts"`
 	Command       []string                `yaml:"command"`
 }
@@ -135,4 +198,116 @@ func hasGeneratedExpectedPort(ports []generatedExpectedPort, name string) bool {
 		}
 	}
 	return false
+}
+
+func releasedScrollPaths(t *testing.T) []string {
+	t.Helper()
+	content, err := os.ReadFile("scripts/push.sh")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pattern := regexp.MustCompile(`(?m)^\s*run druid push \S+\s+(\./scrolls/\S+)`)
+	matches := pattern.FindAllStringSubmatch(string(content), -1)
+	seen := map[string]bool{}
+	paths := make([]string, 0, len(matches))
+	for _, match := range matches {
+		path := strings.TrimPrefix(match[1], "./")
+		if !seen[path] {
+			seen[path] = true
+			paths = append(paths, path)
+		}
+	}
+	if len(paths) == 0 {
+		t.Fatal("release catalog did not contain any Scroll paths")
+	}
+	return paths
+}
+
+func allGeneratedProcedureCommands(scroll generatedScroll) [][]string {
+	commands := make([][]string, 0)
+	for _, command := range scroll.Commands {
+		for _, procedure := range command.Procedures {
+			commands = append(commands, procedure.Command)
+		}
+	}
+	return commands
+}
+
+func requireGeneratedCommandPrefix(t *testing.T, commands [][]string, prefix ...string) {
+	t.Helper()
+	for _, command := range commands {
+		if generatedCommandHasPrefix(command, prefix...) {
+			return
+		}
+	}
+	t.Fatalf("no procedure command starts with %q", strings.Join(prefix, " "))
+}
+
+func generatedCommandHasPrefix(command []string, prefix ...string) bool {
+	return len(command) >= len(prefix) && slices.Equal(command[:len(prefix)], prefix)
+}
+
+func requireCompatibleProgressImages(t *testing.T, scroll generatedScroll) {
+	t.Helper()
+	for _, command := range scroll.Commands {
+		for _, procedure := range command.Procedures {
+			if !generatedCommandHasPrefix(procedure.Command, "druid", "progress") {
+				continue
+			}
+			expected := "artifacts.druid.gg/druid-team/druid:stable"
+			if len(procedure.Command) > 2 && procedure.Command[2] == "steamcmd" {
+				expected += "-steamcmd"
+			}
+			if procedure.Image != expected {
+				t.Fatalf("progress command %q uses incompatible image %q; want %q",
+					strings.Join(procedure.Command, " "), procedure.Image, expected)
+			}
+		}
+	}
+}
+
+func requireGeneratedProcedureImage(
+	t *testing.T,
+	scroll generatedScroll,
+	command []string,
+	expectedImage string,
+) {
+	t.Helper()
+	for _, scrollCommand := range scroll.Commands {
+		for _, procedure := range scrollCommand.Procedures {
+			if slices.Equal(procedure.Command, command) {
+				if procedure.Image != expectedImage {
+					t.Fatalf("command %q uses incompatible image %q; want %q",
+						strings.Join(command, " "), procedure.Image, expectedImage)
+				}
+				return
+			}
+		}
+	}
+	t.Fatalf("procedure command %q not found", strings.Join(command, " "))
+}
+
+var rawDownloadCommandPattern = regexp.MustCompile(`(^|[[:space:];|&])(wget|curl|steamcmd)([[:space:];|&]|$)`)
+
+func rejectRawDownloadScripts(t *testing.T, root string) {
+	t.Helper()
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() || filepath.Ext(path) != ".sh" {
+			return nil
+		}
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		if rawDownloadCommandPattern.Match(content) {
+			t.Fatalf("raw payload download in published script %s has no structured progress", path)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
