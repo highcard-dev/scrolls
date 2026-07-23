@@ -10,7 +10,7 @@ commands:
   install-hsm:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:stable
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.258
       mounts:
       - path: "/server"
       working_dir: "/server"

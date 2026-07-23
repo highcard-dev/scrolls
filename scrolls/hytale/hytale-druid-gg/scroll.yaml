@@ -11,7 +11,7 @@ commands:
     run: once
     procedures:
     - id: download-hytale-updater
-      image: artifacts.druid.gg/druid-team/druid:stable
+      image: artifacts.druid.gg/druid-team/druid:v0.1.258
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -25,7 +25,7 @@ commands:
       - Downloading Hytale updater
       - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-update-hytale-server.sh
     - id: download-hytale-launcher
-      image: artifacts.druid.gg/druid-team/druid:stable
+      image: artifacts.druid.gg/druid-team/druid:v0.1.258
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -38,7 +38,7 @@ commands:
       - --label
       - Downloading Hytale launcher
       - https://github.com/highcard-dev/hsm/releases/latest/download/gsp-start-hytale-server.sh
-    - image: artifacts.druid.gg/druid-team/druid:stable
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.258
       mounts:
       - path: "/server"
       working_dir: "/server"

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -106,7 +108,7 @@ func TestReleasedScrollsHaveTruthfulInstallProgress(t *testing.T) {
 					t,
 					scroll,
 					[]string{"sh", "install-lgsm.sh"},
-					"artifacts.druid.gg/druid-team/druid:stable-steamcmd",
+					"artifacts.druid.gg/druid-team/druid:v0.1.258-steamcmd",
 				)
 			case strings.Contains(path, "/rust/"):
 				requireGeneratedCommandPrefix(t, commands, "druid", "progress", "steamcmd", "--")
@@ -133,12 +135,99 @@ func TestReleasedScrollsHaveTruthfulInstallProgress(t *testing.T) {
 					t,
 					scroll,
 					[]string{"sh", "install.sh"},
-					"artifacts.druid.gg/druid-team/druid:stable",
+					"artifacts.druid.gg/druid-team/druid:v0.1.258",
 				)
 				findGeneratedProcedure(t, scroll.Commands["login"].Procedures, "authenticate-hytale")
 				findGeneratedProcedure(t, scroll.Commands["update"].Procedures, "install-hytale-server")
+			default:
+				t.Fatalf("released Scroll has no explicit HIG-24 progress classification: %s", path)
 			}
 		})
+	}
+}
+
+func TestPushRetargetsEmbeddedProgressImages(t *testing.T) {
+	if _, err := exec.LookPath("bash"); err != nil {
+		t.Skip("bash is required")
+	}
+
+	tests := []struct {
+		name          string
+		environment   []string
+		expectedImage string
+	}{
+		{
+			name: "explicit preview images",
+			environment: []string{
+				"DRUID_SCROLL_RUNTIME_IMAGE=local.example/druid:test",
+				"DRUID_SCROLL_STEAMCMD_IMAGE=local.example/druid:test-steamcmd",
+			},
+			expectedImage: "local.example/druid:test",
+		},
+		{
+			name: "plain HTTP local seed",
+			environment: []string{
+				"SCROLL_REGISTRY_HOST=http://druid-gs:8088",
+				"DRUID_REGISTRY_PLAIN_HTTP=true",
+			},
+			expectedImage: "druid:local",
+		},
+	}
+
+	for index, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			fakeDir := filepath.Join(".", fmt.Sprintf(".push-test-%d-%d", os.Getpid(), index))
+			if err := os.Mkdir(fakeDir, 0o755); err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() { _ = os.RemoveAll(fakeDir) })
+			fakeDruid := filepath.Join(fakeDir, "druid")
+			script := `#!/usr/bin/env bash
+set -euo pipefail
+if [[ "$1" != "push" || "$2" == "category" ]]; then
+  exit 0
+fi
+source_dir="$3"
+scroll="$source_dir/scroll.yaml"
+if grep -Fq 'artifacts.druid.gg/druid-team/druid:v0.1.258' "$scroll"; then
+  echo "pinned progress image leaked into packaged Scroll: $scroll" >&2
+  exit 41
+fi
+if ! grep -Fq "$EXPECTED_PROGRESS_IMAGE" "$scroll"; then
+  echo "retargeted progress image missing from packaged Scroll: $scroll" >&2
+  exit 42
+fi
+`
+			if err := os.WriteFile(fakeDruid, []byte(script), 0o755); err != nil {
+				t.Fatal(err)
+			}
+
+			command := exec.Command("bash", "scripts/push.sh")
+			command.Env = append(
+				os.Environ(),
+				"DRUID_BIN="+filepath.ToSlash(fakeDruid),
+				"SCROLL_PUSH_CATEGORIES=0",
+				"SCROLL_PUSH_ARTIFACTS=1",
+				"EXPECTED_PROGRESS_IMAGE="+test.expectedImage,
+			)
+			command.Env = append(command.Env, test.environment...)
+			output, err := command.CombinedOutput()
+			if err != nil {
+				t.Fatalf("push.sh failed: %v\n%s", err, output)
+			}
+		})
+	}
+}
+
+func TestWorkflowsUseProgressCapableCLIVersion(t *testing.T) {
+	for _, path := range []string{".github/workflows/pr.yml", ".github/workflows/release.yml"} {
+		content, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(string(content), "DRUID_CLI_VERSION: v0.1.258") {
+			t.Fatalf("%s does not use the progress-capable CLI release", path)
+		}
 	}
 }
 
@@ -254,7 +343,7 @@ func requireCompatibleProgressImages(t *testing.T, scroll generatedScroll) {
 			if !generatedCommandHasPrefix(procedure.Command, "druid", "progress") {
 				continue
 			}
-			expected := "artifacts.druid.gg/druid-team/druid:stable"
+			expected := "artifacts.druid.gg/druid-team/druid:v0.1.258"
 			if len(procedure.Command) > 2 && procedure.Command[2] == "steamcmd" {
 				expected += "-steamcmd"
 			}

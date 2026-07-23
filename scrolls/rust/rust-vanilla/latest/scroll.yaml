@@ -72,7 +72,7 @@ commands:
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.258-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"

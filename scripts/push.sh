@@ -13,7 +13,7 @@ SCROLL_REGISTRY_HOST="${SCROLL_REGISTRY_HOST:-artifacts.druid.gg}"
 SCROLL_REGISTRY_NAMESPACE="${SCROLL_REGISTRY_NAMESPACE:-druid-team}"
 SCROLL_REGISTRY_USER="${SCROLL_REGISTRY_USER:-}"
 SCROLL_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD:-}"
-DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.257}"
+DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.258}"
 SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
 
@@ -27,8 +27,16 @@ registry_host="${registry_host%%/*}"
 registry_prefix="${registry_host}/${SCROLL_REGISTRY_NAMESPACE}"
 runtime_namespace="${SCROLL_REGISTRY_RUNTIME_NAMESPACE:-${SCROLL_REGISTRY_NAMESPACE}}"
 runtime_prefix="${registry_host}/${runtime_namespace}"
-runtime_image="${DRUID_SCROLL_RUNTIME_IMAGE:-${runtime_prefix}/druid:${DRUID_CLI_VERSION}}"
-steamcmd_image="${DRUID_SCROLL_STEAMCMD_IMAGE:-${runtime_image}-steamcmd}"
+if [[ -n "${DRUID_SCROLL_RUNTIME_IMAGE:-}" ]]; then
+  runtime_image="$DRUID_SCROLL_RUNTIME_IMAGE"
+elif [[ "${DRUID_REGISTRY_PLAIN_HTTP:-false}" == "true" ]]; then
+  runtime_image="${DRUID_K8S_PULL_IMAGE:-druid:local}"
+else
+  runtime_image="${runtime_prefix}/druid:${DRUID_CLI_VERSION}"
+fi
+steamcmd_image="${DRUID_SCROLL_STEAMCMD_IMAGE:-${DRUID_K8S_STEAMCMD_IMAGE:-${runtime_image}-steamcmd}}"
+pinned_progress_image="artifacts.druid.gg/druid-team/druid:v0.1.258"
+pinned_steamcmd_progress_image="${pinned_progress_image}-steamcmd"
 
 login_if_configured() {
   if [[ "$SCROLL_PUSH_DRY_RUN" = "1" ]]; then
@@ -41,6 +49,7 @@ login_if_configured() {
 
 run() {
   local command="$*"
+  local temporary_source=""
 
   # Add the optional suffix only to artifact tags. Category pushes are metadata
   # for the stable repository and do not get PR suffixes.
@@ -62,13 +71,47 @@ run() {
   # local Harbor, staging, or PR namespaces without changing every push line.
   command="${command//artifacts.druid.gg\/druid-team\/druid:v0.1.257-steamcmd/$steamcmd_image}"
   command="${command//artifacts.druid.gg\/druid-team\/druid:v0.1.257/$runtime_image}"
+  command="${command//$pinned_steamcmd_progress_image/$steamcmd_image}"
+  command="${command//$pinned_progress_image/$runtime_image}"
   command="${command//artifacts.druid.gg\/druid-team/$registry_prefix}"
+
+  # A Scroll may embed a progress-capable procedure image in scroll.yaml.
+  # Package a temporary, retargeted copy so local and preview artifacts do not
+  # accidentally depend on the production registry or a mutable tag.
+  if [[ "$SCROLL_PUSH_DRY_RUN" != "1" && "$command" == druid\ push\ * && "$command" != druid\ push\ category\ * ]]; then
+    local rest ref source_dir escaped_runtime_image escaped_steamcmd_image
+    rest="${command#druid push }"
+    ref="${rest%% *}"
+    rest="${rest#"$ref" }"
+    source_dir="${rest%% *}"
+    if [[ -f "$source_dir/scroll.yaml" ]]; then
+      temporary_source="$(mktemp -d "${TMPDIR:-/tmp}/druid-scroll-push.XXXXXX")"
+      cp -a "$source_dir/." "$temporary_source/"
+      escaped_runtime_image="${runtime_image//\\/\\\\}"
+      escaped_runtime_image="${escaped_runtime_image//&/\\&}"
+      escaped_runtime_image="${escaped_runtime_image//|/\\|}"
+      escaped_steamcmd_image="${steamcmd_image//\\/\\\\}"
+      escaped_steamcmd_image="${escaped_steamcmd_image//&/\\&}"
+      escaped_steamcmd_image="${escaped_steamcmd_image//|/\\|}"
+      sed -i \
+        -e "s|$pinned_steamcmd_progress_image|$escaped_steamcmd_image|g" \
+        -e "s|$pinned_progress_image|$escaped_runtime_image|g" \
+        "$temporary_source/scroll.yaml"
+      command="${command/"$source_dir"/"$temporary_source"}"
+    fi
+  fi
+
   command="${command/#druid /"$DRUID_BIN" }"
   echo "$command"
   if [[ "$SCROLL_PUSH_DRY_RUN" = "1" ]]; then
     return 0
   fi
-  eval "$command"
+  local status=0
+  eval "$command" || status=$?
+  if [[ -n "$temporary_source" ]]; then
+    rm -rf -- "$temporary_source"
+  fi
+  return "$status"
 }
 
 push_release_categories() {

@@ -55,7 +55,7 @@ commands:
     - install
     procedures:
     - ignore_failure: true
-      image: artifacts.druid.gg/druid-team/druid:stable-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:v0.1.258-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -109,7 +109,7 @@ commands:
       command:
       - echo
       - Installing LGSM...
-    - image: artifacts.druid.gg/druid-team/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.258-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -130,7 +130,7 @@ commands:
       command:
       - sh
       - patch-lgsm-permissions.sh
-    - image: artifacts.druid.gg/druid-team/druid:stable-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.258-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"

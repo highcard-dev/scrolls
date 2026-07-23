@@ -11,7 +11,7 @@ jobs:
       SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
       SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
       SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
-      DRUID_CLI_VERSION: v0.1.257
+      DRUID_CLI_VERSION: v0.1.258
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3

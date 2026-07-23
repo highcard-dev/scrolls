@@ -105,11 +105,11 @@ func main() {
 	}
 	progressImage := os.Getenv("DRUID_PROGRESS_RUNTIME_IMAGE")
 	if progressImage == "" {
-		progressImage = "artifacts.druid.gg/druid-team/druid:stable"
+		progressImage = "artifacts.druid.gg/druid-team/druid:v0.1.258"
 	}
 	progressSteamImage := os.Getenv("DRUID_PROGRESS_STEAM_RUNTIME_IMAGE")
 	if progressSteamImage == "" {
-		progressSteamImage = "artifacts.druid.gg/druid-team/druid:stable-steamcmd"
+		progressSteamImage = "artifacts.druid.gg/druid-team/druid:v0.1.258-steamcmd"
 	}
 	coldstarterImage := os.Getenv("DRUID_COLDSTARTER_IMAGE")
 	if coldstarterImage == "" {

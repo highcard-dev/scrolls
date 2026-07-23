@@ -54,7 +54,7 @@ commands:
     run: once
     procedures:
     - id: download-server-files
-      image: artifacts.druid.gg/druid-team/druid:stable
+      image: artifacts.druid.gg/druid-team/druid:v0.1.258
       mounts:
       - path: "/server"
       working_dir: "/server"
