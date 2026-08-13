@@ -17,6 +17,12 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(source, "scroll.yaml"), []byte("name: test\ndesc: test\nversion: 0.0.1\napp_version: 1.21.7\ncommands: {}\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
+	if err := os.MkdirAll(filepath.Join(source, "data"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "data", "server.properties.default"), []byte("max-players=20\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	bundle := filepath.Join(root, "app.wasm")
 	if err := os.WriteFile(bundle, []byte("wasm"), 0644); err != nil {
 		t.Fatal(err)
@@ -51,6 +57,9 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(destination, "private", "dist", "app.wasm")); err != nil {
 		t.Fatal(err)
 	}
+	if _, err := os.Stat(filepath.Join(destination, "data", "server.properties")); !os.IsNotExist(err) {
+		t.Fatalf("active config was unexpectedly created beside packaged default: %v", err)
+	}
 }
 
 func TestCatalogCoversEveryReleasedFamily(t *testing.T) {
@@ -69,15 +78,87 @@ func TestCatalogCoversEveryReleasedFamily(t *testing.T) {
 	}
 }
 
+func TestLinuxGSMCatalogsExposeManagementAndGameConfiguration(t *testing.T) {
+	want := map[string][]string{
+		"arkserver":  {"data/lgsm/config-lgsm/arkserver/arkserver.cfg", "data/serverfiles/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini", "data/serverfiles/ShooterGame/Saved/Config/LinuxServer/Game.ini"},
+		"cs2server":  {"data/lgsm/config-lgsm/cs2server/cs2server.cfg", "data/serverfiles/game/csgo/cfg/server.cfg"},
+		"csgoserver": {"data/lgsm/config-lgsm/csgoserver/csgoserver.cfg", "data/serverfiles/csgo/cfg/csgoserver.cfg"},
+		"dayzserver": {"data/lgsm/config-lgsm/dayzserver/common.cfg", "data/lgsm/config-lgsm/dayzserver/dayzserver.cfg", "data/serverfiles/cfg/dayzserver.server.cfg"},
+		"gmodserver": {"data/lgsm/config-lgsm/gmodserver/gmodserver.cfg", "data/serverfiles/garrysmod/cfg/gmodserver.cfg"},
+		"pwserver":   {"data/lgsm/config-lgsm/pwserver/common.cfg", "data/lgsm/config-lgsm/pwserver/pwserver.cfg", "data/serverfiles/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini"},
+		"pzserver":   {"data/lgsm/config-lgsm/pzserver/pzserver.cfg", "data/Zomboid/Server/pzserver.ini"},
+		"sdtdserver": {"data/lgsm/config-lgsm/sdtdserver/sdtdserver.cfg", "data/serverfiles/sdtdserver.xml"},
+		"untserver":  {"data/lgsm/config-lgsm/untserver/untserver.cfg", "data/serverfiles/Servers/untserver/Config.json", "data/serverfiles/Servers/untserver/Commands.dat", "data/serverfiles/Servers/untserver/WorkshopDownloadConfig.json"},
+	}
+	for id, paths := range want {
+		got, err := familyManifest("scrolls/lgsm/"+id, "latest")
+		if err != nil {
+			t.Fatalf("%s: %v", id, err)
+		}
+		gotPaths := make([]string, 0, len(got.Files))
+		for _, file := range got.Files {
+			gotPaths = append(gotPaths, file.Path)
+		}
+		if strings.Join(gotPaths, "\n") != strings.Join(paths, "\n") {
+			t.Errorf("%s paths = %#v, want %#v", id, gotPaths, paths)
+		}
+	}
+}
+
+func TestHytaleCatalogIncludesEveryDocumentedTopLevelConfiguration(t *testing.T) {
+	got, err := familyManifest("scrolls/hytale/hytale-standalone", "latest")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"data/Server/config.json", "data/Server/permissions.json", "data/Server/whitelist.json", "data/Server/bans.json"}
+	gotPaths := make([]string, 0, len(got.Files))
+	for _, file := range got.Files {
+		gotPaths = append(gotPaths, file.Path)
+	}
+	if strings.Join(gotPaths, "\n") != strings.Join(want, "\n") {
+		t.Fatalf("Hytale paths = %#v, want %#v", gotPaths, want)
+	}
+}
+
+func TestSevenDaysToDieUsesTypedXMLProperties(t *testing.T) {
+	got, err := familyManifest("scrolls/lgsm/sdtdserver", "latest")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Files[1].Format != "xml-properties" {
+		t.Fatalf("7 Days to Die game config format = %q", got.Files[1].Format)
+	}
+}
+
+func TestCuberiteCatalogIncludesDocumentedServerAndDefaultWorldConfiguration(t *testing.T) {
+	got, err := familyManifest("scrolls/minecraft/cuberite/latest", "latest")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{
+		"data/settings.ini", "data/webadmin.ini",
+		"data/world/world.ini", "data/world_nether/world.ini", "data/world_the_end/world.ini",
+		"data/monsters.ini", "data/motd.txt", "data/crafting.txt", "data/brewing.txt",
+		"data/furnace.txt", "data/items.ini",
+	}
+	gotPaths := make([]string, 0, len(got.Files))
+	for _, file := range got.Files {
+		gotPaths = append(gotPaths, file.Path)
+	}
+	if strings.Join(gotPaths, "\n") != strings.Join(want, "\n") {
+		t.Fatalf("Cuberite paths = %#v, want %#v", gotPaths, want)
+	}
+}
+
 func TestArkCatalogIncludesTypedSettingsAndRawFallback(t *testing.T) {
 	got, err := familyManifest("scrolls/lgsm/arkserver", "arkserver")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got.Server.Family != "ark" || len(got.Files) != 2 {
+	if got.Server.Family != "ark" || len(got.Files) != 3 {
 		t.Fatalf("ARK manifest = %#v", got)
 	}
-	if len(got.Files[0].Sections) < 3 || len(got.Files[1].Sections[0].Fields) < 10 {
+	if len(got.Files[1].Sections) < 3 || len(got.Files[2].Sections[0].Fields) < 10 {
 		t.Fatalf("ARK typed coverage is incomplete: %#v", got.Files)
 	}
 }
@@ -91,10 +172,16 @@ func TestEnsureConfigFilesCreatesRuntimeDefaultsButPreservesTemplates(t *testing
 	if err := os.WriteFile(template, []byte("generated=true\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
+	packagedDefault := filepath.Join(root, "data", "packaged.cfg.default")
+	if err := os.WriteFile(packagedDefault, []byte("generated=false\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	config := manifest{Files: []fileSchema{
 		{Path: "data/templated.cfg", Format: "key-value"},
-		{Path: "data/config.json", Format: "json"},
-		{Path: "data/server/druid/cfg/server.cfg", Format: "key-value"},
+		{Path: "data/packaged.cfg", Format: "key-value"},
+		{Path: "data/config.json", Format: "json", CreateIfMissing: true},
+		{Path: "data/server/druid/cfg/server.cfg", Format: "key-value", CreateIfMissing: true},
+		{Path: "data/settings.ini", Format: "ini", CreateIfMissing: true},
 	}}
 
 	if err := ensureConfigFiles(root, config); err != nil {
@@ -103,13 +190,48 @@ func TestEnsureConfigFilesCreatesRuntimeDefaultsButPreservesTemplates(t *testing
 	if _, err := os.Stat(filepath.Join(root, "data", "templated.cfg")); !os.IsNotExist(err) {
 		t.Fatalf("template output was unexpectedly created: %v", err)
 	}
+	if _, err := os.Stat(filepath.Join(root, "data", "packaged.cfg")); !os.IsNotExist(err) {
+		t.Fatalf("packaged-default output was unexpectedly created: %v", err)
+	}
 	jsonBytes, err := os.ReadFile(filepath.Join(root, "data", "config.json"))
 	if err != nil || string(jsonBytes) != "{}\n" {
 		t.Fatalf("JSON default = %q, %v", jsonBytes, err)
 	}
 	rustBytes, err := os.ReadFile(filepath.Join(root, "data", "server", "druid", "cfg", "server.cfg"))
-	if err != nil || !strings.Contains(string(rustBytes), "server.maxplayers 75") {
+	if err != nil || !strings.Contains(string(rustBytes), "server.maxplayers 75") ||
+		!strings.Contains(string(rustBytes), "server.level Procedural Map") ||
+		!strings.Contains(string(rustBytes), "server.headerimage https://druid.gg/") ||
+		!strings.Contains(string(rustBytes), "server.url https://druid.gg/") {
 		t.Fatalf("Rust default = %q, %v", rustBytes, err)
+	}
+	cuberiteBytes, err := os.ReadFile(filepath.Join(root, "data", "settings.ini"))
+	if err != nil || !strings.Contains(string(cuberiteBytes), "[Server]") ||
+		!strings.Contains(string(cuberiteBytes), "Ports=25565") ||
+		!strings.Contains(string(cuberiteBytes), "[Worlds]") {
+		t.Fatalf("Cuberite default = %q, %v", cuberiteBytes, err)
+	}
+}
+
+func TestRustStartScriptsDoNotOverrideUIManagedConvars(t *testing.T) {
+	managed := []string{
+		"-server.maxplayers", "-server.hostname", "-server.level", "-server.worldsize",
+		"-server.saveinterval", "-server.globalchat", "-server.description",
+		"-server.headerimage", "-server.url",
+	}
+	for _, variant := range []string{"rust-vanilla", "rust-oxide"} {
+		path := filepath.Join("..", "..", "scrolls", "rust", variant, "latest", "data", "start.sh")
+		contents, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, flag := range managed {
+			if strings.Contains(string(contents), flag) {
+				t.Errorf("%s still overrides UI-managed convar %s", variant, flag)
+			}
+		}
+		if !strings.Contains(string(contents), `-server.identity "druid"`) {
+			t.Errorf("%s must retain server.identity to locate data/server/druid/cfg/server.cfg", variant)
+		}
 	}
 }
 
@@ -165,10 +287,17 @@ func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) 
 			t.Errorf("parse manifest %s: %v", path, err)
 			return nil
 		}
-		for _, file := range got.Files {
+		expected, manifestErr := familyManifest(filepath.ToSlash(path), "test")
+		if manifestErr != nil {
+			t.Errorf("catalog %s: %v", path, manifestErr)
+			return nil
+		}
+		for index, file := range got.Files {
 			target := filepath.Join(destination, filepath.FromSlash(file.Path))
 			if _, err := os.Stat(target); err != nil {
-				if _, templateErr := os.Stat(target + ".scroll_template"); templateErr != nil {
+				_, templateErr := os.Stat(target + ".scroll_template")
+				_, defaultErr := os.Stat(target + ".default")
+				if templateErr != nil && defaultErr != nil && expected.Files[index].CreateIfMissing {
 					t.Errorf("%s has neither config nor template for %s", path, file.Path)
 				}
 			}
