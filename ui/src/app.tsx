@@ -1,6 +1,7 @@
 import {
   createConfigEditorComponent,
   fingerprint,
+  withMissingFileFallback,
   type FileGateway,
 } from "@druid-ui/config-editor";
 import {
@@ -8,7 +9,7 @@ import {
   saveFileToDeployment,
 } from "@druid-ui/plattform";
 
-const gateway: FileGateway = {
+const gateway = withMissingFileFallback({
   async load(path) {
     return await loadFileFromDeployment(path);
   },
@@ -21,7 +22,7 @@ const gateway: FileGateway = {
     await saveFileToDeployment(path, content);
     return { status: "saved", fingerprint: await fingerprint(content) };
   },
-};
+} satisfies FileGateway);
 
 export const component = createConfigEditorComponent({
   manifestPath: "private/config-editor.manifest.json",
