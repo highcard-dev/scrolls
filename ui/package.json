@@ -1,0 +1,14 @@
+{
+  "name": "@druid-scrolls/config-admin-ui",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "druid-ui-build --wit=wit/druid-plattform.wit --world-name=druid-plattform src/app.tsx dist"
+  },
+  "dependencies": {
+    "@druid-ui/build": "^2.0.0",
+    "@druid-ui/config-editor": "^2.1.0",
+    "@druid-ui/plattform": "^2.0.0"
+  }
+}

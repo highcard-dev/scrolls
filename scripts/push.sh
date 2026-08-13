@@ -17,6 +17,7 @@ DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.249}"
 SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
 SCROLL_PUSH_JOBS="${SCROLL_PUSH_JOBS:-1}"
+SCROLL_PUSH_UI="${SCROLL_PUSH_UI:-1}"
 
 if [[ ! "$SCROLL_PUSH_JOBS" =~ ^[1-9][0-9]*$ ]]; then
   echo "SCROLL_PUSH_JOBS must be a positive integer (got: $SCROLL_PUSH_JOBS)" >&2
@@ -38,6 +39,15 @@ steamcmd_image="${DRUID_SCROLL_STEAMCMD_IMAGE:-${runtime_image}-steamcmd}"
 
 push_pids=()
 push_phase_failed=0
+staged_dirs=()
+
+cleanup_staged_dirs() {
+  local dir
+  for dir in "${staged_dirs[@]}"; do
+    rm -rf -- "$dir"
+  done
+}
+trap cleanup_staged_dirs EXIT
 
 wait_for_oldest_push() {
   local pid="${push_pids[0]}"
@@ -68,41 +78,54 @@ login_if_configured() {
 }
 
 run() {
-  local command="$*"
+  local -a command=("$@")
+  local index
 
   # Add the optional suffix only to artifact tags. Category pushes are metadata
   # for the stable repository and do not get PR suffixes.
-  if [[ -n "$SCROLL_TAG_SUFFIX" && "$command" == druid\ push\ * && "$command" != druid\ push\ category\ * ]]; then
-    local rest ref after last
-    rest="${command#druid push }"
-    ref="${rest%% *}"
-    after="${rest#"$ref"}"
+  if [[ -n "$SCROLL_TAG_SUFFIX" && "${command[0]:-}" == "druid" && "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]]; then
+    local ref last
+    ref="${command[2]}"
     last="${ref##*/}"
     if [[ "$last" == *:* ]]; then
       ref="${ref}${SCROLL_TAG_SUFFIX}"
     else
       ref="${ref}:${SCROLL_TAG_SUFFIX#-}"
     fi
-    command="druid push ${ref}${after}"
+    command[2]="$ref"
   fi
 
   # The catalog intentionally uses production refs. Retarget them here for
   # local Harbor, staging, or PR namespaces without changing every push line.
-  command="${command//artifacts.druid.gg\/druid-team\/druid:v0.1.249-steamcmd/$steamcmd_image}"
-  command="${command//artifacts.druid.gg\/druid-team\/druid:v0.1.249/$runtime_image}"
-  command="${command//artifacts.druid.gg\/druid-team/$registry_prefix}"
-  command="${command/#druid /"$DRUID_BIN" }"
-  echo "$command"
+  for index in "${!command[@]}"; do
+    command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.249-steamcmd/$steamcmd_image}"
+    command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.249/$runtime_image}"
+    command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$registry_prefix}"
+  done
+  if [[ "${command[0]:-}" == "druid" ]]; then
+    command[0]="$DRUID_BIN"
+  fi
+
+  printf '%q ' "${command[@]}"
+  printf '\n'
   if [[ "$SCROLL_PUSH_DRY_RUN" = "1" ]]; then
     return 0
   fi
 
+  if [[ "$SCROLL_PUSH_UI" = "1" && "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]]; then
+    local staged_root
+    staged_root="$(mktemp -d)"
+    staged_dirs+=("$staged_root")
+    go run ./scripts/stage-scroll-ui "${command[3]}" "$staged_root/artifact" "$repo_root/ui/dist/app.wasm"
+    command[3]="$staged_root/artifact"
+  fi
+
   if ((SCROLL_PUSH_JOBS == 1)); then
-    eval "$command"
+    "${command[@]}"
     return
   fi
 
-  eval "$command" &
+  "${command[@]}" &
   push_pids+=("$!")
   if ((${#push_pids[@]} >= SCROLL_PUSH_JOBS)); then
     wait_for_oldest_push
