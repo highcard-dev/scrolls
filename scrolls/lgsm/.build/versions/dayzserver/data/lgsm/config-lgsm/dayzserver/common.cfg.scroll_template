@@ -1,3 +1,0 @@
-port="{{ env "DRUID_PORT_MAIN_1" | default "2302" }}"
-steamuser="${STEAM_USER:?STEAM_USER is required for DayZ server install}"
-steampass="${STEAM_PASS:?STEAM_PASS is required for DayZ server install}"

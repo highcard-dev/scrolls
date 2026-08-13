@@ -18,11 +18,9 @@ var (
 		"-nix-steamcmd",
 	}
 	portOverrideNamePattern = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_-]*$`)
-	portOverridePattern     = regexp.MustCompile(`^([A-Za-z][A-Za-z0-9_-]*)=([0-9]+)(?:/(tcp|udp|http|https))?$`)
 	pzserverRequiredPorts   = map[string]string{
-		"main":    "16261/udp",
-		"main2":   "16262/udp",
-		"maintcp": "16261",
+		"main":  "/udp",
+		"main2": "/udp",
 	}
 )
 
@@ -103,23 +101,51 @@ func validatePortOverrides(fields []string) (map[string]string, error) {
 			continue
 		}
 		override := fields[i+1]
-		matches := portOverridePattern.FindStringSubmatch(override)
-		if matches == nil {
-			failures = append(failures, fmt.Sprintf("invalid %s override %q; expected name=port or name=port/protocol", field, override))
-			continue
-		}
-		name := matches[1]
-		portText := matches[2]
-		port, err := strconv.Atoi(portText)
-		if err != nil || port < 1 || port > 65535 {
-			failures = append(failures, fmt.Sprintf("invalid %s override %q; port must be 1-65535", field, override))
-			continue
-		}
+		name, value, hasValue := strings.Cut(override, "=")
 		if !portOverrideNamePattern.MatchString(name) {
 			failures = append(failures, fmt.Sprintf("invalid %s override %q; invalid port name", field, override))
 			continue
 		}
-		ports[name] = strings.TrimPrefix(override, name+"=")
+		if !hasValue {
+			value = ""
+		}
+		portText := value
+		protocol := ""
+		if strings.Contains(value, "/") {
+			parts := strings.Split(value, "/")
+			if len(parts) != 2 || parts[1] == "" {
+				failures = append(failures, fmt.Sprintf("invalid %s override %q; expected name=port or name=port/protocol", field, override))
+				continue
+			}
+			portText = parts[0]
+			protocol = parts[1]
+			switch protocol {
+			case "tcp", "udp", "http", "https":
+			default:
+				failures = append(failures, fmt.Sprintf("invalid %s override %q; unsupported protocol", field, override))
+				continue
+			}
+		}
+		if portText == "" || portText == "0" {
+			if protocol == "http" || protocol == "https" {
+				failures = append(failures, fmt.Sprintf("invalid %s override %q; dynamic HTTP ports are not supported", field, override))
+				continue
+			}
+			ports[name] = "0"
+			if protocol != "" {
+				ports[name] = "/" + protocol
+			}
+			continue
+		}
+		port, err := strconv.Atoi(portText)
+		if err != nil || port < 1 || port > 65535 {
+			failures = append(failures, fmt.Sprintf("invalid %s override %q; port must be omitted or 1-65535", field, override))
+			continue
+		}
+		ports[name] = portText
+		if protocol != "" {
+			ports[name] += "/" + protocol
+		}
 	}
 
 	if len(failures) > 0 {

@@ -17,14 +17,30 @@ func TestValidatePortOverridesAcceptsConcretePorts(t *testing.T) {
 	}
 }
 
-func TestValidatePortOverridesRejectsBlankAndBarePorts(t *testing.T) {
+func TestValidatePortOverridesAcceptsDynamicPorts(t *testing.T) {
 	for _, value := range []string{
 		"main",
 		"main=",
 		"main=/udp",
 		"main=0",
 		"main=0/udp",
+	} {
+		fields := []string{"druid", "push", "repo:tag", "./scroll", "-p", value}
+		if _, err := validatePortOverrides(fields); err != nil {
+			t.Fatalf("%s failed validation: %v", value, err)
+		}
+	}
+}
+
+func TestValidatePortOverridesRejectsInvalidPorts(t *testing.T) {
+	for _, value := range []string{
 		"main=65536",
+		"main=/",
+		"main=/sctp",
+		"web=/http",
+		"web=0/https",
+		"main=123/udp/extra",
+		"1main=123",
 	} {
 		fields := []string{"druid", "push", "repo:tag", "./scroll", "-p", value}
 		if _, err := validatePortOverrides(fields); err == nil {

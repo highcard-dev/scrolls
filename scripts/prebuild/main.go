@@ -211,11 +211,6 @@ func runProcedure(root string, spec prebuildSpec, mounts *dockerMountSet, index 
 }
 
 func prebuildCommand(command []string) (string, []string) {
-	if len(command) >= 2 && isShell(command[0]) && !strings.HasPrefix(command[1], "-") && filepath.Ext(command[1]) == ".sh" {
-		args := []string{"-lc", templateBackedScriptWrapper, command[0]}
-		args = append(args, command[1:]...)
-		return "sh", args
-	}
 	return command[0], command[1:]
 }
 
@@ -304,19 +299,6 @@ func formatBytes(bytes uint64) string {
 	const mib = 1024 * 1024
 	return fmt.Sprintf("%.1fMi", float64(bytes)/mib)
 }
-
-func isShell(value string) bool {
-	base := filepath.Base(value)
-	return base == "sh" || base == "bash"
-}
-
-const templateBackedScriptWrapper = `script="$1"
-shift
-if [ ! -f "$script" ] && [ -f "$script.scroll_template" ]; then
-  cp "$script.scroll_template" "$script"
-  chmod +x "$script"
-fi
-exec "$0" "$script" "$@"`
 
 func mountHostPath(root string, m mount) string {
 	if m.SubPath == "." {
@@ -638,19 +620,18 @@ func selectSpecs(raw string) ([]prebuildSpec, error) {
 }
 
 func allSpecs() []prebuildSpec {
-	steamImage := getenv("DRUID_STEAM_RUNTIME_IMAGE", "artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd")
+	steamImage := getenv("DRUID_STEAM_RUNTIME_IMAGE", "artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd")
 	specs := []prebuildSpec{
 		{Target: "pwserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:pwserver-prebuild", Source: "./scrolls/lgsm/pwserver", Image: steamImage, Ports: []string{"main=8211/udp", "rcon=25575"}, MinDisk: "7Gi", MinRAM: "2Gi", MinCPU: "0.5", Category: "palworld", Smart: true, PackMeta: true},
-		{Target: "arkserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:arkserver-prebuild", Source: "./scrolls/lgsm/arkserver", Image: steamImage, Ports: []string{"main=7777/udp", "query=27015/udp", "rcon=27020"}, MinDisk: "25Gi", MinRAM: "7Gi", MinCPU: "0.5", Category: "ark", Smart: true, PackMeta: true},
-		{Target: "dayzserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:dayzserver-prebuild", Source: "./scrolls/lgsm/dayzserver", Image: steamImage, Ports: []string{"main=2302/udp", "battle-eye=2304/udp", "query=27016/udp"}, MinDisk: "7Gi", MinRAM: "5Gi", MinCPU: "1", Category: "dayz", PackMeta: true, RequiredEnv: []string{"STEAM_USER", "STEAM_PASS"}},
-		{Target: "untserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:untserver-prebuild", Source: "./scrolls/lgsm/untserver", Image: steamImage, Ports: []string{"main=27015/udp", "mainv6=27016"}, MinDisk: "7Gi", MinRAM: "1Gi", MinCPU: "0.5", Category: "unturned", Smart: true, PackMeta: true},
+		{Target: "arkserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:arkserver-prebuild", Source: "./scrolls/lgsm/arkserver", Image: steamImage, Ports: []string{"main=/udp", "query=/udp", "rcon"}, MinDisk: "25Gi", MinRAM: "7Gi", MinCPU: "0.5", Category: "ark", Smart: true, PackMeta: true},
+		{Target: "untserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:untserver-prebuild", Source: "./scrolls/lgsm/untserver", Image: steamImage, Ports: []string{"main=/udp", "mainv6=27016"}, MinDisk: "7Gi", MinRAM: "1Gi", MinCPU: "0.5", Category: "unturned", Smart: true, PackMeta: true},
 		{Target: "sdtdserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:sdtdserver-prebuild", Source: "./scrolls/lgsm/sdtdserver", Image: steamImage, Ports: []string{"query=26900/udp", "main=26900/udp", "main2=26902/udp", "maintcp=26900"}, MinDisk: "20Gi", MinRAM: "2Gi", MinCPU: "0.5", Category: "7days", PackMeta: true},
-		{Target: "gmodserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:gmodserver-prebuild", Source: "./scrolls/lgsm/gmodserver", Image: steamImage, Ports: []string{"query=27005/udp", "main=27015/udp", "sourcetv=27020/udp", "steam=27015"}, MinDisk: "8Gi", MinRAM: "512Mi", MinCPU: "0.25", Category: "gmod", Smart: true, PackMeta: true},
+		{Target: "gmodserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:gmodserver-prebuild", Source: "./scrolls/lgsm/gmodserver", Image: steamImage, Ports: []string{"query=27005/udp", "main=/udp", "sourcetv=27020/udp", "steam=27015"}, MinDisk: "8Gi", MinRAM: "512Mi", MinCPU: "0.25", Category: "gmod", Smart: true, PackMeta: true},
 		{Target: "cs2server", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:cs2server-prebuild", Source: "./scrolls/lgsm/cs2server", Image: steamImage, Ports: []string{"main=27015/udp", "rcon=27015"}, MinDisk: "70Gi", BuildDisk: "95Gi", MinRAM: "1Gi", MinCPU: "0.5", Category: "cs2", Smart: true, PackMeta: true},
 		{Target: "pzserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:pzserver-prebuild", Source: "./scrolls/lgsm/pzserver", Image: steamImage, Ports: []string{"main=16261/udp", "main2=16262/udp", "maintcp=16261"}, MinDisk: "3Gi", MinRAM: "512Mi", MinCPU: "0.25", Category: "zomboid", Smart: true, PackMeta: true},
 		{Target: "csgoserver", Artifact: "artifacts.druid.gg/druid-team/scroll-lgsm:csgoserver-prebuild", Source: "./scrolls/lgsm/csgoserver", Image: steamImage, Ports: []string{"query=27005/udp", "main=27015/udp", "sourcetv=27020/udp", "steam=27015"}, BuildDisk: "45Gi", Category: "csgo", Smart: true, PackMeta: true},
-		{Target: "rust-vanilla", Artifact: "artifacts.druid.gg/druid-team/scroll-rust-vanilla:latest-prebuild", Source: "./scrolls/rust/rust-vanilla/latest", Image: steamImage, Ports: []string{"main=28015/udp", "query=28017/udp", "rcon=28016", "rustplus=28082"}, MinDisk: "10Gi", BuildDisk: "25Gi", MinRAM: "6Gi", MinCPU: "1", Category: "rust", Smart: true},
-		{Target: "rust-oxide", Artifact: "artifacts.druid.gg/druid-team/scroll-rust-oxide:latest-prebuild", Source: "./scrolls/rust/rust-oxide/latest", Image: steamImage, Ports: []string{"main=28015/udp", "query=28017/udp", "rcon=28016", "rustplus=28082"}, MinDisk: "10Gi", BuildDisk: "25Gi", MinRAM: "6Gi", MinCPU: "1", Category: "rust", Smart: true},
+		{Target: "rust-vanilla", Artifact: "artifacts.druid.gg/druid-team/scroll-rust-vanilla:latest-prebuild", Source: "./scrolls/rust/rust-vanilla/latest", Image: steamImage, Ports: []string{"main=/udp", "query=/udp", "rcon", "rustplus"}, MinDisk: "10Gi", BuildDisk: "25Gi", MinRAM: "6Gi", MinCPU: "1", Category: "rust", Smart: true},
+		{Target: "rust-oxide", Artifact: "artifacts.druid.gg/druid-team/scroll-rust-oxide:latest-prebuild", Source: "./scrolls/rust/rust-oxide/latest", Image: steamImage, Ports: []string{"main=/udp", "query=/udp", "rcon", "rustplus"}, MinDisk: "10Gi", BuildDisk: "25Gi", MinRAM: "6Gi", MinCPU: "1", Category: "rust", Smart: true},
 	}
 	sort.Slice(specs, func(i, j int) bool { return specs[i].Target < specs[j].Target })
 	return specs

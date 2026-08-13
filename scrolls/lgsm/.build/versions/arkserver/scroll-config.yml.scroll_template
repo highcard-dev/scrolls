@@ -1,3 +1,0 @@
-rcon:
-  password: {{ randAlphaNum 50  }}
-  port: {{ env "DRUID_PORT_RCON_1" | default "27020" }}

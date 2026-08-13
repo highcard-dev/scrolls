@@ -9,6 +9,8 @@ chunks:
     path: lgsm
   - name: patch-lgsm-permissions
     path: patch-lgsm-permissions.sh
+  - name: configure-runtime
+    path: configure-runtime.sh
   - name: serverfiles
     path: serverfiles
     chunks:

@@ -14,6 +14,8 @@ chunks:
     path: lgsm
   - name: patch-lgsm-permissions
     path: patch-lgsm-permissions.sh
+  - name: configure-runtime
+    path: configure-runtime.sh
   - name: serverfiles
     path: serverfiles
     chunks:
@@ -47,15 +49,12 @@ chunks:
 ports:
 - name: main
   protocol: udp
-  port: 7777
   description: Main game port. Use this port inside of your game client to connect to the server. Depending on the game you might need the query port to connect.
 - name: query
   protocol: udp
-  port: 27015
   description: Steam Query Port. Use this to connect via the Steam client.
 - name: rcon
   protocol: tcp
-  port: 27020
 commands:
   console:
     needs:
@@ -63,7 +62,7 @@ commands:
     run: restart
     procedures:
     - id: coldstart
-      image: artifacts.druid.gg/druid-team/druid:v0.1.249
+      image: artifacts.druid.gg/druid-team/druid:v0.1.256
       expectedPorts:
       - name: query
         keepAliveTraffic: 6mb/30m
@@ -88,12 +87,13 @@ commands:
       command:
       - druid-coldstarter
     - id: start
-      image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       expectedPorts:
       - name: query
         keepAliveTraffic: 6mb/30m
       - name: main
         keepAliveTraffic: 6mb/30m
+      - name: rcon
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -101,20 +101,31 @@ commands:
       command:
       - sh
       - -lc
-      - ./arkserver start && exec ./arkserver console
+      - sh configure-runtime.sh && ./arkserver start && exec ./arkserver console
   start:
     needs:
     - install
     procedures:
     - ignore_failure: true
-      image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+      image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - ./arkserver
       - update
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
+      expectedPorts:
+      - name: main
+      - name: query
+      - name: rcon
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - configure-runtime.sh
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -124,7 +135,7 @@ commands:
   stop:
     run: always
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -133,14 +144,25 @@ commands:
       - stop
   restart:
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - echo
       - Restarting server...
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
+      expectedPorts:
+      - name: main
+      - name: query
+      - name: rcon
+      mounts:
+      - path: "/server"
+      working_dir: "/server"
+      command:
+      - sh
+      - configure-runtime.sh
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
@@ -150,35 +172,35 @@ commands:
   install:
     run: once
     procedures:
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - echo
       - Installing LGSM...
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - install-lgsm.sh
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - ./linuxgsm.sh
       - arkserver
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
       command:
       - sh
       - patch-lgsm-permissions.sh
-    - image: artifacts.druid.gg/druid-team/druid:v0.1.249-steamcmd
+    - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
       mounts:
       - path: "/server"
       working_dir: "/server"
