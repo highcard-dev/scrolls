@@ -1,0 +1,13 @@
+package druid:ui;
+
+interface plattform {
+    request: func(url: string, method: string, body: string, header: tuple<string, string>) -> string;
+    load-file-from-deployment: func(path: string) -> string;
+    save-file-to-deployment: func(path: string, content: string) -> string;
+}
+
+world druid-plattform {
+    import ui;
+    import plattform;
+    export component;
+}
