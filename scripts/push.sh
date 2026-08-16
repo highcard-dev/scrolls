@@ -43,6 +43,7 @@ staged_dirs=()
 
 cleanup_staged_dirs() {
   local dir
+  ((${#staged_dirs[@]} == 0)) && return
   for dir in "${staged_dirs[@]}"; do
     rm -rf -- "$dir"
   done

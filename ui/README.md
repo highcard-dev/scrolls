@@ -4,15 +4,15 @@ Every released game-server Scroll receives the same sandboxed configuration-edit
 
 Minecraft variants share one typed `server.properties` schema. Other families expose their native configuration files and always retain a lossless Raw view, so newly introduced or uncommon options remain editable even before a typed control is added.
 
-The committed WASM package is built from `src/app.tsx` with Druid UI 2.x. SHA-256:
+The editor implementation and its tests live in `src/config-editor`. The committed WASM package is built from `src/app.tsx` with Druid UI 2.x and is rebuilt by the PR and release workflows before staging.
 
-`15cd01c1ead7ca2cd15e46dfca1840c35c6a46f09637c6eaa6ee0cb86a8d4a8b`
-
-Rebuild after `@druid-ui/config-editor` 2.1 is published:
+Rebuild the UI after changing its source:
 
 ```bash
 cd ui
-npm install
+npm ci
+npm test
+npm run type-check
 npm run build
 ```
 
