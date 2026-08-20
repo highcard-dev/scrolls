@@ -9,9 +9,9 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@druid-ui/build": "^2.2.0",
-    "@druid-ui/component": "^2.2.0",
-    "@druid-ui/plattform": "^2.2.0",
+    "@druid-ui/build": "^3.0.0",
+    "@druid-ui/component": "^3.0.0",
+    "@druid-ui/plattform": "^3.0.0",
     "typescript": "~5.8.3",
     "vitest": "^4.1.10"
   }
