@@ -1,21 +1,28 @@
 import {
   createConfigEditorComponent,
+  fingerprint,
   withMissingFileFallback,
   type FileGateway,
-} from "@druid-ui/config-editor";
+} from "./config-editor/index.js";
 import {
   loadFileFromDeployment,
-  saveFileToDeploymentIfMatch,
+  saveFileToDeployment,
 } from "@druid-ui/plattform";
+
+const requireString = (value: unknown, operation: string): string => {
+  if (typeof value !== "string") {
+    throw new TypeError(`${operation} returned a non-string response.`);
+  }
+  return value;
+};
 
 const gateway = withMissingFileFallback({
   async load(path) {
-    return await loadFileFromDeployment(path);
+    return requireString(await loadFileFromDeployment(path), "loadFileFromDeployment");
   },
-  async save(path, content, expectedFingerprint) {
-    return JSON.parse(
-      await saveFileToDeploymentIfMatch(path, content, expectedFingerprint),
-    );
+  async save(path, content) {
+    await saveFileToDeployment(path, content);
+    return { status: "saved", fingerprint: await fingerprint(content) };
   },
 } satisfies FileGateway);
 
