@@ -24,7 +24,7 @@ commands:
   console:
     needs:
     - start
-    run: restart
+    run: persistent
     procedures:
     - id: coldstart
       image: {{ .ColdstarterImage }}
