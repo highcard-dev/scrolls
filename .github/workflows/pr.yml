@@ -77,4 +77,4 @@ jobs:
           SCROLL_REGISTRY_RUNTIME_NAMESPACE: druid-team
           SCROLL_TAG_SUFFIX: -pr${{ github.event.pull_request.number }}
           SCROLL_PUSH_CATEGORIES: "0"
-        run: ./scripts/push.sh
+        run: bash ./scripts/push.sh
