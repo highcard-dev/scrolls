@@ -5,5 +5,8 @@ scrolls-registry/.builds
 .builds
 .prebuild-tmp
 *.tar.gz
+ui/node_modules/
+ui/dist/app.bundled.js
+ui/dist/wit/
 
 scroll-builder

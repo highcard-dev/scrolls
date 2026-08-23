@@ -17,6 +17,14 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: ">=1.19.3"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Build and test Scroll UI
+        working-directory: ui
+        run: npm ci && npm test && npm run type-check && npm run build
       - run: apt update && apt install -y make
       - name: Build scroll tree
         env:
@@ -43,7 +51,9 @@ jobs:
           chmod +x druid
           mv druid /usr/local/bin/druid
       - name: Validate all scrolls
-        run: ./scripts/validate_all_scrolls.sh
+        run: ./scripts/validate_all_scrolls.sh && bash ./scripts/validate_ui_coverage.sh
+      - name: Test bounded push parallelism
+        run: bash ./scripts/tests/push-parallel.test.sh
       - name: Login to registry
         if: github.event.pull_request.head.repo.full_name == github.repository
         run: druid login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}

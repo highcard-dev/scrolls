@@ -16,6 +16,13 @@ SCROLL_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD:-}"
 DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.257}"
 SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
+SCROLL_PUSH_JOBS="${SCROLL_PUSH_JOBS:-1}"
+SCROLL_PUSH_UI="${SCROLL_PUSH_UI:-1}"
+
+if [[ ! "$SCROLL_PUSH_JOBS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "SCROLL_PUSH_JOBS must be a positive integer (got: $SCROLL_PUSH_JOBS)" >&2
+  exit 2
+fi
 
 # Used by PR CI to publish the same catalog as preview tags, for example:
 # SCROLL_REGISTRY_NAMESPACE=druid-team-experimental SCROLL_TAG_SUFFIX=-pr123.
@@ -30,6 +37,38 @@ runtime_prefix="${registry_host}/${runtime_namespace}"
 runtime_image="${DRUID_SCROLL_RUNTIME_IMAGE:-${runtime_prefix}/druid:${DRUID_CLI_VERSION}}"
 steamcmd_image="${DRUID_SCROLL_STEAMCMD_IMAGE:-${runtime_image}-steamcmd}"
 
+push_pids=()
+push_phase_failed=0
+staged_dirs=()
+
+cleanup_staged_dirs() {
+  local dir
+  ((${#staged_dirs[@]} == 0)) && return
+  for dir in "${staged_dirs[@]}"; do
+    rm -rf -- "$dir"
+  done
+}
+trap cleanup_staged_dirs EXIT
+
+wait_for_oldest_push() {
+  local pid="${push_pids[0]}"
+
+  if ! wait "$pid"; then
+    push_phase_failed=1
+  fi
+  push_pids=("${push_pids[@]:1}")
+}
+
+wait_for_push_phase() {
+  while ((${#push_pids[@]} > 0)); do
+    wait_for_oldest_push
+  done
+
+  local failed="$push_phase_failed"
+  push_phase_failed=0
+  return "$failed"
+}
+
 login_if_configured() {
   if [[ "$SCROLL_PUSH_DRY_RUN" = "1" ]]; then
     return 0
@@ -40,35 +79,58 @@ login_if_configured() {
 }
 
 run() {
-  local command="$*"
+  local -a command=("$@")
+  local index
 
   # Add the optional suffix only to artifact tags. Category pushes are metadata
   # for the stable repository and do not get PR suffixes.
-  if [[ -n "$SCROLL_TAG_SUFFIX" && "$command" == druid\ push\ * && "$command" != druid\ push\ category\ * ]]; then
-    local rest ref after last
-    rest="${command#druid push }"
-    ref="${rest%% *}"
-    after="${rest#"$ref"}"
+  if [[ -n "$SCROLL_TAG_SUFFIX" && "${command[0]:-}" == "druid" && "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]]; then
+    local ref last
+    ref="${command[2]}"
     last="${ref##*/}"
     if [[ "$last" == *:* ]]; then
       ref="${ref}${SCROLL_TAG_SUFFIX}"
     else
       ref="${ref}:${SCROLL_TAG_SUFFIX#-}"
     fi
-    command="druid push ${ref}${after}"
+    command[2]="$ref"
   fi
 
   # The catalog intentionally uses production refs. Retarget them here for
   # local Harbor, staging, or PR namespaces without changing every push line.
-  command="${command//artifacts.druid.gg\/druid-team\/druid:v0.1.257-steamcmd/$steamcmd_image}"
-  command="${command//artifacts.druid.gg\/druid-team\/druid:v0.1.257/$runtime_image}"
-  command="${command//artifacts.druid.gg\/druid-team/$registry_prefix}"
-  command="${command/#druid /"$DRUID_BIN" }"
-  echo "$command"
+  for index in "${!command[@]}"; do
+    command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257-steamcmd/$steamcmd_image}"
+    command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257/$runtime_image}"
+    command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$registry_prefix}"
+  done
+  if [[ "${command[0]:-}" == "druid" ]]; then
+    command[0]="$DRUID_BIN"
+  fi
+
+  printf '%q ' "${command[@]}"
+  printf '\n'
   if [[ "$SCROLL_PUSH_DRY_RUN" = "1" ]]; then
     return 0
   fi
-  eval "$command"
+
+  if [[ "$SCROLL_PUSH_UI" = "1" && "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]]; then
+    local staged_root
+    staged_root="$(mktemp -d)"
+    staged_dirs+=("$staged_root")
+    go run ./scripts/stage-scroll-ui "${command[3]}" "$staged_root/artifact" "$repo_root/ui/dist/app.wasm"
+    command[3]="$staged_root/artifact"
+  fi
+
+  if ((SCROLL_PUSH_JOBS == 1)); then
+    "${command[@]}"
+    return
+  fi
+
+  "${command[@]}" &
+  push_pids+=("$!")
+  if ((${#push_pids[@]} >= SCROLL_PUSH_JOBS)); then
+    wait_for_oldest_push
+  fi
 }
 
 push_release_categories() {
@@ -223,8 +285,16 @@ login_if_configured
 
 if [[ "$SCROLL_PUSH_CATEGORIES" = "1" ]]; then
   push_release_categories
+  if ! wait_for_push_phase; then
+    echo "One or more category pushes failed." >&2
+    exit 1
+  fi
 fi
 
 if [[ "$SCROLL_PUSH_ARTIFACTS" = "1" ]]; then
   push_release_artifacts
+  if ! wait_for_push_phase; then
+    echo "One or more artifact pushes failed." >&2
+    exit 1
+  fi
 fi

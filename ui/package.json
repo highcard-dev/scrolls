@@ -1,0 +1,18 @@
+{
+  "name": "@druid-scrolls/config-admin-ui",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "druid-ui-build --wit=node_modules/@druid-ui/plattform/wit/druid-plattform.wit --world-name=druid-plattform src/app.tsx dist",
+    "test": "vitest run src/config-editor",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@druid-ui/build": "^3.0.0",
+    "@druid-ui/component": "^3.0.0",
+    "@druid-ui/plattform": "^3.0.0",
+    "typescript": "~5.8.3",
+    "vitest": "^4.1.10"
+  }
+}

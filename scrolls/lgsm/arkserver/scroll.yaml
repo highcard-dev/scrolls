@@ -59,7 +59,7 @@ commands:
   console:
     needs:
     - start
-    run: restart
+    run: persistent
     procedures:
     - id: coldstart
       image: artifacts.druid.gg/druid-team/druid:v0.1.256

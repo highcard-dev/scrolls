@@ -23,13 +23,4 @@ exec ./RustDedicated -batchmode -nographics \
    -rcon.ip "0.0.0.0" \
    -rcon.port "${DRUID_PORT_RCON_1:-28016}" \
    -rcon.password "${rcon_password}" \
-   -server.maxplayers 75 \
-   -server.hostname "Rust Oxide Server by druid.gg" \
-   -server.identity "druid" \
-   -server.level "Procedural Map" \
-   -server.worldsize 1000 \
-   -server.saveinterval 300 \
-   -server.globalchat true \
-   -server.description "A Server hosted on druid.gg" \
-   -server.headerimage "https://druid.gg/" \
-   -server.url "https://druid.gg/"
+   -server.identity "druid"
