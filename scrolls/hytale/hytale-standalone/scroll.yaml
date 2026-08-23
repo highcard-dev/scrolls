@@ -55,5 +55,5 @@ commands:
       expectedPorts:
       - name: main
         keepAliveTraffic: 60kb/30m
-    run: restart
+    run: persistent
 serve: start
