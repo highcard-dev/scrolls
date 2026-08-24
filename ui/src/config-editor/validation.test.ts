@@ -46,12 +46,11 @@ describe("coerceFieldValue", () => {
 
   it.each([
     ["5000.000000", 5000],
-    ["5e3", 5000],
   ] as const)("coerces numerically integral configuration value %j", (input, expected) => {
     expect(coerceFieldValue(field(), input)).toBe(expected);
   });
 
-  it.each(["1.5", "NaN", "Infinity", "", "  "])(
+  it.each(["1.5", "5e3", "NaN", "Infinity", "", "  "])(
     "rejects invalid integer %j",
     (input) => expect(() => coerceFieldValue(field(), input)).toThrow(/integer/),
   );

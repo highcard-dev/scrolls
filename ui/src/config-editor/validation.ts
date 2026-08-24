@@ -43,7 +43,7 @@ export const coerceFieldValue = (
 
   const text = scalarText(input).trim();
   if (field.type === "integer") {
-    if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text)) {
+    if (!/^[+-]?\d+(?:\.0+)?$/.test(text)) {
       throw new TypeError("Value must be an integer.");
     }
     const value = Number(text);

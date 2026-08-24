@@ -50,3 +50,16 @@ describe("config editor scrollbar theme", () => {
     expect(corner?.style.background).toBe("transparent");
   });
 });
+
+describe("config editor rendering performance", () => {
+  it("defers rendering off-screen field sections", () => {
+    const rules = parsedStyleRules();
+    const fieldSection = findRule(rules, ".field-section");
+
+    expect(fieldSection).toBeDefined();
+    expect(fieldSection?.style.getPropertyValue("content-visibility")).toBe("auto");
+    expect(fieldSection?.style.getPropertyValue("contain-intrinsic-size")).toBe(
+      "auto 360px",
+    );
+  });
+});

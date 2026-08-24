@@ -77,7 +77,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .tab { min-height: 40px; min-width: 92px; border: 0; border-radius: 7px; background: transparent; color: var(--druid-muted); cursor: pointer; }
 .tab[aria-selected="true"] { background: var(--druid-panel-raised); color: var(--druid-text); }
 .form-editor { display: grid; gap: 18px; }
-.field-section { min-width: 0; margin: 0; padding: 18px; border: 1px solid var(--druid-border); border-radius: 14px; background: rgba(16, 27, 23, .84); }
+.field-section { min-width: 0; margin: 0; padding: 18px; border: 1px solid var(--druid-border); border-radius: 14px; background: rgba(16, 27, 23, .84); content-visibility: auto; contain-intrinsic-size: auto 360px; }
 .field-section legend { padding: 0 8px; color: var(--druid-accent); font-weight: 800; }
 .section-description { margin: 0 0 16px; color: var(--druid-muted); font-size: 13px; }
 .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
@@ -94,11 +94,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .raw-editor { display: grid; gap: 10px; }
 .raw-textarea { width: 100%; min-height: 440px; resize: vertical; padding: 16px; border: 1px solid var(--druid-border); border-radius: 12px; background: #050b08; color: #dce8e1; font: 13px/1.55 "Cascadia Code", "SFMono-Regular", Consolas, monospace; tab-size: 2; }
 .status-card { padding: 14px; border: 1px solid var(--druid-border); border-radius: 12px; background: var(--druid-panel); }
-.status-card p { margin: 4px 0; color: var(--druid-muted); font-size: 13px; }
-.change-list, .issue-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.change-item { padding: 10px; border: 1px solid var(--druid-border); border-radius: 9px; background: #0b1511; font-size: 13px; }
-.change-value { display: block; margin-top: 4px; color: var(--druid-muted); word-break: break-word; }
-.issue-item { color: var(--druid-error); font-size: 12px; }
 .action-bar { display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
 .action-feedback { display: grid; gap: 3px; text-align: right; }
 .save-button { min-height: 46px; padding: 0 18px; border: 0; border-radius: 9px; background: var(--druid-accent); color: var(--druid-accent-ink); font-weight: 850; cursor: pointer; }

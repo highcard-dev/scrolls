@@ -18,7 +18,6 @@ export { FileRail } from "./components/FileRail.js";
 export { FieldControl } from "./components/FieldControl.js";
 export { FormEditor } from "./components/FormEditor.js";
 export { RawEditor } from "./components/RawEditor.js";
-export { Inspector } from "./components/Inspector.js";
 export { ActionBar } from "./components/ActionBar.js";
 export { EDITOR_STYLES } from "./styles.js";
 export { copy } from "./copy.js";
