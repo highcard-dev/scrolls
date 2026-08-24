@@ -27,8 +27,9 @@ export const coerceFieldValue = (
   }
   if (field.type === "boolean") {
     if (input === true || input === false) return input;
-    if (input === "true") return true;
-    if (input === "false") return false;
+    const value = scalarText(input).trim().toLowerCase();
+    if (value === "true") return true;
+    if (value === "false") return false;
     throw new TypeError("Value must be true or false.");
   }
 
@@ -42,7 +43,9 @@ export const coerceFieldValue = (
 
   const text = scalarText(input).trim();
   if (field.type === "integer") {
-    if (!/^[+-]?\d+$/.test(text)) throw new TypeError("Value must be an integer.");
+    if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text)) {
+      throw new TypeError("Value must be an integer.");
+    }
     const value = Number(text);
     if (!Number.isSafeInteger(value)) throw new TypeError("Value must be an integer.");
     return value;

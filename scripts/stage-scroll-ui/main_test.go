@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
@@ -40,6 +42,13 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if string(stagedYAML) == "" || !contains(string(stagedYAML), "path: private/dist/app.wasm") {
 		t.Fatalf("staged yaml = %s", stagedYAML)
 	}
+	var stagedScroll map[string]any
+	if err := yaml.Unmarshal(stagedYAML, &stagedScroll); err != nil {
+		t.Fatal(err)
+	}
+	if chunks, exists := stagedScroll["chunks"]; exists {
+		t.Fatalf("automatic data chunking was replaced by explicit chunks: %#v", chunks)
+	}
 	manifestBytes, err := os.ReadFile(filepath.Join(destination, "private", "config-editor.manifest.json"))
 	if err != nil {
 		t.Fatal(err)
@@ -54,11 +63,67 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if len(got.Files) != 1 || len(got.Files[0].Sections) < 4 {
 		t.Fatalf("manifest files = %#v", got.Files)
 	}
+	if got.Files[0].Path != "server.properties" {
+		t.Fatalf("runtime-relative manifest path = %q, want server.properties", got.Files[0].Path)
+	}
 	if _, err := os.Stat(filepath.Join(destination, "private", "dist", "app.wasm")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, "data", "private", "config-editor.manifest.json")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, "data", "private", "dist", "app.wasm")); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(filepath.Join(destination, "data", "server.properties")); !os.IsNotExist(err) {
 		t.Fatalf("active config was unexpectedly created beside packaged default: %v", err)
+	}
+}
+
+func TestStageAppendsPrivateDataChunkToExistingExplicitChunks(t *testing.T) {
+	root := t.TempDir()
+	source := filepath.Join(root, "scrolls", "lgsm", "pzserver")
+	if err := os.MkdirAll(filepath.Join(source, "data", "lgsm"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "scroll.yaml"), []byte("name: test\ndesc: test\nversion: 0.0.1\ncommands: {}\nchunks:\n  - name: lgsm\n    path: lgsm\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	bundle := filepath.Join(root, "app.wasm")
+	if err := os.WriteFile(bundle, []byte("wasm"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	destination := filepath.Join(root, "staged")
+	if err := stage(source, destination, bundle); err != nil {
+		t.Fatal(err)
+	}
+	stagedYAML, err := os.ReadFile(filepath.Join(destination, "scroll.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var stagedScroll map[string]any
+	if err := yaml.Unmarshal(stagedYAML, &stagedScroll); err != nil {
+		t.Fatal(err)
+	}
+	chunks, ok := stagedScroll["chunks"].([]any)
+	if !ok {
+		t.Fatalf("staged chunks = %#v", stagedScroll["chunks"])
+	}
+	wantPaths := map[string]bool{"lgsm": false, "Zomboid": false, "private": false}
+	for _, value := range chunks {
+		chunk, ok := value.(map[string]any)
+		if ok {
+			if path, wanted := chunk["path"].(string); wanted {
+				if _, exists := wantPaths[path]; exists {
+					wantPaths[path] = true
+				}
+			}
+		}
+	}
+	for path, found := range wantPaths {
+		if !found {
+			t.Fatalf("explicit data chunk %q missing from %#v", path, chunks)
+		}
 	}
 }
 
@@ -80,15 +145,15 @@ func TestCatalogCoversEveryReleasedFamily(t *testing.T) {
 
 func TestLinuxGSMCatalogsExposeManagementAndGameConfiguration(t *testing.T) {
 	want := map[string][]string{
-		"arkserver":  {"data/lgsm/config-lgsm/arkserver/arkserver.cfg", "data/serverfiles/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini", "data/serverfiles/ShooterGame/Saved/Config/LinuxServer/Game.ini"},
-		"cs2server":  {"data/lgsm/config-lgsm/cs2server/cs2server.cfg", "data/serverfiles/game/csgo/cfg/server.cfg"},
-		"csgoserver": {"data/lgsm/config-lgsm/csgoserver/csgoserver.cfg", "data/serverfiles/csgo/cfg/csgoserver.cfg"},
-		"dayzserver": {"data/lgsm/config-lgsm/dayzserver/common.cfg", "data/lgsm/config-lgsm/dayzserver/dayzserver.cfg", "data/serverfiles/cfg/dayzserver.server.cfg"},
-		"gmodserver": {"data/lgsm/config-lgsm/gmodserver/gmodserver.cfg", "data/serverfiles/garrysmod/cfg/gmodserver.cfg"},
-		"pwserver":   {"data/lgsm/config-lgsm/pwserver/common.cfg", "data/lgsm/config-lgsm/pwserver/pwserver.cfg", "data/serverfiles/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini"},
-		"pzserver":   {"data/lgsm/config-lgsm/pzserver/pzserver.cfg", "data/Zomboid/Server/pzserver.ini"},
-		"sdtdserver": {"data/lgsm/config-lgsm/sdtdserver/sdtdserver.cfg", "data/serverfiles/sdtdserver.xml"},
-		"untserver":  {"data/lgsm/config-lgsm/untserver/untserver.cfg", "data/serverfiles/Servers/untserver/Config.json", "data/serverfiles/Servers/untserver/Commands.dat", "data/serverfiles/Servers/untserver/WorkshopDownloadConfig.json"},
+		"arkserver":  {"lgsm/config-lgsm/arkserver/arkserver.cfg", "serverfiles/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini", "serverfiles/ShooterGame/Saved/Config/LinuxServer/Game.ini"},
+		"cs2server":  {"lgsm/config-lgsm/cs2server/cs2server.cfg", "serverfiles/game/csgo/cfg/server.cfg"},
+		"csgoserver": {"lgsm/config-lgsm/csgoserver/csgoserver.cfg", "serverfiles/csgo/cfg/csgoserver.cfg"},
+		"dayzserver": {"lgsm/config-lgsm/dayzserver/common.cfg", "lgsm/config-lgsm/dayzserver/dayzserver.cfg", "serverfiles/cfg/dayzserver.server.cfg"},
+		"gmodserver": {"lgsm/config-lgsm/gmodserver/gmodserver.cfg", "serverfiles/garrysmod/cfg/gmodserver.cfg"},
+		"pwserver":   {"lgsm/config-lgsm/pwserver/common.cfg", "lgsm/config-lgsm/pwserver/pwserver.cfg", "serverfiles/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini"},
+		"pzserver":   {"lgsm/config-lgsm/pzserver/pzserver.cfg", "Zomboid/Server/pzserver.ini"},
+		"sdtdserver": {"lgsm/config-lgsm/sdtdserver/sdtdserver.cfg", "serverfiles/sdtdserver.xml"},
+		"untserver":  {"lgsm/config-lgsm/untserver/untserver.cfg", "serverfiles/Servers/untserver/Config.json", "serverfiles/Servers/untserver/Commands.dat", "serverfiles/Servers/untserver/WorkshopDownloadConfig.json"},
 	}
 	for id, paths := range want {
 		got, err := familyManifest("scrolls/lgsm/"+id, "latest")
@@ -110,7 +175,7 @@ func TestHytaleCatalogIncludesEveryDocumentedTopLevelConfiguration(t *testing.T)
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []string{"data/Server/config.json", "data/Server/permissions.json", "data/Server/whitelist.json", "data/Server/bans.json"}
+	want := []string{"Server/config.json", "Server/permissions.json", "Server/whitelist.json", "Server/bans.json"}
 	gotPaths := make([]string, 0, len(got.Files))
 	for _, file := range got.Files {
 		gotPaths = append(gotPaths, file.Path)
@@ -136,10 +201,10 @@ func TestCuberiteCatalogIncludesDocumentedServerAndDefaultWorldConfiguration(t *
 		t.Fatal(err)
 	}
 	want := []string{
-		"data/settings.ini", "data/webadmin.ini",
-		"data/world/world.ini", "data/world_nether/world.ini", "data/world_the_end/world.ini",
-		"data/monsters.ini", "data/motd.txt", "data/crafting.txt", "data/brewing.txt",
-		"data/furnace.txt", "data/items.ini",
+		"settings.ini", "webadmin.ini",
+		"world/world.ini", "world_nether/world.ini", "world_the_end/world.ini",
+		"monsters.ini", "motd.txt", "crafting.txt", "brewing.txt",
+		"furnace.txt", "items.ini",
 	}
 	gotPaths := make([]string, 0, len(got.Files))
 	for _, file := range got.Files {
@@ -177,11 +242,12 @@ func TestEnsureConfigFilesCreatesRuntimeDefaultsButPreservesTemplates(t *testing
 		t.Fatal(err)
 	}
 	config := manifest{Files: []fileSchema{
-		{Path: "data/templated.cfg", Format: "key-value"},
-		{Path: "data/packaged.cfg", Format: "key-value"},
-		{Path: "data/config.json", Format: "json", CreateIfMissing: true},
-		{Path: "data/server/druid/cfg/server.cfg", Format: "key-value", CreateIfMissing: true},
-		{Path: "data/settings.ini", Format: "ini", CreateIfMissing: true},
+		{Path: "templated.cfg", Format: "key-value"},
+		{Path: "packaged.cfg", Format: "key-value"},
+		{Path: "generated.cfg", Format: "key-value"},
+		{Path: "config.json", Format: "json", CreateIfMissing: true},
+		{Path: "server/druid/cfg/server.cfg", Format: "key-value", CreateIfMissing: true},
+		{Path: "settings.ini", Format: "ini", CreateIfMissing: true},
 	}}
 
 	if err := ensureConfigFiles(root, config); err != nil {
@@ -192,6 +258,10 @@ func TestEnsureConfigFilesCreatesRuntimeDefaultsButPreservesTemplates(t *testing
 	}
 	if _, err := os.Stat(filepath.Join(root, "data", "packaged.cfg")); !os.IsNotExist(err) {
 		t.Fatalf("packaged-default output was unexpectedly created: %v", err)
+	}
+	generatedDefault, err := os.ReadFile(filepath.Join(root, "data", "generated.cfg.default"))
+	if err != nil || len(generatedDefault) == 0 {
+		t.Fatalf("generated fallback must be non-empty so OCI packaging retains it: %q, %v", generatedDefault, err)
 	}
 	jsonBytes, err := os.ReadFile(filepath.Join(root, "data", "config.json"))
 	if err != nil || string(jsonBytes) != "{}\n" {
@@ -287,17 +357,15 @@ func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) 
 			t.Errorf("parse manifest %s: %v", path, err)
 			return nil
 		}
-		expected, manifestErr := familyManifest(filepath.ToSlash(path), "test")
-		if manifestErr != nil {
-			t.Errorf("catalog %s: %v", path, manifestErr)
-			return nil
-		}
-		for index, file := range got.Files {
-			target := filepath.Join(destination, filepath.FromSlash(file.Path))
+		for _, file := range got.Files {
+			if strings.HasPrefix(file.Path, "data/") {
+				t.Errorf("%s exposes artifact path %q instead of a runtime-relative path", path, file.Path)
+			}
+			target := filepath.Join(destination, "data", filepath.FromSlash(file.Path))
 			if _, err := os.Stat(target); err != nil {
 				_, templateErr := os.Stat(target + ".scroll_template")
 				_, defaultErr := os.Stat(target + ".default")
-				if templateErr != nil && defaultErr != nil && expected.Files[index].CreateIfMissing {
+				if templateErr != nil && defaultErr != nil {
 					t.Errorf("%s has neither config nor template for %s", path, file.Path)
 				}
 			}

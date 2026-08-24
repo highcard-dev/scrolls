@@ -9,6 +9,7 @@ export const copy = {
   rawChanged: "Raw configuration changed",
   unknownKeys: "Unknown keys: Preserved",
   restartRequired: "Restart required",
+  restartAfterSave: "Restart required after saving",
   stopBeforeSave: "Stop the server before saving configuration files that it may rewrite.",
   noRestartRequired: "No restart required",
   save: "Save changes",

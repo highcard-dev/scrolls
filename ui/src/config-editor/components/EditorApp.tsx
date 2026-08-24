@@ -10,7 +10,6 @@ import { EDITOR_STYLES } from "../styles.js";
 import { ActionBar } from "./ActionBar.js";
 import { FileRail } from "./FileRail.js";
 import { FormEditor } from "./FormEditor.js";
-import { Inspector } from "./Inspector.js";
 import { RawEditor } from "./RawEditor.js";
 
 export type EditorMode = "form" | "raw";
@@ -49,8 +48,18 @@ export const EditorApp = ({
         <div class="eyebrow">Druid Admin UI</div>
         <h1 class="editor-title">{manifest.server.displayName}</h1>
       </div>
-      <div class="server-version">
-        {manifest.server.appVersion ? `Version ${manifest.server.appVersion}` : copy.appTitle}
+      <div class="header-controls">
+        <div class="server-version">
+          {manifest.server.appVersion ? `Version ${manifest.server.appVersion}` : copy.appTitle}
+        </div>
+        <ActionBar
+          dirty={snapshot.dirty}
+          invalid={snapshot.issues.some((issue) => issue.severity === "error")}
+          restartRequired={snapshot.restartRequired}
+          saving={saving}
+          status={status}
+          onSave={onSave}
+        />
       </div>
     </header>
     <div class="editor-grid">
@@ -87,15 +96,7 @@ export const EditorApp = ({
         ) : (
           <RawEditor source={store.serializeForDisplay()} onChange={onRaw} />
         )}
-        <ActionBar
-          dirty={snapshot.dirty}
-          invalid={snapshot.issues.some((issue) => issue.severity === "error")}
-          saving={saving}
-          status={status}
-          onSave={onSave}
-        />
       </main>
-      <Inspector snapshot={snapshot} />
     </div>
   </div>
 );

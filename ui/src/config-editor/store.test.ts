@@ -335,4 +335,30 @@ describe("ConfigEditorStore", () => {
 
     expect(store.serializeSelectedFile()).toBe('{\n  "port": 5520\n}\n');
   });
+
+  it("shows a declared default for a missing setting without changing the file", () => {
+    const store = loadedStore(
+      "motd=Druid\n",
+      fileSchema([
+        baseField({
+          key: "online-mode",
+          label: "Online mode",
+          type: "boolean",
+          min: undefined,
+          max: undefined,
+          defaultValue: true,
+        }),
+      ]),
+    );
+
+    expect(store.snapshot().fields["online-mode"]).toEqual(
+      expect.objectContaining({
+        displayValue: "true",
+        value: true,
+        dirty: false,
+        issues: [],
+      }),
+    );
+    expect(store.serializeSelectedFile()).toBe("motd=Druid\n");
+  });
 });

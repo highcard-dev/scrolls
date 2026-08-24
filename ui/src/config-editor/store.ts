@@ -192,9 +192,10 @@ export class ConfigEditorStore {
     field: FieldSchema,
   ): { value: ConfigValue | undefined; issues: ValidationIssue[] } {
     const raw = this.adapter.get(document, field.key);
-    if (raw === undefined) return { value: undefined, issues: [] };
+    const input = raw === undefined ? field.defaultValue : raw;
+    if (input === undefined) return { value: undefined, issues: [] };
     try {
-      const value = coerceFieldValue(field, raw);
+      const value = coerceFieldValue(field, input);
       return { value, issues: validateField(field, value) };
     } catch (error) {
       return {
