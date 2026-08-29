@@ -49,9 +49,13 @@ jobs:
           distribution: "microsoft" # See 'Supported distributions' for available options
           java-version: "${{ matrix.version.java-version }}"
       - run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-      - run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
+      - name: Build Spigot with BuildTools
+        id: build_spigot
+        continue-on-error: true
+        run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
       - name: Stage verified Spigot jar
         id: stage_jar
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
@@ -67,6 +71,7 @@ jobs:
           mv "${jar}" "spigot/${jar}"
           echo "artifact=true" >> "$GITHUB_OUTPUT"
       - uses: jakejarvis/s3-sync-action@master
+        continue-on-error: true
         if: steps.stage_jar.outputs.artifact == 'true'
         env:
           AWS_S3_BUCKET: ${{ secrets.PRESIGN_BUCKET_NAME }}
