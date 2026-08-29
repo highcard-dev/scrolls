@@ -354,6 +354,7 @@ func stage(source, destination, bundle string) error {
 	if err != nil {
 		return err
 	}
+	runtimeManifest := runtimeConfigManifest(configManifest)
 	scroll["ui"] = map[string]any{"private": map[string]any{"path": "private/dist/app.wasm"}}
 	updatedYAML, err := yaml.Marshal(scroll)
 	if err != nil {
@@ -370,15 +371,28 @@ func stage(source, destination, bundle string) error {
 	if err := copyFile(bundle, filepath.Join(privateDir, "dist", "app.wasm")); err != nil {
 		return err
 	}
-	manifestBytes, err := json.MarshalIndent(configManifest, "", "  ")
+	manifestBytes, err := json.MarshalIndent(runtimeManifest, "", "  ")
 	if err != nil {
 		return err
 	}
 	manifestBytes = append(manifestBytes, '\n')
-	if err := os.WriteFile(filepath.Join(privateDir, "config-editor.manifest.json"), manifestBytes, 0644); err != nil {
+	manifestDir := filepath.Join(destination, "data", ".druid")
+	if err := os.MkdirAll(manifestDir, 0755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(manifestDir, "config-editor.manifest.json"), manifestBytes, 0644); err != nil {
 		return err
 	}
 	return ensureConfigFiles(destination, configManifest)
+}
+
+func runtimeConfigManifest(source manifest) manifest {
+	result := source
+	result.Files = append([]fileSchema(nil), source.Files...)
+	for index := range result.Files {
+		result.Files[index].Path = strings.TrimPrefix(result.Files[index].Path, "data/")
+	}
+	return result
 }
 
 func ensureConfigFiles(destination string, configManifest manifest) error {

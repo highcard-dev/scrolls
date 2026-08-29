@@ -40,7 +40,7 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if string(stagedYAML) == "" || !contains(string(stagedYAML), "path: private/dist/app.wasm") {
 		t.Fatalf("staged yaml = %s", stagedYAML)
 	}
-	manifestBytes, err := os.ReadFile(filepath.Join(destination, "private", "config-editor.manifest.json"))
+	manifestBytes, err := os.ReadFile(filepath.Join(destination, "data", ".druid", "config-editor.manifest.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,6 +53,9 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	}
 	if len(got.Files) != 1 || len(got.Files[0].Sections) < 4 {
 		t.Fatalf("manifest files = %#v", got.Files)
+	}
+	if got.Files[0].Path != "server.properties" {
+		t.Fatalf("runtime manifest path = %q, want server.properties", got.Files[0].Path)
 	}
 	if _, err := os.Stat(filepath.Join(destination, "private", "dist", "app.wasm")); err != nil {
 		t.Fatal(err)
@@ -277,7 +280,7 @@ func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) 
 			t.Errorf("stage %s: %v", path, err)
 			return nil
 		}
-		manifestBytes, err := os.ReadFile(filepath.Join(destination, "private", "config-editor.manifest.json"))
+		manifestBytes, err := os.ReadFile(filepath.Join(destination, "data", ".druid", "config-editor.manifest.json"))
 		if err != nil {
 			t.Errorf("manifest %s: %v", path, err)
 			return nil
@@ -293,7 +296,7 @@ func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) 
 			return nil
 		}
 		for index, file := range got.Files {
-			target := filepath.Join(destination, filepath.FromSlash(file.Path))
+			target := filepath.Join(destination, "data", filepath.FromSlash(file.Path))
 			if _, err := os.Stat(target); err != nil {
 				_, templateErr := os.Stat(target + ".scroll_template")
 				_, defaultErr := os.Stat(target + ".default")
