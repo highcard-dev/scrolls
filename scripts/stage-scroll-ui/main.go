@@ -365,6 +365,17 @@ func stage(source, destination, bundle string) error {
 	}
 
 	privateDir := filepath.Join(destination, "private")
+	uiSource := filepath.Dir(filepath.Dir(bundle))
+	if err := cp.Copy(uiSource, privateDir, cp.Options{Skip: func(_ os.FileInfo, src, _ string) (bool, error) {
+		relative, err := filepath.Rel(uiSource, src)
+		if err != nil {
+			return false, err
+		}
+		topLevel := strings.Split(filepath.ToSlash(relative), "/")[0]
+		return topLevel == "dist" || topLevel == "node_modules", nil
+	}}); err != nil {
+		return fmt.Errorf("copy UI source: %w", err)
+	}
 	if err := os.MkdirAll(filepath.Join(privateDir, "dist"), 0755); err != nil {
 		return err
 	}

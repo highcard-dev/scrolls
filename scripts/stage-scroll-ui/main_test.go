@@ -23,8 +23,14 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(source, "data", "server.properties.default"), []byte("max-players=20\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	bundle := filepath.Join(root, "app.wasm")
-	if err := os.WriteFile(bundle, []byte("wasm"), 0644); err != nil {
+	uiSource, bundle := writeTestUISource(t)
+	if err := os.WriteFile(filepath.Join(uiSource, "dist", "stale.js"), []byte("stale\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(uiSource, "node_modules", "dependency"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(uiSource, "node_modules", "dependency", "index.js"), []byte("dependency\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
 	destination := filepath.Join(root, "staged")
@@ -59,6 +65,18 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(destination, "private", "dist", "app.wasm")); err != nil {
 		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "src", "app.tsx")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "package.json")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "dist", "stale.js")); !os.IsNotExist(err) {
+		t.Fatalf("stale build output was packaged: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "node_modules")); !os.IsNotExist(err) {
+		t.Fatalf("node_modules was packaged: %v", err)
 	}
 	if _, err := os.Stat(filepath.Join(destination, "data", "server.properties")); !os.IsNotExist(err) {
 		t.Fatalf("active config was unexpectedly created beside packaged default: %v", err)
@@ -262,10 +280,7 @@ func TestCatalogCoversEveryCheckedInGameServerScroll(t *testing.T) {
 }
 
 func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) {
-	bundle := filepath.Join(t.TempDir(), "app.wasm")
-	if err := os.WriteFile(bundle, []byte("wasm"), 0644); err != nil {
-		t.Fatal(err)
-	}
+	_, bundle := writeTestUISource(t)
 	count := 0
 	err := filepath.Walk(filepath.Join("..", "..", "scrolls"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -313,6 +328,28 @@ func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) 
 	if count != 124 {
 		t.Fatalf("staged Scroll count = %d, want 124", count)
 	}
+}
+
+func writeTestUISource(t *testing.T) (string, string) {
+	t.Helper()
+	uiSource := filepath.Join(t.TempDir(), "ui")
+	if err := os.MkdirAll(filepath.Join(uiSource, "src"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(uiSource, "package.json"), []byte("{}\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(uiSource, "src", "app.tsx"), []byte("export const source = true;\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(uiSource, "dist"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	bundle := filepath.Join(uiSource, "dist", "app.wasm")
+	if err := os.WriteFile(bundle, []byte("wasm"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	return uiSource, bundle
 }
 
 func contains(value, part string) bool {

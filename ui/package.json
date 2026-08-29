@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "druid-ui-build --wit=node_modules/@druid-ui/plattform/wit/druid-plattform.wit --world-name=druid-plattform src/app.tsx dist",
+    "build:raw": "druid-ui-build --wit=node_modules/@druid-ui/plattform/wit/druid-plattform.wit --world-name=druid-plattform src/app.tsx --raw dist",
+    "dev": "druid-ui-build --wit=node_modules/@druid-ui/plattform/wit/druid-plattform.wit --world-name=druid-plattform src/app.tsx --watch --raw dist",
     "test": "vitest run src/config-editor",
     "type-check": "tsc --noEmit"
   },
