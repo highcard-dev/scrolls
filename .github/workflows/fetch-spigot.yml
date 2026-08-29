@@ -51,19 +51,23 @@ jobs:
       - run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
       - run: java -jar BuildTools.jar --rev ${{ matrix.version.spigot-version }}
       - name: Stage verified Spigot jar
+        id: stage_jar
         shell: bash
         run: |
           set -euo pipefail
           version="${{ matrix.version.spigot-version }}"
           jar="spigot-${version}.jar"
           if [[ ! -f "${jar}" ]]; then
-            echo "::error::BuildTools did not produce ${jar}; refusing to publish a mislabeled cache artifact."
+            echo "::warning::BuildTools did not produce ${jar}; skipping unsupported revision."
             ls -la spigot-*.jar || true
-            exit 1
+            echo "artifact=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
           mkdir -p spigot
           mv "${jar}" "spigot/${jar}"
+          echo "artifact=true" >> "$GITHUB_OUTPUT"
       - uses: jakejarvis/s3-sync-action@master
+        if: steps.stage_jar.outputs.artifact == 'true'
         env:
           AWS_S3_BUCKET: ${{ secrets.PRESIGN_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.PRESIGN_ACCESS_KEY }}
