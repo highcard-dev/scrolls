@@ -245,6 +245,14 @@ export class ConfigEditorStore {
     }
 
     state.displayValue = input;
+    if (
+      input.trim() === "" &&
+      state.current === undefined &&
+      (state.schema.type === "integer" || state.schema.type === "number")
+    ) {
+      state.issues = [];
+      return;
+    }
     let value: ConfigValue;
     try {
       value = coerceFieldValue(state.schema, input);

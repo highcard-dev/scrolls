@@ -89,6 +89,16 @@ describe("ConfigEditorStore", () => {
     expect(store.serializeSelectedFile()).toBe("max-players=20\n");
   });
 
+  it("keeps empty optional numeric fields absent", () => {
+    const store = loadedStore("motd=hello\n", fileSchema([baseField()]));
+
+    store.setDisplayValue("max-players", "");
+
+    expect(store.snapshot().fields["max-players"]!.issues).toEqual([]);
+    expect(store.snapshot().dirty).toBe(false);
+    expect(store.serializeSelectedFile()).toBe("motd=hello\n");
+  });
+
   it("redacts secret values from change summaries and immutable snapshots", () => {
     const store = loadedStore(
       "password=old-secret\n",
