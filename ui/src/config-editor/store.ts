@@ -193,6 +193,13 @@ export class ConfigEditorStore {
   ): { value: ConfigValue | undefined; issues: ValidationIssue[] } {
     const raw = this.adapter.get(document, field.key);
     if (raw === undefined) return { value: undefined, issues: [] };
+    if (
+      typeof raw === "string" &&
+      (field.type === "integer" || field.type === "number") &&
+      /^__DRUID_[A-Z0-9_]+__$/.test(raw)
+    ) {
+      return { value: undefined, issues: [] };
+    }
     try {
       const value = coerceFieldValue(field, raw);
       return { value, issues: validateField(field, value) };
