@@ -99,6 +99,22 @@ describe("ConfigEditorStore", () => {
     expect(store.serializeSelectedFile()).toBe("motd=hello\n");
   });
 
+  it("preserves unresolved numeric runtime placeholders without validation errors", () => {
+    const store = loadedStore(
+      "motd=hello\nserver-port=__DRUID_PORT_MAIN__\n",
+      fileSchema([
+        baseField({ key: "motd", type: "string", min: undefined, max: undefined }),
+        baseField({ key: "server-port" }),
+      ]),
+    );
+
+    expect(store.snapshot().fields["server-port"]!.issues).toEqual([]);
+    store.setDisplayValue("motd", "updated");
+    expect(store.serializeSelectedFile()).toBe(
+      "motd=updated\nserver-port=__DRUID_PORT_MAIN__\n",
+    );
+  });
+
   it("redacts secret values from change summaries and immutable snapshots", () => {
     const store = loadedStore(
       "password=old-secret\n",
