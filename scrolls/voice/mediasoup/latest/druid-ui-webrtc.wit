@@ -1,0 +1,309 @@
+// WIT Interface Definition for DruidUI WebRTC Support
+// WebAssembly Component Model interface for real-time voice communication
+
+package druid:webrtc@0.1.0;
+
+/// Core WebRTC interfaces for voice chat in DruidUI
+interface webrtc {
+    
+    // ============================================================================
+    // Media Device Access
+    // ============================================================================
+    
+    /// Media stream constraints for getUserMedia
+    record media-constraints {
+        audio: option<audio-constraints>,
+        video: option<video-constraints>,
+    }
+    
+    record audio-constraints {
+        sample-rate: option<u32>,           // e.g., 48000
+        channel-count: option<u32>,         // 1 = mono, 2 = stereo
+        echo-cancellation: option<bool>,
+        noise-suppression: option<bool>,
+        auto-gain-control: option<bool>,
+        device-id: option<string>,
+    }
+    
+    record video-constraints {
+        width: option<u32>,
+        height: option<u32>,
+        frame-rate: option<u32>,
+        device-id: option<string>,
+    }
+    
+    /// Media device information
+    record media-device-info {
+        device-id: string,
+        label: string,
+        kind: device-kind,
+    }
+    
+    enum device-kind {
+        audio-input,
+        audio-output,
+        video-input,
+    }
+    
+    /// Handle to a media stream (audio/video)
+    resource media-stream {
+        /// Get tracks from this stream
+        get-audio-tracks: func() -> list<audio-track-handle>;
+        get-video-tracks: func() -> list<video-track-handle>;
+        
+        /// Add/remove tracks
+        add-track: func(track: track-handle);
+        remove-track: func(track: track-handle);
+        
+        /// Stream state
+        is-active: func() -> bool;
+        
+        /// Clean up
+        stop: func();
+    }
+    
+    type audio-track-handle = u32;
+    type video-track-handle = u32;
+    type track-handle = u32;
+    
+    /// Request user media (microphone/camera)
+    get-user-media: func(constraints: media-constraints) -> result<media-stream, media-error>;
+    
+    /// Enumerate available media devices
+    enumerate-devices: func() -> result<list<media-device-info>, media-error>;
+    
+    enum media-error {
+        permission-denied,
+        device-not-found,
+        constraint-not-satisfied,
+        not-supported,
+        unknown,
+    }
+    
+    
+    // ============================================================================
+    // RTCPeerConnection
+    // ============================================================================
+    
+    /// WebRTC peer connection for sending/receiving media
+    resource rtc-peer-connection {
+        /// Add a media stream to send
+        add-stream: func(stream: media-stream) -> result<_, rtc-error>;
+        
+        /// Create an offer (caller side)
+        create-offer: func() -> result<session-description, rtc-error>;
+        
+        /// Create an answer (callee side)
+        create-answer: func() -> result<session-description, rtc-error>;
+        
+        /// Set local description
+        set-local-description: func(desc: session-description) -> result<_, rtc-error>;
+        
+        /// Set remote description
+        set-remote-description: func(desc: session-description) -> result<_, rtc-error>;
+        
+        /// Add ICE candidate
+        add-ice-candidate: func(candidate: ice-candidate) -> result<_, rtc-error>;
+        
+        /// Get connection state
+        get-connection-state: func() -> connection-state;
+        
+        /// Get ICE connection state
+        get-ice-connection-state: func() -> ice-connection-state;
+        
+        /// Close the connection
+        close: func();
+    }
+    
+    record rtc-configuration {
+        ice-servers: list<ice-server>,
+    }
+    
+    record ice-server {
+        urls: list<string>,               // STUN/TURN server URLs
+        username: option<string>,
+        credential: option<string>,
+    }
+    
+    record session-description {
+        sdp-type: sdp-type,
+        sdp: string,
+    }
+    
+    enum sdp-type {
+        offer,
+        answer,
+        pranswer,
+        rollback,
+    }
+    
+    record ice-candidate {
+        candidate: string,
+        sdp-mid: option<string>,
+        sdp-m-line-index: option<u32>,
+    }
+    
+    enum connection-state {
+        new,
+        connecting,
+        connected,
+        disconnected,
+        failed,
+        closed,
+    }
+    
+    enum ice-connection-state {
+        new,
+        checking,
+        connected,
+        completed,
+        failed,
+        disconnected,
+        closed,
+    }
+    
+    enum rtc-error {
+        invalid-state,
+        invalid-parameter,
+        operation-error,
+        unknown,
+    }
+    
+    /// Create a new peer connection
+    create-peer-connection: func(config: rtc-configuration) -> result<rtc-peer-connection, rtc-error>;
+    
+    
+    // ============================================================================
+    // WebRTC Events (callbacks from host to WASM)
+    // ============================================================================
+    
+    /// Event types for WebRTC
+    variant webrtc-event {
+        /// ICE candidate generated
+        ice-candidate(ice-candidate-event),
+        
+        /// Connection state changed
+        connection-state-change(connection-state),
+        
+        /// ICE connection state changed
+        ice-connection-state-change(ice-connection-state),
+        
+        /// Remote stream added
+        remote-stream-added(media-stream),
+        
+        /// Remote stream removed
+        remote-stream-removed(stream-id),
+        
+        /// Track added to connection
+        track-added(track-event),
+    }
+    
+    record ice-candidate-event {
+        candidate: option<ice-candidate>,
+    }
+    
+    record track-event {
+        track: track-handle,
+        streams: list<media-stream>,
+    }
+    
+    type stream-id = string;
+    
+    /// Register callback for WebRTC events (called by WASM component)
+    /// Host will invoke the exported `handle-webrtc-event` function
+    register-event-handler: func(connection-id: u32);
+    
+    
+    // ============================================================================
+    // Audio Control
+    // ============================================================================
+    
+    /// Audio track controls
+    resource audio-track {
+        /// Mute/unmute
+        set-enabled: func(enabled: bool);
+        is-enabled: func() -> bool;
+        
+        /// Volume control (0.0 to 1.0)
+        set-volume: func(volume: f32);
+        get-volume: func() -> f32;
+        
+        /// Get current audio level (0.0 to 1.0)
+        get-audio-level: func() -> f32;
+    }
+    
+    /// Get audio track from handle
+    get-audio-track: func(handle: audio-track-handle) -> result<audio-track, media-error>;
+    
+    
+    // ============================================================================
+    // WebSocket Signaling (for WebRTC signaling channel)
+    // ============================================================================
+    
+    resource websocket {
+        /// Send text message
+        send-text: func(data: string) -> result<_, ws-error>;
+        
+        /// Send binary message
+        send-binary: func(data: list<u8>) -> result<_, ws-error>;
+        
+        /// Close connection
+        close: func(code: option<u16>, reason: option<string>);
+        
+        /// Get ready state
+        get-ready-state: func() -> ws-ready-state;
+    }
+    
+    enum ws-ready-state {
+        connecting,
+        open,
+        closing,
+        closed,
+    }
+    
+    enum ws-error {
+        invalid-state,
+        send-failed,
+        unknown,
+    }
+    
+    /// WebSocket events
+    variant ws-event {
+        open,
+        message-text(string),
+        message-binary(list<u8>),
+        error(string),
+        close(ws-close-event),
+    }
+    
+    record ws-close-event {
+        code: u16,
+        reason: string,
+        was-clean: bool,
+    }
+    
+    /// Connect to WebSocket server
+    websocket-connect: func(url: string) -> result<websocket, ws-error>;
+    
+    /// Register WebSocket event handler
+    register-ws-event-handler: func(ws-id: u32);
+}
+
+
+// ============================================================================
+// World Definition - Export interface for DruidUI components
+// ============================================================================
+
+world druid-voice-component {
+    /// Import WebRTC capabilities from host
+    import webrtc;
+    
+    /// Export event handlers (called by host)
+    export handle-webrtc-event: func(connection-id: u32, event: webrtc.webrtc-event);
+    export handle-ws-event: func(ws-id: u32, event: webrtc.ws-event);
+    
+    /// Export component lifecycle
+    export init: func();
+    export render: func() -> string;  // Returns HTML/virtual DOM
+    export on-user-action: func(action: string, data: string);
+}
