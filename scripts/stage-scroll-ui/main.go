@@ -120,7 +120,7 @@ func arkManifest(version string) manifest {
 
 	return manifest{Version: 1, Server: serverSchema{Family: "ark", DisplayName: "ARK: Survival Evolved", AppVersion: version}, Files: []fileSchema{
 		{
-			Path: "data/serverfiles/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini", Format: "unreal-ini", Label: "GameUserSettings.ini",
+			Path: "serverfiles/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini", Format: "unreal-ini", Label: "GameUserSettings.ini",
 			Description: "ARK server access, administration, and transfer settings. Every additional option remains editable in Raw mode.", Documentation: docs,
 			Sections: []sectionSchema{
 				{ID: "server", Label: "Server and administration", Fields: server},
@@ -132,7 +132,7 @@ func arkManifest(version string) manifest {
 			},
 		},
 		{
-			Path: "data/serverfiles/ShooterGame/Saved/Config/LinuxServer/Game.ini", Format: "unreal-ini", Label: "Game.ini",
+			Path: "serverfiles/ShooterGame/Saved/Config/LinuxServer/Game.ini", Format: "unreal-ini", Label: "Game.ini",
 			Description: "ARK progression, breeding, harvesting, and balance settings. Advanced arrays and overrides remain editable in Raw mode.", Documentation: docs,
 			Sections: []sectionSchema{{ID: "gameplay", Label: "World and progression", Fields: gameplay}},
 		},
@@ -215,7 +215,7 @@ func minecraftManifest(version string) manifest {
 	admin[9].Min, admin[9].Max = number(1), number(4)
 
 	return manifest{Version: 1, Server: serverSchema{Family: "minecraft", DisplayName: "Minecraft Server", AppVersion: version}, Files: []fileSchema{{
-		Path: "data/server.properties", Format: "java-properties", Label: "server.properties",
+		Path: "server.properties", Format: "java-properties", Label: "server.properties",
 		Description:   "Minecraft dedicated-server settings. Version-specific and unknown keys remain editable in Raw mode.",
 		Documentation: "https://minecraft.wiki/w/Server.properties",
 		Sections: []sectionSchema{
@@ -243,17 +243,17 @@ func familyManifest(source string, appVersion string) (manifest, error) {
 		if strings.Contains(source, "/cuberite/") {
 			const docs = "https://book.cuberite.org/"
 			return manifest{1, serverSchema{"minecraft-cuberite", "Cuberite Server", appVersion}, []fileSchema{
-				managedFile("data/settings.ini", "settings.ini", "ini", "Cuberite server-wide settings.", docs),
-				rawFile("data/webadmin.ini", "webadmin.ini", "ini", "Cuberite WebAdmin settings.", docs),
-				rawFile("data/world/world.ini", "world/world.ini", "ini", "Cuberite overworld settings.", docs),
-				rawFile("data/world_nether/world.ini", "world_nether/world.ini", "ini", "Cuberite Nether world settings.", docs),
-				rawFile("data/world_the_end/world.ini", "world_the_end/world.ini", "ini", "Cuberite End world settings.", docs),
-				rawFile("data/monsters.ini", "monsters.ini", "ini", "Cuberite monster behaviour settings.", docs),
-				rawFile("data/motd.txt", "motd.txt", "raw", "Cuberite message of the day.", docs),
-				rawFile("data/crafting.txt", "crafting.txt", "raw", "Cuberite crafting recipes.", docs),
-				rawFile("data/brewing.txt", "brewing.txt", "raw", "Cuberite brewing recipes.", docs),
-				rawFile("data/furnace.txt", "furnace.txt", "raw", "Cuberite furnace recipes.", docs),
-				rawFile("data/items.ini", "items.ini", "ini", "Cuberite item identifiers.", docs),
+				managedFile("settings.ini", "settings.ini", "ini", "Cuberite server-wide settings.", docs),
+				rawFile("webadmin.ini", "webadmin.ini", "ini", "Cuberite WebAdmin settings.", docs),
+				rawFile("world/world.ini", "world/world.ini", "ini", "Cuberite overworld settings.", docs),
+				rawFile("world_nether/world.ini", "world_nether/world.ini", "ini", "Cuberite Nether world settings.", docs),
+				rawFile("world_the_end/world.ini", "world_the_end/world.ini", "ini", "Cuberite End world settings.", docs),
+				rawFile("monsters.ini", "monsters.ini", "ini", "Cuberite monster behaviour settings.", docs),
+				rawFile("motd.txt", "motd.txt", "raw", "Cuberite message of the day.", docs),
+				rawFile("crafting.txt", "crafting.txt", "raw", "Cuberite crafting recipes.", docs),
+				rawFile("brewing.txt", "brewing.txt", "raw", "Cuberite brewing recipes.", docs),
+				rawFile("furnace.txt", "furnace.txt", "raw", "Cuberite furnace recipes.", docs),
+				rawFile("items.ini", "items.ini", "ini", "Cuberite item identifiers.", docs),
 			}}, nil
 		}
 		return minecraftManifest(appVersion), nil
@@ -267,47 +267,47 @@ func familyManifest(source string, appVersion string) (manifest, error) {
 	families := map[string]family{
 		"arkserver": {"ARK: Survival Evolved", "https://ark.wiki.gg/wiki/Server_configuration", nil},
 		"cs2server": {"Counter-Strike 2", "https://docs.linuxgsm.com/configuration/game-server-config", []fileSchema{
-			managedFile("data/lgsm/config-lgsm/cs2server/cs2server.cfg", "cs2server.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
-			rawFile("data/serverfiles/game/csgo/cfg/server.cfg", "server.cfg", "key-value", "Counter-Strike 2 game-server configuration.", "https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers"),
+			managedFile("lgsm/config-lgsm/cs2server/cs2server.cfg", "cs2server.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
+			rawFile("serverfiles/game/csgo/cfg/server.cfg", "server.cfg", "key-value", "Counter-Strike 2 game-server configuration.", "https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers"),
 		}},
 		"csgoserver": {"Counter-Strike: Global Offensive", "https://docs.linuxgsm.com/configuration/game-server-config", []fileSchema{
-			managedFile("data/lgsm/config-lgsm/csgoserver/csgoserver.cfg", "csgoserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
-			rawFile("data/serverfiles/csgo/cfg/csgoserver.cfg", "csgoserver.cfg", "key-value", "Counter-Strike: Global Offensive game-server configuration.", "https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive/Dedicated_Servers"),
+			managedFile("lgsm/config-lgsm/csgoserver/csgoserver.cfg", "csgoserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
+			rawFile("serverfiles/csgo/cfg/csgoserver.cfg", "csgoserver.cfg", "key-value", "Counter-Strike: Global Offensive game-server configuration.", "https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive/Dedicated_Servers"),
 		}},
 		"dayzserver": {"DayZ", "https://community.bistudio.com/wiki/DayZ:Server_Configuration", []fileSchema{
-			managedFile("data/lgsm/config-lgsm/dayzserver/common.cfg", "common.cfg", "key-value", "LinuxGSM settings shared by DayZ instances.", lgsmDocs),
-			managedFile("data/lgsm/config-lgsm/dayzserver/dayzserver.cfg", "dayzserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
-			rawFile("data/serverfiles/cfg/dayzserver.server.cfg", "dayzserver.server.cfg", "key-value", "DayZ game-server configuration.", "https://community.bistudio.com/wiki/DayZ:Server_Configuration"),
+			managedFile("lgsm/config-lgsm/dayzserver/common.cfg", "common.cfg", "key-value", "LinuxGSM settings shared by DayZ instances.", lgsmDocs),
+			managedFile("lgsm/config-lgsm/dayzserver/dayzserver.cfg", "dayzserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
+			rawFile("serverfiles/cfg/dayzserver.server.cfg", "dayzserver.server.cfg", "key-value", "DayZ game-server configuration.", "https://community.bistudio.com/wiki/DayZ:Server_Configuration"),
 		}},
 		"gmodserver": {"Garry's Mod", "https://docs.linuxgsm.com/configuration/game-server-config", []fileSchema{
-			managedFile("data/lgsm/config-lgsm/gmodserver/gmodserver.cfg", "gmodserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
-			rawFile("data/serverfiles/garrysmod/cfg/gmodserver.cfg", "gmodserver.cfg", "key-value", "Garry's Mod game-server configuration.", "https://wiki.facepunch.com/gmod/Downloading_a_Dedicated_Server"),
+			managedFile("lgsm/config-lgsm/gmodserver/gmodserver.cfg", "gmodserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
+			rawFile("serverfiles/garrysmod/cfg/gmodserver.cfg", "gmodserver.cfg", "key-value", "Garry's Mod game-server configuration.", "https://wiki.facepunch.com/gmod/Downloading_a_Dedicated_Server"),
 		}},
 		"pwserver": {"Palworld", "https://tech.palworldgame.com/settings-and-operation/configuration/", []fileSchema{
-			managedFile("data/lgsm/config-lgsm/pwserver/common.cfg", "common.cfg", "key-value", "LinuxGSM settings shared by Palworld instances.", lgsmDocs),
-			managedFile("data/lgsm/config-lgsm/pwserver/pwserver.cfg", "pwserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
-			rawFile("data/serverfiles/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini", "PalWorldSettings.ini", "unreal-ini", "Palworld game-server configuration.", "https://tech.palworldgame.com/settings-and-operation/configuration/"),
+			managedFile("lgsm/config-lgsm/pwserver/common.cfg", "common.cfg", "key-value", "LinuxGSM settings shared by Palworld instances.", lgsmDocs),
+			managedFile("lgsm/config-lgsm/pwserver/pwserver.cfg", "pwserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
+			rawFile("serverfiles/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini", "PalWorldSettings.ini", "unreal-ini", "Palworld game-server configuration.", "https://tech.palworldgame.com/settings-and-operation/configuration/"),
 		}},
 		"pzserver": {"Project Zomboid", "https://pzwiki.net/wiki/Server_settings", []fileSchema{
-			managedFile("data/lgsm/config-lgsm/pzserver/pzserver.cfg", "pzserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
-			rawFile("data/Zomboid/Server/pzserver.ini", "pzserver.ini", "ini", "Project Zomboid game-server configuration.", "https://pzwiki.net/wiki/Server_settings"),
+			managedFile("lgsm/config-lgsm/pzserver/pzserver.cfg", "pzserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
+			rawFile("Zomboid/Server/pzserver.ini", "pzserver.ini", "ini", "Project Zomboid game-server configuration.", "https://pzwiki.net/wiki/Server_settings"),
 		}},
 		"sdtdserver": {"7 Days to Die", "https://developer.valvesoftware.com/wiki/7_Days_to_Die_Dedicated_Server", []fileSchema{
-			managedFile("data/lgsm/config-lgsm/sdtdserver/sdtdserver.cfg", "sdtdserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
-			rawFile("data/serverfiles/sdtdserver.xml", "sdtdserver.xml", "xml-properties", "7 Days to Die game-server configuration.", "https://developer.valvesoftware.com/wiki/7_Days_to_Die_Dedicated_Server"),
+			managedFile("lgsm/config-lgsm/sdtdserver/sdtdserver.cfg", "sdtdserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
+			rawFile("serverfiles/sdtdserver.xml", "sdtdserver.xml", "xml-properties", "7 Days to Die game-server configuration.", "https://developer.valvesoftware.com/wiki/7_Days_to_Die_Dedicated_Server"),
 		}},
 		"untserver": {"Unturned", "https://docs.smartlydressedgames.com/en/stable/servers/server-hosting.html", []fileSchema{
-			managedFile("data/lgsm/config-lgsm/untserver/untserver.cfg", "untserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
-			rawFile("data/serverfiles/Servers/untserver/Config.json", "Config.json", "json", "Unturned game-server configuration.", "https://docs.smartlydressedgames.com/en/stable/servers/server-hosting.html"),
-			rawFile("data/serverfiles/Servers/untserver/Commands.dat", "Commands.dat", "key-value", "Unturned startup commands and server identity.", "https://docs.smartlydressedgames.com/en/stable/servers/server-hosting.html"),
-			rawFile("data/serverfiles/Servers/untserver/WorkshopDownloadConfig.json", "WorkshopDownloadConfig.json", "json", "Unturned workshop download configuration.", "https://docs.smartlydressedgames.com/en/stable/servers/server-hosting.html"),
+			managedFile("lgsm/config-lgsm/untserver/untserver.cfg", "untserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs),
+			rawFile("serverfiles/Servers/untserver/Config.json", "Config.json", "json", "Unturned game-server configuration.", "https://docs.smartlydressedgames.com/en/stable/servers/server-hosting.html"),
+			rawFile("serverfiles/Servers/untserver/Commands.dat", "Commands.dat", "key-value", "Unturned startup commands and server identity.", "https://docs.smartlydressedgames.com/en/stable/servers/server-hosting.html"),
+			rawFile("serverfiles/Servers/untserver/WorkshopDownloadConfig.json", "WorkshopDownloadConfig.json", "json", "Unturned workshop download configuration.", "https://docs.smartlydressedgames.com/en/stable/servers/server-hosting.html"),
 		}},
 	}
 	for id, spec := range families {
 		if strings.Contains(source, "/lgsm/"+id) {
 			if id == "arkserver" {
 				ark := arkManifest(appVersion)
-				ark.Files = append([]fileSchema{managedFile("data/lgsm/config-lgsm/arkserver/arkserver.cfg", "arkserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs)}, ark.Files...)
+				ark.Files = append([]fileSchema{managedFile("lgsm/config-lgsm/arkserver/arkserver.cfg", "arkserver.cfg", "key-value", "LinuxGSM instance overrides.", lgsmDocs)}, ark.Files...)
 				return ark, nil
 			}
 			return manifest{1, serverSchema{"lgsm-" + id, spec.name, appVersion}, spec.files}, nil
@@ -315,15 +315,15 @@ func familyManifest(source string, appVersion string) (manifest, error) {
 	}
 	if strings.Contains(source, "/rust/rust-") {
 		return manifest{1, serverSchema{"rust", "Rust Server", appVersion}, []fileSchema{
-			managedFile("data/server/druid/cfg/server.cfg", "server.cfg", "key-value", "Rust server convars. Every convar remains editable in Raw mode.", "https://wiki.facepunch.com/rust/Creating-a-server"),
+			managedFile("server/druid/cfg/server.cfg", "server.cfg", "key-value", "Rust server convars. Every convar remains editable in Raw mode.", "https://wiki.facepunch.com/rust/Creating-a-server"),
 		}}, nil
 	}
 	if strings.Contains(source, "/hytale/") {
 		return manifest{1, serverSchema{"hytale", "Hytale Server", appVersion}, []fileSchema{
-			rawFile("data/Server/config.json", "config.json", "json", "Hytale server configuration.", "https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual"),
-			rawFile("data/Server/permissions.json", "permissions.json", "json", "Hytale permissions configuration.", "https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual"),
-			rawFile("data/Server/whitelist.json", "whitelist.json", "json", "Hytale player allowlist.", "https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual"),
-			rawFile("data/Server/bans.json", "bans.json", "json", "Hytale player ban list.", "https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual"),
+			rawFile("Server/config.json", "config.json", "json", "Hytale server configuration.", "https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual"),
+			rawFile("Server/permissions.json", "permissions.json", "json", "Hytale permissions configuration.", "https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual"),
+			rawFile("Server/whitelist.json", "whitelist.json", "json", "Hytale player allowlist.", "https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual"),
+			rawFile("Server/bans.json", "bans.json", "json", "Hytale player ban list.", "https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual"),
 		}}, nil
 	}
 	return manifest{}, fmt.Errorf("no configuration UI catalog entry for %s", source)
@@ -356,6 +356,15 @@ func stage(source, destination, bundle string) error {
 	}
 	runtimeManifest := runtimeConfigManifest(configManifest)
 	scroll["ui"] = map[string]any{"private": map[string]any{"path": "private/dist/app.wasm"}}
+	if err := ensureChunk(scroll, "config-admin-ui", "private"); err != nil {
+		return err
+	}
+	for index, file := range configManifest.Files {
+		rootPath := strings.Split(filepath.ToSlash(file.Path), "/")[0]
+		if err := ensureChunk(scroll, fmt.Sprintf("config-file-%d", index+1), rootPath); err != nil {
+			return err
+		}
+	}
 	updatedYAML, err := yaml.Marshal(scroll)
 	if err != nil {
 		return err
@@ -397,6 +406,31 @@ func stage(source, destination, bundle string) error {
 	return ensureConfigFiles(destination, configManifest)
 }
 
+func ensureChunk(scroll map[string]any, name string, path string) error {
+	rawChunks, exists := scroll["chunks"]
+	if !exists {
+		return nil
+	}
+	chunks, ok := rawChunks.([]any)
+	if !ok {
+		return fmt.Errorf("scroll chunks must be a list, got %T", rawChunks)
+	}
+	if len(chunks) == 0 {
+		return nil
+	}
+	for _, value := range chunks {
+		chunk, ok := value.(map[string]any)
+		if ok {
+			chunkPath, _ := chunk["path"].(string)
+			if chunkPath == "." || chunkPath == path {
+				return nil
+			}
+		}
+	}
+	scroll["chunks"] = append(chunks, map[string]any{"name": name, "path": path})
+	return nil
+}
+
 func runtimeConfigManifest(source manifest) manifest {
 	result := source
 	result.Files = append([]fileSchema(nil), source.Files...)
@@ -408,7 +442,7 @@ func runtimeConfigManifest(source manifest) manifest {
 
 func ensureConfigFiles(destination string, configManifest manifest) error {
 	for _, file := range configManifest.Files {
-		target := filepath.Join(destination, filepath.FromSlash(file.Path))
+		target := filepath.Join(destination, "data", filepath.FromSlash(file.Path))
 		if _, err := os.Stat(target); err == nil {
 			continue
 		} else if !os.IsNotExist(err) {
@@ -424,7 +458,7 @@ func ensureConfigFiles(destination string, configManifest manifest) error {
 		} else if !os.IsNotExist(err) {
 			return err
 		}
-		content := ""
+		content := "\n"
 		if file.Format == "json" {
 			content = "{}\n"
 		}
@@ -435,7 +469,7 @@ func ensureConfigFiles(destination string, configManifest manifest) error {
 			content = "[Server]\nDescription=Druid Cuberite Server\nPorts=25565\nMaxPlayers=100\n\n[Worlds]\nDefaultWorld=world\n"
 		}
 		if !file.CreateIfMissing {
-			continue
+			target += ".default"
 		}
 		if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
 			return err

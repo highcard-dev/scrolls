@@ -22,7 +22,20 @@ describe("coerceFieldValue", () => {
     expect(coerceFieldValue(field({ type: "string", min: undefined, max: undefined }), "")).toBe("");
   });
 
-  it.each(["TRUE", "yes", "1", ""])("rejects non-canonical boolean %j", (input) => {
+  it.each([
+    ["True", true],
+    ["FALSE", false],
+    ["  true  ", true],
+  ] as const)("coerces common configuration boolean %j", (input, expected) => {
+    expect(
+      coerceFieldValue(
+        field({ type: "boolean", min: undefined, max: undefined }),
+        input,
+      ),
+    ).toBe(expected);
+  });
+
+  it.each(["yes", "1", ""])("rejects non-boolean value %j", (input) => {
     expect(() =>
       coerceFieldValue(
         field({ type: "boolean", min: undefined, max: undefined }),
@@ -31,7 +44,13 @@ describe("coerceFieldValue", () => {
     ).toThrow(/true or false/);
   });
 
-  it.each(["1.5", "NaN", "Infinity", "", "  "])(
+  it.each([
+    ["5000.000000", 5000],
+  ] as const)("coerces numerically integral configuration value %j", (input, expected) => {
+    expect(coerceFieldValue(field(), input)).toBe(expected);
+  });
+
+  it.each(["1.5", "5e3", "NaN", "Infinity", "", "  "])(
     "rejects invalid integer %j",
     (input) => expect(() => coerceFieldValue(field(), input)).toThrow(/integer/),
   );
