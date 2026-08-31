@@ -147,6 +147,8 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+      - stdbuf
+      - -oL
       - ./{{ .Version }}
       - update
 {{- if .Vars.runtime_config_script }}
@@ -250,6 +252,8 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+      - stdbuf
+      - -oL
       - ./{{ .Version }}
       - auto-install
 {{- if eq .Vars.postinstall "enabled" }}

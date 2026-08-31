@@ -80,6 +80,21 @@ func TestGeneratedSharedPortsRemainConcrete(t *testing.T) {
 	}
 }
 
+func TestGeneratedLGSMDownloadCommandsAreLineBuffered(t *testing.T) {
+	scroll := readGeneratedScroll(t, "scrolls/lgsm/arkserver/scroll.yaml")
+
+	update := scroll.Commands["start"].Procedures[0].Command
+	if !slices.Equal(update, []string{"stdbuf", "-oL", "./arkserver", "update"}) {
+		t.Fatalf("ARK update command = %#v", update)
+	}
+
+	installProcedures := scroll.Commands["install"].Procedures
+	autoInstall := installProcedures[len(installProcedures)-1].Command
+	if !slices.Equal(autoInstall, []string{"stdbuf", "-oL", "./arkserver", "auto-install"}) {
+		t.Fatalf("ARK auto-install command = %#v", autoInstall)
+	}
+}
+
 type generatedScroll struct {
 	Ports    []generatedPort             `yaml:"ports"`
 	Commands map[string]generatedCommand `yaml:"commands"`

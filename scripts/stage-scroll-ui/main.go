@@ -354,6 +354,7 @@ func stage(source, destination, bundle string) error {
 	if err != nil {
 		return err
 	}
+	runtimeManifest := runtimeConfigManifest(configManifest)
 	scroll["ui"] = map[string]any{"private": map[string]any{"path": "private/dist/app.wasm"}}
 	if err := ensureChunk(scroll, "config-admin-ui", "private"); err != nil {
 		return err
@@ -372,25 +373,35 @@ func stage(source, destination, bundle string) error {
 		return err
 	}
 
-	privateDirs := []string{
-		filepath.Join(destination, "private"),
-		filepath.Join(destination, "data", "private"),
+	privateDir := filepath.Join(destination, "private")
+	uiSource := filepath.Dir(filepath.Dir(bundle))
+	if err := cp.Copy(uiSource, privateDir, cp.Options{Skip: func(_ os.FileInfo, src, _ string) (bool, error) {
+		relative, err := filepath.Rel(uiSource, src)
+		if err != nil {
+			return false, err
+		}
+		topLevel := strings.Split(filepath.ToSlash(relative), "/")[0]
+		return topLevel == "dist" || topLevel == "node_modules", nil
+	}}); err != nil {
+		return fmt.Errorf("copy UI source: %w", err)
 	}
-	manifestBytes, err := json.MarshalIndent(configManifest, "", "  ")
+	if err := os.MkdirAll(filepath.Join(privateDir, "dist"), 0755); err != nil {
+		return err
+	}
+	if err := copyFile(bundle, filepath.Join(privateDir, "dist", "app.wasm")); err != nil {
+		return err
+	}
+	manifestBytes, err := json.MarshalIndent(runtimeManifest, "", "  ")
 	if err != nil {
 		return err
 	}
 	manifestBytes = append(manifestBytes, '\n')
-	for _, privateDir := range privateDirs {
-		if err := os.MkdirAll(filepath.Join(privateDir, "dist"), 0755); err != nil {
-			return err
-		}
-		if err := copyFile(bundle, filepath.Join(privateDir, "dist", "app.wasm")); err != nil {
-			return err
-		}
-		if err := os.WriteFile(filepath.Join(privateDir, "config-editor.manifest.json"), manifestBytes, 0644); err != nil {
-			return err
-		}
+	manifestDir := filepath.Join(destination, "data", ".druid")
+	if err := os.MkdirAll(manifestDir, 0755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(manifestDir, "config-editor.manifest.json"), manifestBytes, 0644); err != nil {
+		return err
 	}
 	return ensureConfigFiles(destination, configManifest)
 }
@@ -418,6 +429,15 @@ func ensureChunk(scroll map[string]any, name string, path string) error {
 	}
 	scroll["chunks"] = append(chunks, map[string]any{"name": name, "path": path})
 	return nil
+}
+
+func runtimeConfigManifest(source manifest) manifest {
+	result := source
+	result.Files = append([]fileSchema(nil), source.Files...)
+	for index := range result.Files {
+		result.Files[index].Path = strings.TrimPrefix(result.Files[index].Path, "data/")
+	}
+	return result
 }
 
 func ensureConfigFiles(destination string, configManifest manifest) error {

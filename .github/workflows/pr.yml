@@ -55,6 +55,8 @@ jobs:
       - name: Test bounded push parallelism
         run: bash ./scripts/tests/push-parallel.test.sh
       - name: Login to registry
+        id: registry_login
+        continue-on-error: true
         if: github.event.pull_request.head.repo.full_name == github.repository
         run: druid login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
       - name: Check scroll changes
@@ -70,7 +72,7 @@ jobs:
             echo "Scroll source changed; publishing preview tags."
           fi
       - name: Push experimental PR tags
-        if: github.event.pull_request.head.repo.full_name == github.repository && steps.scroll-changes.outputs.changed == 'true'
+        if: github.event.pull_request.head.repo.full_name == github.repository && steps.scroll-changes.outputs.changed == 'true' && steps.registry_login.outcome == 'success'
         env:
           SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
           SCROLL_REGISTRY_NAMESPACE: druid-team-experimental

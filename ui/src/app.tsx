@@ -27,6 +27,6 @@ const gateway = withMissingFileFallback({
 } satisfies FileGateway);
 
 export const component = createConfigEditorComponent({
-  manifestPath: "private/config-editor.manifest.json",
+  manifestPath: ".druid/config-editor.manifest.json",
   gateway,
 });

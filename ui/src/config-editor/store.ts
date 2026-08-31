@@ -194,6 +194,13 @@ export class ConfigEditorStore {
     const raw = this.adapter.get(document, field.key);
     const input = raw === undefined ? field.defaultValue : raw;
     if (input === undefined) return { value: undefined, issues: [] };
+    if (
+      typeof raw === "string" &&
+      (field.type === "integer" || field.type === "number") &&
+      /^__DRUID_[A-Z0-9_]+__$/.test(raw)
+    ) {
+      return { value: undefined, issues: [] };
+    }
     try {
       const value = coerceFieldValue(field, input);
       return { value, issues: validateField(field, value) };
@@ -246,6 +253,14 @@ export class ConfigEditorStore {
     }
 
     state.displayValue = input;
+    if (
+      input.trim() === "" &&
+      state.current === undefined &&
+      (state.schema.type === "integer" || state.schema.type === "number")
+    ) {
+      state.issues = [];
+      return;
+    }
     let value: ConfigValue;
     try {
       value = coerceFieldValue(state.schema, input);

@@ -97,6 +97,8 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+      - stdbuf
+      - -oL
       - ./pzserver
       - update
     - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
@@ -169,6 +171,8 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+      - stdbuf
+      - -oL
       - ./pzserver
       - auto-install
 serve: console
