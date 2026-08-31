@@ -68,6 +68,8 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+      - stdbuf
+      - -oL
       - ./csgoserver
       - update
     - image: artifacts.druid.gg/druid-team/druid:v0.1.256-steamcmd
@@ -139,6 +141,8 @@ commands:
       - path: "/server"
       working_dir: "/server"
       command:
+      - stdbuf
+      - -oL
       - ./csgoserver
       - auto-install
 serve: console
