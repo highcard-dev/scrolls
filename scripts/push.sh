@@ -18,6 +18,11 @@ SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
 SCROLL_PUSH_JOBS="${SCROLL_PUSH_JOBS:-1}"
 SCROLL_PUSH_UI="${SCROLL_PUSH_UI:-1}"
+SCROLL_PUBLISH_MODE="${SCROLL_PUBLISH_MODE:-direct}"
+if [[ "$SCROLL_PUBLISH_MODE" != "direct" && "$SCROLL_PUBLISH_MODE" != "lifecycle" ]]; then
+  echo "SCROLL_PUBLISH_MODE must be direct or lifecycle" >&2
+  exit 2
+fi
 
 if [[ ! "$SCROLL_PUSH_JOBS" =~ ^[1-9][0-9]*$ ]]; then
   echo "SCROLL_PUSH_JOBS must be a positive integer (got: $SCROLL_PUSH_JOBS)" >&2
@@ -122,14 +127,22 @@ run() {
   fi
 
   if ((SCROLL_PUSH_JOBS == 1)); then
-    "${command[@]}"
+    execute_push "${command[@]}"
     return
   fi
 
-  "${command[@]}" &
+  execute_push "${command[@]}" &
   push_pids+=("$!")
   if ((${#push_pids[@]} >= SCROLL_PUSH_JOBS)); then
     wait_for_oldest_push
+  fi
+}
+
+execute_push() {
+  if [[ "$SCROLL_PUBLISH_MODE" == "lifecycle" && "${2:-}" == "push" && "${3:-}" != "category" ]]; then
+    go run ./scripts/publish-lifecycle -- "$@"
+  else
+    "$@"
   fi
 }
 
@@ -284,6 +297,11 @@ push_release_artifacts() {
   run druid push artifacts.druid.gg/druid-team/scroll-hytale:latest ./scrolls/hytale/hytale-druid-gg -p main=5520/udp -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 10Gi --min-ram 4Gi --min-cpu 1 -m --smart --category hytale
 }
 
+if [[ "$SCROLL_PUBLISH_MODE" == "lifecycle" && "$SCROLL_PUSH_DRY_RUN" != "1" ]]; then
+  # Freeze build metadata across retries of one reviewed commit.
+  export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git show -s --format=%ct HEAD)}"
+  go run ./scripts/publish-lifecycle preflight
+fi
 login_if_configured
 
 if [[ "$SCROLL_PUSH_CATEGORIES" = "1" ]]; then
