@@ -2,81 +2,10 @@ name: PR Pipeline
 on:
   pull_request:
     branches: [master]
+permissions:
+  contents: read
 jobs:
   build-deploy:
-    runs-on: self-hosted
-    env:
-      SCROLL_REGISTRY_PR_NAMESPACE: druid-team-experimental
-      SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
-      SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
-      SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
-      SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
-      DRUID_CLI_VERSION: v0.1.257
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ">=1.19.3"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: ui/package-lock.json
-      - name: Build and test Scroll UI
-        working-directory: ui
-        run: npm ci && npm test && npm run type-check && npm run build
-      - run: apt update && apt install -y make
-      - name: Build scroll tree
-        env:
-          SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
-        run: |
-          if [ "${{ github.event.pull_request.head.repo.full_name }}" = "${{ github.repository }}" ]; then
-            registry_host="${SCROLL_REGISTRY_HOST#http://}"
-            registry_host="${registry_host#https://}"
-            registry_host="${registry_host%%/*}"
-            export DRUID_COLDSTARTER_IMAGE="${registry_host}/${SCROLL_REGISTRY_PR_NAMESPACE}/druid:stable-pr${{ github.event.pull_request.number }}"
-          fi
-          make build-tree
-      - name: Get registry binary
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: robinraju/release-downloader@v1.7
-        with:
-          repository: "highcard-dev/druid-cli"
-          tag: ${{ env.DRUID_CLI_VERSION }}
-          fileName: "druid"
-          token: ${{ secrets.GO_REPO_TOKEN }}
-      - name: Install druid
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        run: |
-          chmod +x druid
-          mv druid /usr/local/bin/druid
-      - name: Validate all scrolls
-        run: ./scripts/validate_all_scrolls.sh && bash ./scripts/validate_ui_coverage.sh
-      - name: Test bounded push parallelism
-        run: bash ./scripts/tests/push-parallel.test.sh
-      - name: Login to registry
-        id: registry_login
-        continue-on-error: true
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        run: druid login --host ${{ secrets.SCROLL_REGISTRY_HOST }} --user '${{ secrets.SCROLL_REGISTRY_USER }}' --password ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
-      - name: Check scroll changes
-        id: scroll-changes
-        run: |
-          set -euo pipefail
-          git fetch origin "${{ github.base_ref }}" --depth=1
-          if git diff --quiet "origin/${{ github.base_ref }}"..HEAD -- scrolls; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No scroll source changes; skipping preview push."
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Scroll source changed; publishing preview tags."
-          fi
-      - name: Push experimental PR tags
-        if: github.event.pull_request.head.repo.full_name == github.repository && steps.scroll-changes.outputs.changed == 'true' && steps.registry_login.outcome == 'success'
-        env:
-          SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
-          SCROLL_REGISTRY_NAMESPACE: druid-team-experimental
-          SCROLL_REGISTRY_RUNTIME_NAMESPACE: druid-team
-          SCROLL_TAG_SUFFIX: -pr${{ github.event.pull_request.number }}
-          SCROLL_PUSH_CATEGORIES: "0"
-        run: bash ./scripts/push.sh
+    uses: ./.github/workflows/scroll-lifecycle.yml
+    with:
+      public: false

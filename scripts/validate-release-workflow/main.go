@@ -33,6 +33,10 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
+	if err := validateLifecycleWorkflows(".github/workflows"); err != nil {
+		fmt.Fprintln(os.Stderr, "Error:", err)
+		os.Exit(1)
+	}
 }
 
 func validateReleaseWorkflow(path string) error {

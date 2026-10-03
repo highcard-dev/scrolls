@@ -110,9 +110,6 @@ fi
 
 failure_starts="$(grep -c '^start artifact ' "$tmp_dir/state/events.log")"
 failure_ends="$(grep -c '^end artifact ' "$tmp_dir/state/events.log")"
-if [[ "$failure_starts" != "$expected_artifacts" ]]; then
-  sed -n '1,12p' "$tmp_dir/failure.err" >&2
-fi
 assert_equals "$expected_artifacts" "$failure_starts" \
   "a job failure must not abandon the remaining queued artifact pushes"
 assert_equals "$failure_starts" "$failure_ends" \

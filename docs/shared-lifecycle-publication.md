@@ -1,8 +1,58 @@
 # Shared authored-release publication
 
-Implementation is opt-in and locally tested. The production/PR workflows have
-**not** been switched: authorization for that ongoing CI change and dedicated
-Team credential provisioning remain outstanding. Do not treat this as deployed.
+The local workflow draft routes release and PR publication through the shared
+lifecycle. This is a local-only recovery; it has not been pushed or run on GitHub.
+Dedicated Team
+identity/credentials and protected GitHub environments are not provisioned.
+Do not treat this as deployed or as complete product acceptance.
+
+## Local CI cutover draft
+
+`release.yml` and `pr.yml` call `scroll-lifecycle.yml`; neither retains a direct
+registry publication fallback. The shared workflow validates/builds UI, checks
+the catalog and runs publisher/staging/workflow tests without Team secrets.
+Publication then uses a fresh runner and the protected `scroll-release` or
+`scroll-preview` environment. Fork PRs validate but never enter publication.
+
+The publication job builds CLI commit
+`a9f5dd9ec361ee5b268dfa5b5c2a56ef60f350fd`, which includes fixed-source timestamps
+and deterministic layer order, rather than assuming the old released binary has
+those behaviors. It checks out the exact release/PR-head SHA, suffixes revisions
+with that SHA, and uses separate `-pr<number>` private repositories for previews.
+Runtime-image references remain separate from the private staging project.
+In-flight publication is not cancelled when a newer run arrives.
+
+The existing direct script mode remains available for local Harbor bootstrap;
+neither CI caller selects it. CI still uses the one explicit catalog and its
+category barrier. Categories go into the publisher's private staging project;
+final revisions embed their own presentation metadata.
+
+## Rollout prerequisites (no remote changes performed)
+
+Before enabling the draft:
+
+1. Deploy matching Core/runtime lifecycle changes through their normal CI.
+2. Create a normal dedicated Team account and issue a private-project robot
+   through the normal registry-credentials flow. Do not reuse the old admin or
+   public-project robot.
+3. Create `scroll-release` and `scroll-preview` GitHub environments. Require
+   approval of the exact source commit and disable self-approval. Restrict release
+   deployment branches/tags to the reviewed release sources. Preview approval
+   must cover source code that will receive the dedicated preview credentials.
+4. Put `GO_REPO_TOKEN` (read-only CLI source access), `SCROLL_TEAM_EMAIL`,
+   `SCROLL_TEAM_PASSWORD`, `SCROLL_TEAM_REGISTRY_USER` and
+   `SCROLL_TEAM_REGISTRY_PASSWORD` in those environments, not validation jobs.
+   Set environment variables `SCROLL_LIFECYCLE_URL`, `SCROLL_AUTH_URL`,
+   `SCROLL_LIFECYCLE_OWNER` and scheme-less `SCROLL_REGISTRY_HOST`.
+5. Only after checking protections and deployed dependencies, set the environment
+   variable `SCROLL_LIFECYCLE_READY=true`. A missing/false value fails the job;
+   it does not skip publication successfully or fall back to direct pushes.
+6. Review branch-protection required-check names after the shared-workflow change,
+   and run the first approved preview/release with fresh credentials.
+
+Workflow YAML names an environment but does not create its required-reviewer
+policy. Environment secrets belong to the called job, as described in
+[GitHub's reusable-workflow documentation](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#using-inputs-and-secrets-in-a-reusable-workflow).
 
 ## Contract
 
@@ -59,6 +109,25 @@ lifecycle PRs must be deployed before enabling the workflows.
 
 ## Verification
 
+- Recovery on 2026-10-03 reconstructed the latest retained changes from session
+  history in `druid-local/.worktrees/scroll-lifecycle/scrolls`, on the local
+  branch `recovery/scroll-lifecycle-20261003`. Publisher, UI-staging and workflow
+  suites pass freshly, as do workflow validation and actionlint. The earlier
+  live acceptance results below are historical, not rerun during recovery.
+- Local workflow syntax checks pass with actionlint v1.7.7 (ShellCheck disabled).
+  Publisher, UI-staging and workflow-validator Go suites pass together.
+  Twelve workflow mutation cases reject missing cutover guards; executing the
+  actual provisioning guard proves unset/false/uppercase values fail and only
+  `true` passes. The guard must precede every other publication-job step.
+  Independent spec/standards review found no blocking defects; the standards
+  review prompted the executable provisioning-guard regression test.
+  This verifies the local draft, not GitHub environment protection or live CI.
+- `go test ./scripts/publish-lifecycle -run '^TestPushScript' -count=3`:
+  passes (37.753s). The real `push.sh` runs against offline boundaries, covering
+  all category/artifact calls, immutable timestamp/tag inputs, separate runtime
+  image namespace, lifecycle artifact concurrency, category barrier, preflight
+  rejection before mutation and complete job reaping after a publisher failure.
+  This does not exercise live Core or prove that CI selects lifecycle mode.
 - Go publisher tests cover shared private/public operations, immutable staging,
   expected-owner rejection before push, failed-push isolation, separate private
   preview identity, explicit review, fresh JWTs and redirect credential isolation.
