@@ -1,0 +1,46 @@
+name: artifacts.druid.gg/druid-team/scroll-voice-mediasoup
+desc: Voice Server powered by mediasoup (WebRTC SFU)
+version: 0.0.1
+app_version: latest
+ports:
+  - name: http
+    protocol: tcp
+    description: HTTP API and WebSocket signaling
+    sleep_handler: generic
+  - name: webrtc-min
+    protocol: udp
+    description: WebRTC media (min range)
+    sleep_handler: packet_handler/webrtc.lua
+    vars:
+      - name: ServerName
+        value: "Druid Voice Server (idle) - Join to wake"
+      - name: MaxUsers
+        value: "50"
+  - name: webrtc-max
+    protocol: udp
+    description: WebRTC media (max range)
+init: "start"
+dependencies:
+  - nodejs_22
+  - yarn
+commands:
+  start:
+    needs: [install]
+    run: restart
+    procedures:
+      - mode: exec
+        data:
+          - node
+          - server.js
+  stop:
+    type: stop
+    procedures:
+      - mode: signal
+        data: SIGTERM
+  install:
+    run: once
+    procedures:
+      - mode: exec
+        data:
+          - sh
+          - install.sh
