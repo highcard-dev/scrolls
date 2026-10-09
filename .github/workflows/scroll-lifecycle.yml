@@ -1,0 +1,130 @@
+name: Shared Scroll lifecycle
+on:
+  workflow_call:
+    inputs:
+      public:
+        description: Publish reviewed releases publicly; PR previews remain private.
+        required: true
+        type: boolean
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: self-hosted
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.7"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Build and test Scroll UI
+        working-directory: ui
+        run: npm ci && npm test && npm run type-check && npm run build
+      - name: Build scroll tree
+        if: github.event_name == 'pull_request'
+        run: make build-tree
+      - name: Validate catalog and UI
+        run: go run ./scripts/validate-release-workflow && go run ./scripts/validate-scrolls.go && bash ./scripts/validate_ui_coverage.sh
+      - name: Test lifecycle publication
+        run: go test ./scripts/publish-lifecycle ./scripts/stage-scroll-ui ./scripts/validate-release-workflow -count=1
+      - name: Test bounded catalog publication
+        run: bash ./scripts/tests/push-parallel.test.sh
+      - name: Check release inputs
+        id: changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" ]] && git diff --quiet "$BASE_SHA"...HEAD -- scrolls ui scripts .github/workflows go.mod go.sum Makefile; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    needs: verify
+    if: >-
+      needs.verify.outputs.changed == 'true' &&
+      ((inputs.public && github.event_name != 'pull_request') ||
+      (!inputs.public && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
+    # A fresh runner keeps Team credentials out of the untrusted validation job.
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    environment: ${{ inputs.public && 'scroll-release' || 'scroll-preview' }}
+    concurrency:
+      group: scroll-lifecycle-${{ inputs.public && 'release' || format('pr-{0}', github.event.pull_request.number) }}
+      cancel-in-progress: false
+    steps:
+      - name: Require provisioned lifecycle environment
+        env:
+          LIFECYCLE_READY: ${{ vars.SCROLL_LIFECYCLE_READY }}
+        run: |
+          if [[ "$LIFECYCLE_READY" != "true" ]]; then
+            echo "Configure the protected Team lifecycle environment before publication." >&2
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Checkout lifecycle-capable CLI
+        uses: actions/checkout@v4
+        with:
+          repository: highcard-dev/druid-cli
+          # Includes SOURCE_DATE_EPOCH and stable root-layer ordering.
+          ref: a9f5dd9ec361ee5b268dfa5b5c2a56ef60f350fd
+          path: .druid-cli
+          token: ${{ secrets.GO_REPO_TOKEN }}
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .druid-cli/go.mod
+      - name: Build pinned CLI
+        working-directory: .druid-cli
+        run: |
+          mkdir -p "$RUNNER_TEMP/scroll-cli"
+          go build -o "$RUNNER_TEMP/scroll-cli/druid" ./apps/druid
+          echo "$RUNNER_TEMP/scroll-cli" >> "$GITHUB_PATH"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Build Scroll UI
+        working-directory: ui
+        run: npm ci && npm run build
+      - name: Build scroll tree
+        if: github.event_name == 'pull_request'
+        run: make build-tree
+      - name: Validate with pinned CLI
+        run: ./scripts/validate_all_scrolls.sh && bash ./scripts/validate_ui_coverage.sh
+      - name: Publish through shared lifecycle
+        env:
+          SCROLL_PUBLISH_MODE: lifecycle
+          SCROLL_LIFECYCLE_URL: ${{ vars.SCROLL_LIFECYCLE_URL }}
+          SCROLL_AUTH_URL: ${{ vars.SCROLL_AUTH_URL }}
+          SCROLL_LIFECYCLE_OWNER: ${{ vars.SCROLL_LIFECYCLE_OWNER }}
+          SCROLL_REGISTRY_HOST: ${{ vars.SCROLL_REGISTRY_HOST }}
+          SCROLL_REGISTRY_NAMESPACE: ${{ vars.SCROLL_LIFECYCLE_OWNER }}
+          SCROLL_REGISTRY_RUNTIME_NAMESPACE: druid-team
+          SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_TEAM_REGISTRY_USER }}
+          SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_TEAM_REGISTRY_PASSWORD }}
+          SCROLL_TEAM_EMAIL: ${{ secrets.SCROLL_TEAM_EMAIL }}
+          SCROLL_TEAM_PASSWORD: ${{ secrets.SCROLL_TEAM_PASSWORD }}
+          SCROLL_TAG_SUFFIX: -${{ github.event.pull_request.head.sha || github.sha }}
+          SCROLL_LIFECYCLE_REPOSITORY_SUFFIX: ${{ github.event_name == 'pull_request' && format('-pr{0}', github.event.pull_request.number) || '' }}
+          SCROLL_LIFECYCLE_PUBLISH: ${{ inputs.public && '1' || '0' }}
+          SCROLL_LIFECYCLE_REVIEWED: ${{ inputs.public && '1' || '0' }}
+        run: bash ./scripts/push.sh

@@ -16,6 +16,13 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if err := os.MkdirAll(source, 0755); err != nil {
 		t.Fatal(err)
 	}
+	metadata := filepath.Join(filepath.Dir(source), ".meta")
+	if err := os.MkdirAll(metadata, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(metadata, "en-US.md"), []byte("---\nname: Paper\n---\nPresentation\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.WriteFile(filepath.Join(source, "scroll.yaml"), []byte("name: test\ndesc: test\nversion: 0.0.1\napp_version: 1.21.7\ncommands: {}\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -39,6 +46,9 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 
 	if err := stage(source, destination, bundle); err != nil {
 		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, ".meta", "en-US.md")); err != nil {
+		t.Fatal("family presentation missing from release", err)
 	}
 
 	stagedYAML, err := os.ReadFile(filepath.Join(destination, "scroll.yaml"))
