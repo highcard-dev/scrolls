@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Druid Voice Server - DruidUI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .container {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card h2 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.3rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.online {
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.offline {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-box {
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .stat-box .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .stat-box .value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .voice-channel {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .voice-channel h3 {
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        .voice-channel .users {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        #log {
+            background: #1e293b;
+            color: #10b981;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+        }
+        
+        .log-timestamp {
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎙️ Druid Voice Server</h1>
+        <p>Powered by mediasoup WebRTC SFU - Self-Hosted Voice Chat</p>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>
+                <span class="status-indicator" id="status-indicator"></span>
+                Server Status
+            </h2>
+            <p id="status-text">Connecting...</p>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="label">Active Users</div>
+                    <div class="value" id="stat-users">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Voice Channels</div>
+                    <div class="value" id="stat-channels">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Uptime</div>
+                    <div class="value" id="stat-uptime">--:--</div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" id="btn-join" disabled>Join Voice Channel</button>
+                <button class="btn" id="btn-mute" disabled>Mute</button>
+                <button class="btn" id="btn-deafen" disabled>Deafen</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Voice Channels</h2>
+            <div id="channels-list">
+                <div class="voice-channel">
+                    <div>
+                        <h3>🔊 General Voice</h3>
+                        <span class="users" id="channel-general-users">0 users</span>
+                    </div>
+                    <button class="btn">Join</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Server Log</h2>
+            <div id="log">
+                <div class="log-entry">
+                    <span class="log-timestamp">[00:00:00]</span> Druid Voice Server initializing...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
