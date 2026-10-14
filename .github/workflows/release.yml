@@ -2,47 +2,12 @@ name: Release Changed Pipeline
 on:
   workflow_dispatch:
   push:
-    branches:
-      - master
-    tags:
-      - v*
+    branches: [master]
+    tags: [v*]
+permissions:
+  contents: read
 jobs:
   build-deploy:
-    runs-on: self-hosted
-    env:
-      SCROLL_REGISTRY_ENDPOINT: ${{ secrets.SCROLL_REGISTRY_ENDPOINT }}
-      SCROLL_REGISTRY_API_KEY: ${{ secrets.SCROLL_REGISTRY_API_KEY }}
-      SCROLL_REGISTRY_API_SECRET: ${{ secrets.SCROLL_REGISTRY_API_SECRET }}
-      SCROLL_REGISTRY_BUCKET: ${{ secrets.SCROLL_REGISTRY_BUCKET_STAGING }}
-      SCROLL_REGISTRY_HOST: ${{ secrets.SCROLL_REGISTRY_HOST }}
-      SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
-      SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
-      DRUID_CLI_VERSION: v0.1.257
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ">=1.19.3"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: ui/package-lock.json
-      - name: Build and test Scroll UI
-        working-directory: ui
-        run: npm ci && npm test && npm run type-check && npm run build
-      - name: Get registry binary
-        uses: robinraju/release-downloader@v1.7
-        with:
-          repository: "highcard-dev/druid-cli"
-          tag: ${{ env.DRUID_CLI_VERSION }}
-          fileName: "druid"
-          token: ${{ secrets.GO_REPO_TOKEN }}
-      - run: chmod +x druid
-      - name: Install druid
-        run: mv druid /usr/local/bin/druid
-      - name: druid version
-        run: druid version
-      - run: ./scripts/validate_all_scrolls.sh && bash ./scripts/validate_ui_coverage.sh
-      - name: Push release scrolls
-        run: bash ./scripts/push.sh
+    uses: ./.github/workflows/scroll-lifecycle.yml
+    with:
+      public: true
