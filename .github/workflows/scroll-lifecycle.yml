@@ -36,8 +36,8 @@ jobs:
         run: make build-tree
       - name: Validate catalog and UI
         run: go run ./scripts/validate-release-workflow && go run ./scripts/validate-scrolls.go && bash ./scripts/validate_ui_coverage.sh
-      - name: Test lifecycle publication
-        run: go test ./scripts/publish-lifecycle ./scripts/stage-scroll-ui ./scripts/validate-release-workflow -count=1
+      - name: Test direct publication support
+        run: go test ./scripts/stage-scroll-ui ./scripts/validate-release-workflow ./scripts/publish-owned -count=1
       - name: Test bounded catalog publication
         run: bash ./scripts/tests/push-parallel.test.sh
       - name: Check release inputs
@@ -59,7 +59,7 @@ jobs:
       needs.verify.outputs.changed == 'true' &&
       ((inputs.public && github.event_name != 'pull_request') ||
       (!inputs.public && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
-    # A fresh runner keeps Team credentials out of the untrusted validation job.
+    # A fresh runner keeps publisher credentials out of the untrusted validation job.
     runs-on: ubuntu-latest
     timeout-minutes: 360
     environment: ${{ inputs.public && 'scroll-release' || 'scroll-preview' }}
@@ -72,7 +72,7 @@ jobs:
           LIFECYCLE_READY: ${{ vars.SCROLL_LIFECYCLE_READY }}
         run: |
           if [[ "$LIFECYCLE_READY" != "true" ]]; then
-            echo "Configure the protected Team lifecycle environment before publication." >&2
+            echo "Configure the protected lifecycle environment before publication." >&2
             exit 1
           fi
       - uses: actions/checkout@v4
@@ -110,21 +110,39 @@ jobs:
         run: make build-tree
       - name: Validate with pinned CLI
         run: ./scripts/validate_all_scrolls.sh && bash ./scripts/validate_ui_coverage.sh
-      - name: Publish through shared lifecycle
+      - name: Push to publisher-owned registry repositories
         env:
-          SCROLL_PUBLISH_MODE: lifecycle
+          SCROLL_REGISTRY_HOST: ${{ vars.SCROLL_REGISTRY_HOST }}
+          SCROLL_OWNER_ID: ${{ vars.SCROLL_OWNER_ID }}
+          SCROLL_REGISTRY_RUNTIME_NAMESPACE: ${{ vars.SCROLL_REGISTRY_RUNTIME_NAMESPACE || 'druid-team' }}
+          # Owner revisions embed presentation; category-only OCI artifacts are
+          # not Scroll revisions and must not enter a publication snapshot.
+          SCROLL_PUSH_CATEGORIES: '0'
+          DRUID_SCROLL_RUNTIME_IMAGE: ${{ vars.DRUID_SCROLL_RUNTIME_IMAGE }}
+          DRUID_SCROLL_STEAMCMD_IMAGE: ${{ vars.DRUID_SCROLL_STEAMCMD_IMAGE }}
+          SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
+          SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+          SCROLL_PUSH_MANIFEST: ${{ runner.temp }}/scroll-artifacts.txt
           SCROLL_LIFECYCLE_URL: ${{ vars.SCROLL_LIFECYCLE_URL }}
           SCROLL_AUTH_URL: ${{ vars.SCROLL_AUTH_URL }}
-          SCROLL_LIFECYCLE_OWNER: ${{ vars.SCROLL_LIFECYCLE_OWNER }}
-          SCROLL_REGISTRY_HOST: ${{ vars.SCROLL_REGISTRY_HOST }}
-          SCROLL_REGISTRY_NAMESPACE: ${{ vars.SCROLL_LIFECYCLE_OWNER }}
-          SCROLL_REGISTRY_RUNTIME_NAMESPACE: druid-team
-          SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_TEAM_REGISTRY_USER }}
-          SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_TEAM_REGISTRY_PASSWORD }}
-          SCROLL_TEAM_EMAIL: ${{ secrets.SCROLL_TEAM_EMAIL }}
-          SCROLL_TEAM_PASSWORD: ${{ secrets.SCROLL_TEAM_PASSWORD }}
+          SCROLL_PUBLISH_EMAIL: ${{ secrets.SCROLL_PUBLISH_EMAIL }}
+          SCROLL_PUBLISH_PASSWORD: ${{ secrets.SCROLL_PUBLISH_PASSWORD }}
+          SCROLL_LIFECYCLE_REVIEWED: ${{ vars.SCROLL_LIFECYCLE_REVIEWED }}
+          SCROLL_PUBLIC: ${{ inputs.public && '1' || '0' }}
           SCROLL_TAG_SUFFIX: -${{ github.event.pull_request.head.sha || github.sha }}
-          SCROLL_LIFECYCLE_REPOSITORY_SUFFIX: ${{ github.event_name == 'pull_request' && format('-pr{0}', github.event.pull_request.number) || '' }}
-          SCROLL_LIFECYCLE_PUBLISH: ${{ inputs.public && '1' || '0' }}
-          SCROLL_LIFECYCLE_REVIEWED: ${{ inputs.public && '1' || '0' }}
-        run: bash ./scripts/push.sh
+        run: |
+          set -euo pipefail
+          for name in SCROLL_REGISTRY_HOST SCROLL_OWNER_ID SCROLL_REGISTRY_USER SCROLL_REGISTRY_PASSWORD; do
+            if [[ -z "${!name}" ]]; then
+              echo "Missing required publisher setting: $name" >&2
+              exit 1
+            fi
+          done
+          if [[ "$SCROLL_PUBLIC" == "1" ]]; then
+            go run ./scripts/publish-owned preflight
+          fi
+          : > "$SCROLL_PUSH_MANIFEST"
+          bash ./scripts/push.sh
+          if [[ "$SCROLL_PUBLIC" == "1" ]]; then
+            go run ./scripts/publish-owned publish
+          fi

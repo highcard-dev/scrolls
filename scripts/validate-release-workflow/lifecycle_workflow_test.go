@@ -57,17 +57,21 @@ func TestLifecycleProvisioningGate(t *testing.T) {
 
 func TestLifecycleWorkflowRejectsMissingCutoverGuards(t *testing.T) {
 	for name, change := range map[string][3]string{
+		"category artifacts in owner repositories": {"scroll-lifecycle.yml", "SCROLL_PUSH_CATEGORIES: '0'", "SCROLL_PUSH_CATEGORIES: '1'"},
 		"legacy caller":             {"release.yml", "./.github/workflows/scroll-lifecycle.yml", "./.github/workflows/legacy.yml"},
 		"public preview":            {"pr.yml", "public: false", "public: true"},
-		"direct fallback":           {"scroll-lifecycle.yml", "SCROLL_PUBLISH_MODE: lifecycle", "SCROLL_PUBLISH_MODE: direct"},
+		"staging fallback":          {"scroll-lifecycle.yml", "SCROLL_OWNER_ID: ${{ vars.SCROLL_OWNER_ID }}", "SCROLL_OWNER_ID: ${{ vars.SCROLL_OWNER_ID }}\n          SCROLL_PUBLISH_MODE: lifecycle"},
 		"mutable revision":          {"scroll-lifecycle.yml", "SCROLL_TAG_SUFFIX: -${{ github.event.pull_request.head.sha || github.sha }}", "SCROLL_TAG_SUFFIX: -latest"},
-		"public preview repository": {"scroll-lifecycle.yml", "format('-pr{0}', github.event.pull_request.number) || ''", "''"},
-		"admin credential fallback": {"scroll-lifecycle.yml", "secrets.SCROLL_TEAM_REGISTRY_USER", "secrets.SCROLL_REGISTRY_USER"},
+		"hard-coded owner":          {"scroll-lifecycle.yml", "vars.SCROLL_OWNER_ID", "'druid-team'"},
+		"admin credential fallback": {"scroll-lifecycle.yml", "secrets.SCROLL_REGISTRY_USER", "secrets.HARBOR_ADMIN_USER"},
 		"fork publication":          {"scroll-lifecycle.yml", "github.event.pull_request.head.repo.full_name == github.repository", "true"},
 		"no review environment":     {"scroll-lifecycle.yml", "environment: ${{ inputs.public && 'scroll-release' || 'scroll-preview' }}", "environment: production"},
 		"mutable CLI":               {"scroll-lifecycle.yml", "a9f5dd9ec361ee5b268dfa5b5c2a56ef60f350fd", "master"},
 		"cancel mutation":           {"scroll-lifecycle.yml", "cancel-in-progress: false", "cancel-in-progress: true"},
-		"skip publisher tests":      {"scroll-lifecycle.yml", "go test ./scripts/publish-lifecycle", "go test ./scripts/prebuild"},
+		"skip publication tests":    {"scroll-lifecycle.yml", "go test ./scripts/stage-scroll-ui", "go test ./scripts/prebuild"},
+		"missing credential guard":  {"scroll-lifecycle.yml", "if [[ -z \"${!name}\" ]]; then", "if [[ -n \"${!name}\" ]]; then"},
+		"skip generic publish":      {"scroll-lifecycle.yml", "go run ./scripts/publish-owned publish", "echo skipped-publication"},
+		"admin owner sign-in":       {"scroll-lifecycle.yml", "secrets.SCROLL_PUBLISH_EMAIL", "secrets.HARBOR_ADMIN_EMAIL"},
 		"late provisioning gate":    {"scroll-lifecycle.yml", "      - name: Require provisioned lifecycle environment", "      - run: echo premature-step\n      - name: Require provisioned lifecycle environment"},
 	} {
 		t.Run(name, func(t *testing.T) {

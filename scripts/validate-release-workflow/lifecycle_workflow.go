@@ -37,8 +37,7 @@ type lifecycleStep struct {
 	With map[string]any    `yaml:"with"`
 }
 
-// Check the actual CI callers, not only the opt-in helper. Missing credentials
-// must never silently select the legacy direct-publication path.
+// Check the actual CI callers and keep publication in protected environments.
 func validateLifecycleWorkflows(directory string) error {
 	read := func(name string) (lifecycleWorkflow, error) {
 		var workflow lifecycleWorkflow
@@ -75,7 +74,7 @@ func validateLifecycleWorkflows(directory string) error {
 	}
 	tests, gate, cli, publishCount := false, false, false, 0
 	for _, step := range verify.Steps {
-		if strings.Contains(step.Run, "go test ./scripts/publish-lifecycle ./scripts/stage-scroll-ui ./scripts/validate-release-workflow") {
+		if strings.Contains(step.Run, "go test ./scripts/stage-scroll-ui ./scripts/validate-release-workflow ./scripts/publish-owned") {
 			tests = true
 		}
 		for _, value := range step.Env {
@@ -95,30 +94,41 @@ func validateLifecycleWorkflows(directory string) error {
 			ref, _ := step.With["ref"].(string)
 			cli = regexp.MustCompile(`^[a-f0-9]{40}$`).MatchString(ref) && step.With["persist-credentials"] == false
 		}
-		if step.Run != "bash ./scripts/push.sh" {
+		if !strings.Contains(step.Run, "bash ./scripts/push.sh") {
 			continue
 		}
 		publishCount++
+		if !strings.Contains(step.Run, "for name in SCROLL_REGISTRY_HOST SCROLL_OWNER_ID SCROLL_REGISTRY_USER SCROLL_REGISTRY_PASSWORD; do") ||
+			!strings.Contains(step.Run, "if [[ -z \"${!name}\" ]]; then") || !strings.Contains(step.Run, "exit 1") ||
+			!strings.Contains(step.Run, "go run ./scripts/publish-owned preflight") || !strings.Contains(step.Run, "go run ./scripts/publish-owned publish") ||
+			!strings.Contains(step.Run, ": > \"$SCROLL_PUSH_MANIFEST\"") {
+			return fmt.Errorf("lifecycle publication must reject missing publisher settings")
+		}
 		for name, want := range map[string]string{
-			"SCROLL_PUBLISH_MODE":                "lifecycle",
-			"SCROLL_REGISTRY_NAMESPACE":          "${{ vars.SCROLL_LIFECYCLE_OWNER }}",
-			"SCROLL_REGISTRY_RUNTIME_NAMESPACE":  "druid-team",
-			"SCROLL_REGISTRY_USER":               "${{ secrets.SCROLL_TEAM_REGISTRY_USER }}",
-			"SCROLL_REGISTRY_PASSWORD":           "${{ secrets.SCROLL_TEAM_REGISTRY_PASSWORD }}",
-			"SCROLL_TEAM_EMAIL":                  "${{ secrets.SCROLL_TEAM_EMAIL }}",
-			"SCROLL_TEAM_PASSWORD":               "${{ secrets.SCROLL_TEAM_PASSWORD }}",
-			"SCROLL_TAG_SUFFIX":                  "-${{ github.event.pull_request.head.sha || github.sha }}",
-			"SCROLL_LIFECYCLE_REPOSITORY_SUFFIX": "${{ github.event_name == 'pull_request' && format('-pr{0}', github.event.pull_request.number) || '' }}",
-			"SCROLL_LIFECYCLE_PUBLISH":           "${{ inputs.public && '1' || '0' }}",
-			"SCROLL_LIFECYCLE_REVIEWED":          "${{ inputs.public && '1' || '0' }}",
+			"SCROLL_LIFECYCLE_URL":              "${{ vars.SCROLL_LIFECYCLE_URL }}",
+			"SCROLL_AUTH_URL":                   "${{ vars.SCROLL_AUTH_URL }}",
+			"SCROLL_PUBLISH_EMAIL":              "${{ secrets.SCROLL_PUBLISH_EMAIL }}",
+			"SCROLL_PUBLISH_PASSWORD":           "${{ secrets.SCROLL_PUBLISH_PASSWORD }}",
+			"SCROLL_LIFECYCLE_REVIEWED":         "${{ vars.SCROLL_LIFECYCLE_REVIEWED }}",
+			"SCROLL_PUBLIC":                     "${{ inputs.public && '1' || '0' }}",
+			"SCROLL_PUSH_MANIFEST":              "${{ runner.temp }}/scroll-artifacts.txt",
+			"SCROLL_OWNER_ID":                   "${{ vars.SCROLL_OWNER_ID }}",
+			"SCROLL_REGISTRY_RUNTIME_NAMESPACE": "${{ vars.SCROLL_REGISTRY_RUNTIME_NAMESPACE || 'druid-team' }}",
+			"SCROLL_PUSH_CATEGORIES":            "0",
+			"SCROLL_REGISTRY_USER":              "${{ secrets.SCROLL_REGISTRY_USER }}",
+			"SCROLL_REGISTRY_PASSWORD":          "${{ secrets.SCROLL_REGISTRY_PASSWORD }}",
+			"SCROLL_TAG_SUFFIX":                 "-${{ github.event.pull_request.head.sha || github.sha }}",
 		} {
 			if step.Env[name] != want {
 				return fmt.Errorf("lifecycle publication has incorrect %s", name)
 			}
 		}
+		if _, legacyMode := step.Env["SCROLL_PUBLISH_MODE"]; legacyMode {
+			return fmt.Errorf("publisher workflow must use direct push without a lifecycle mode")
+		}
 	}
 	if !tests || !gate || !cli || publishCount != 1 {
-		return fmt.Errorf("shared workflow needs publisher tests, provisioning gate, pinned CLI and one lifecycle catalog call")
+		return fmt.Errorf("shared workflow needs publication tests, provisioning gate, pinned CLI and one catalog push")
 	}
 	return nil
 }

@@ -1,161 +1,74 @@
 # Shared authored-release publication
 
-The local workflow draft routes release and PR publication through the shared
-lifecycle. This is a local-only recovery; it has not been pushed or run on GitHub.
-Dedicated Team
-identity/credentials and protected GitHub environments are not provisioned.
-Do not treat this as deployed or as complete product acceptance.
+## Current contract
 
-## Local CI cutover draft
+Release and PR workflows use the same explicit catalog in `scripts/push.sh`.
+They push directly to `<registry>/<identity-id>/<repository>:<tag>`; there is
+no staging/import API. Core publishes reviewed revisions by copying an exact
+snapshot into the owner's public username project. The private source remains.
+See the monorepo's `docs/scroll-lifecycle-api-cutover.md` for the Core contract.
 
-`release.yml` and `pr.yml` call `scroll-lifecycle.yml`; neither retains a direct
-registry publication fallback. The shared workflow validates/builds UI, checks
-the catalog and runs publisher/staging/workflow tests without Team secrets.
-Publication then uses a fresh runner and the protected `scroll-release` or
-`scroll-preview` environment. Fork PRs validate but never enter publication.
+1. Validate and build without publication credentials.
+2. Enter a fresh runner and protected `scroll-release` or `scroll-preview`
+   environment. Fork PRs never publish; a missing readiness gate fails closed.
+3. Build the pinned lifecycle-capable CLI and the Scroll UI.
+4. Push owner-scoped revisions tagged with the source commit. Runtime images
+   stay in a separate namespace. Revisions embed presentation; category-only
+   artifacts are excluded from owner publication.
+5. For public releases, `publish-owned` authenticates as the owner, fetches
+   each repository's publication preview, verifies every pushed tag against
+   that preview, and submits it unchanged as `expectedSnapshot`.
+6. Core rejects changed content. The helper does not automatically retry
+   conflicts or replace pending operation intent; inspect and use the current
+   manual recovery flow before retrying.
 
-The publication job builds CLI commit
-`a9f5dd9ec361ee5b268dfa5b5c2a56ef60f350fd`, which includes fixed-source timestamps
-and deterministic layer order, rather than assuming the old released binary has
-those behaviors. It checks out the exact release/PR-head SHA, suffixes revisions
-with that SHA, and uses separate `-pr<number>` private repositories for previews.
-Runtime-image references remain separate from the private staging project.
-In-flight publication is not cancelled when a newer run arrives.
+Public publication approves the complete repository, not only the latest CI
+tag. Use separate release and preview identities/projects. Preview pushes stay
+private. Publication does not cancel an in-flight run when another run starts.
 
-The existing direct script mode remains available for local Harbor bootstrap;
-neither CI caller selects it. CI still uses the one explicit catalog and its
-category barrier. Categories go into the publisher's private staging project;
-final revisions embed their own presentation metadata.
+## Configuration
 
-## Rollout prerequisites (no remote changes performed)
+Provision these through the protected environments, never source control:
 
-Before enabling the draft:
+| Setting | Purpose |
+| --- | --- |
+| `SCROLL_LIFECYCLE_READY=true` | Explicit provisioning gate |
+| `SCROLL_OWNER_ID` | Authenticated identity ID naming the private project |
+| `SCROLL_REGISTRY_HOST` | Scheme-less Harbor host |
+| `SCROLL_REGISTRY_USER`, `SCROLL_REGISTRY_PASSWORD` | Ordinary owner-scoped registry credentials |
+| `SCROLL_REGISTRY_RUNTIME_NAMESPACE` | Runtime-image namespace; workflow defaults to `druid-team` |
+| `SCROLL_LIFECYCLE_URL`, `SCROLL_AUTH_URL` | Core and Auth URLs sharing the trusted origin |
+| `SCROLL_PUBLISH_EMAIL`, `SCROLL_PUBLISH_PASSWORD` | Ordinary publisher sign-in for public publication |
+| `SCROLL_LIFECYCLE_REVIEWED=1` | Confirms content review before public publication |
+| `GO_REPO_TOKEN` | Read-only access to the pinned CLI source |
 
-1. Deploy matching Core/runtime lifecycle changes through their normal CI.
-2. Create a normal dedicated Team account and issue a private-project robot
-   through the normal registry-credentials flow. Do not reuse the old admin or
-   public-project robot.
-3. Create `scroll-release` and `scroll-preview` GitHub environments. Require
-   approval of the exact source commit and disable self-approval. Restrict release
-   deployment branches/tags to the reviewed release sources. Preview approval
-   must cover source code that will receive the dedicated preview credentials.
-4. Put `GO_REPO_TOKEN` (read-only CLI source access), `SCROLL_TEAM_EMAIL`,
-   `SCROLL_TEAM_PASSWORD`, `SCROLL_TEAM_REGISTRY_USER` and
-   `SCROLL_TEAM_REGISTRY_PASSWORD` in those environments, not validation jobs.
-   Set environment variables `SCROLL_LIFECYCLE_URL`, `SCROLL_AUTH_URL`,
-   `SCROLL_LIFECYCLE_OWNER` and scheme-less `SCROLL_REGISTRY_HOST`.
-5. Only after checking protections and deployed dependencies, set the environment
-   variable `SCROLL_LIFECYCLE_READY=true`. A missing/false value fails the job;
-   it does not skip publication successfully or fall back to direct pushes.
-6. Review branch-protection required-check names after the shared-workflow change,
-   and run the first approved preview/release with fresh credentials.
+Optional `DRUID_SCROLL_RUNTIME_IMAGE` and `DRUID_SCROLL_STEAMCMD_IMAGE`
+override runtime image references. Owner builds use the commit timestamp unless
+`SOURCE_DATE_EPOCH` is explicitly set. The workflow sets `SCROLL_PUSH_MANIFEST`
+and commit-based `SCROLL_TAG_SUFFIX`; successful pushes populate the manifest.
 
-Workflow YAML names an environment but does not create its required-reviewer
-policy. Environment secrets belong to the called job, as described in
-[GitHub's reusable-workflow documentation](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#using-inputs-and-secrets-in-a-reusable-workflow).
+`SCROLL_REGISTRY_NAMESPACE` is not a workflow requirement: `SCROLL_OWNER_ID`
+determines artifact destinations, and runtime images have their own setting.
+The shared push script still supports namespaces and category publication for
+local bootstrap. It retains its serial default, bounded parallel option,
+category barrier, and failure handling.
 
-## Contract
+## Rollout and verification
 
-`scripts/push.sh` remains the single explicit catalog and retains its category
-barrier, serial default and bounded concurrency. `SCROLL_PUBLISH_MODE=lifecycle`
-adds the shared Core policy after each rendered artifact push:
+- Deploy matching Core/runtime contracts through their normal CI.
+- Configure protected environments, required reviewers and separate identities
+  before enabling the readiness gate. Workflow YAML does not provision those
+  policies.
+- Publish a Druid UI package containing `ensureFileService`,
+  `addAndRunCommand` and `stopCommand` before releasing a consumer that uses
+  these imports. Local `1000.*` versions and localhost registry URLs are not
+  release dependencies.
+- Run `go test ./scripts/publish-owned ./scripts/stage-scroll-ui ./scripts/validate-release-workflow`
+  and `bash ./scripts/tests/push-parallel.test.sh`. These test the publisher
+  contract and catalog; they do not constitute a production publication.
+- Verify the first approved preview/release with the provisioned credentials.
+  Do not weaken approval or readiness gates to make a run green.
 
-1. Verify the authenticated publisher's private project against the configured
-   owner and registry. Reject admin/public-project registry credentials.
-2. Render/stage the existing Scroll and private UI. Include inherited family
-   `.meta` in the revision, not just a mutable category artifact.
-3. Push into that private project with a cryptographically unique staging tag.
-4. Resolve that tag once, then import its immutable digest through Core.
-5. Core applies canonical identity before hashing, verifies final bytes, handles
-   immutable-tag conflicts and refreshes the catalog under its repository lock.
-6. When explicitly reviewed, publish through the same repository-wide operation
-   used by customers. No public-registry credentials or Team bypass are involved.
-
-The source staging artifact is retained. Backup snapshots are rejected by the
-authored-release endpoint; they must use backup promotion with provenance.
-
-## Configuration contract (not provisioned)
-
-- `SCROLL_LIFECYCLE_URL`: trusted Core base URL, including `/core` at the gateway.
-- `SCROLL_LIFECYCLE_OWNER`: identity ID of the dedicated publisher account.
-- `SCROLL_REGISTRY_HOST`: scheme-less configured Harbor host.
-- `SCROLL_REGISTRY_NAMESPACE`: must equal that identity ID (private staging).
-- `SCROLL_REGISTRY_USER` / `SCROLL_REGISTRY_PASSWORD`: robot credential belonging
-  to that private project, issued by the normal account registry-credential flow.
-- `SCROLL_AUTH_URL`, `SCROLL_TEAM_EMAIL`, `SCROLL_TEAM_PASSWORD`: normal dedicated
-  account sign-in. Auth must have the same trusted origin as Core. Session cookies
-  stay in memory, owner JWTs refresh before lifecycle calls, and sign-out is
-  attempted at exit. Auth credentials are not passed to the renderer subprocess.
-- Alternatively `SCROLL_LIFECYCLE_TOKEN`: a fresh externally supplied owner JWT;
-  expiration fails closed. Never commit or print credentials.
-- `SCROLL_REGISTRY_RUNTIME_NAMESPACE=druid-team`: keeps runtime images separate
-  from the private staging project.
-- `SCROLL_TAG_SUFFIX=-<commit>`: immutable revision names for repeatable CI.
-  Reusing a tag with changed content is a conflict, not an overwrite.
-- Lifecycle mode sets `SOURCE_DATE_EPOCH` from the checked-out commit unless
-  explicitly supplied. The matching CLI must support it and deterministic root
-  layer ordering: otherwise identical rebuilds correctly conflict as different
-  manifest bytes.
-- `SCROLL_LIFECYCLE_PUBLISH=1` plus `SCROLL_LIFECYCLE_REVIEWED=1`: explicitly
-  reviewed public publication. Without publish, imports remain private unless
-  the destination was already public, in which case unreviewed import fails.
-- `SCROLL_LIFECYCLE_REPOSITORY_SUFFIX=-pr<number>`: **separate private preview
-  repositories**. A PR tag in an already-public release repository is not private.
-
-Keep secrets restricted to trusted publication jobs and require a release review
-gate. No production account, robot, GitHub secret, or environment has been created
-by this implementation. Both Core import support and the matching runtime/server
-lifecycle PRs must be deployed before enabling the workflows.
-
-## Verification
-
-- Recovery on 2026-10-03 reconstructed the latest retained changes from session
-  history in `druid-local/.worktrees/scroll-lifecycle/scrolls`, on the local
-  branch `recovery/scroll-lifecycle-20261003`. Publisher, UI-staging and workflow
-  suites pass freshly, as do workflow validation and actionlint. The earlier
-  live acceptance results below are historical, not rerun during recovery.
-- Local workflow syntax checks pass with actionlint v1.7.7 (ShellCheck disabled).
-  Publisher, UI-staging and workflow-validator Go suites pass together.
-  Twelve workflow mutation cases reject missing cutover guards; executing the
-  actual provisioning guard proves unset/false/uppercase values fail and only
-  `true` passes. The guard must precede every other publication-job step.
-  Independent spec/standards review found no blocking defects; the standards
-  review prompted the executable provisioning-guard regression test.
-  This verifies the local draft, not GitHub environment protection or live CI.
-- `go test ./scripts/publish-lifecycle -run '^TestPushScript' -count=3`:
-  passes (37.753s). The real `push.sh` runs against offline boundaries, covering
-  all category/artifact calls, immutable timestamp/tag inputs, separate runtime
-  image namespace, lifecycle artifact concurrency, category barrier, preflight
-  rejection before mutation and complete job reaping after a publisher failure.
-  This does not exercise live Core or prove that CI selects lifecycle mode.
-- Go publisher tests cover shared private/public operations, immutable staging,
-  expected-owner rejection before push, failed-push isolation, separate private
-  preview identity, explicit review, fresh JWTs and redirect credential isolation.
-- Metadata staging tests check inherited presentation and the existing private UI.
-- `SCROLL_PUSH_UI=0 bash scripts/tests/push-parallel.test.sh`: passed.
-- Full staging-enabled concurrency run: passed, 18 categories / 127 artifacts.
-  One earlier run during concurrent edits stopped early (47 artifacts); its
-  original staging error was not retained. The rerun passed without a pool fix;
-  do not misreport that earlier result as a diagnosed production defect.
-- Core shared policy/adapter/schema tests and real local Harbor/Postgres tests
-  cover authored imports, immutable conflicts, public review guards, byte
-  preservation and private staging. See the monorepo verification document.
-- Authenticated helper → local gateway/auth → live Core → Harbor acceptance
-  passed in 7.10s, including private import, an identical digest on rebuild,
-  shared publication and anonymous visibility. The fixture's robot, projects,
-  catalog row, auth account/session and development credit were cleaned up.
-  Four retained fixtures from earlier diagnosis attempts were also removed with
-  exact identity/name/email guards. CI credential provisioning and rollout are
-  still outstanding; no production account or registry was touched.
-- Earlier live failures identified fixture username/schema mistakes and a real
-  ORAS creation-timestamp reproducibility gap. The timestamp fix preserves
-  immutable-tag conflicts rather than weakening them.
-- Subsequent retry failures exposed nondeterministic root-layer ordering in the
-  CLI. A focused real OCI push regression reproduced it in 0.08s; sorting the
-  discovered paths fixed the byte difference without weakening conflict checks.
-  The final live test explicitly signs out after signup and signs back in with
-  the dedicated fixture account. Three consecutive runs passed (8.53s, 6.25s,
-  6.16s), including exact retry, publication, anonymous visibility and cleanup.
-
-On interruption, inspect final registry state before retrying. A disconnected
-HTTP request does not prove that an import or publication was rolled back.
+The former staging/import publisher and its tests were replaced. Historical
+acceptance results remain in Git history and the monorepo lifecycle audit;
+they do not certify this direct-owner publisher or a production rollout.
