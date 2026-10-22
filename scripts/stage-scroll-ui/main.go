@@ -339,6 +339,22 @@ func stage(source, destination, bundle string) error {
 	if err := cp.Copy(source, destination); err != nil {
 		return fmt.Errorf("copy Scroll: %w", err)
 	}
+	// Version directories inherit family presentation. Keep it inside the staged
+	// release so the lifecycle never depends on mutable category tags afterward.
+	if _, err := os.Stat(filepath.Join(destination, ".meta")); os.IsNotExist(err) {
+		for parent := filepath.Dir(source); parent != "." && parent != filepath.Dir(parent); parent = filepath.Dir(parent) {
+			metadata := filepath.Join(parent, ".meta")
+			if info, err := os.Stat(metadata); err == nil && info.IsDir() {
+				if err := cp.Copy(metadata, filepath.Join(destination, ".meta")); err != nil {
+					return fmt.Errorf("copy presentation: %w", err)
+				}
+				break
+			}
+			if filepath.Base(parent) == "scrolls" {
+				break
+			}
+		}
+	}
 
 	scrollPath := filepath.Join(destination, "scroll.yaml")
 	scrollBytes, err := os.ReadFile(scrollPath)

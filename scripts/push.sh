@@ -11,6 +11,7 @@ DRUID_BIN="${DRUID_BIN:-druid}"
 SCROLL_PUSH_DRY_RUN="${SCROLL_PUSH_DRY_RUN:-0}"
 SCROLL_REGISTRY_HOST="${SCROLL_REGISTRY_HOST:-artifacts.druid.gg}"
 SCROLL_REGISTRY_NAMESPACE="${SCROLL_REGISTRY_NAMESPACE:-druid-team}"
+SCROLL_OWNER_ID="${SCROLL_OWNER_ID:-}"
 SCROLL_REGISTRY_USER="${SCROLL_REGISTRY_USER:-}"
 SCROLL_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD:-}"
 DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.257}"
@@ -18,7 +19,6 @@ SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
 SCROLL_PUSH_JOBS="${SCROLL_PUSH_JOBS:-1}"
 SCROLL_PUSH_UI="${SCROLL_PUSH_UI:-1}"
-
 if [[ ! "$SCROLL_PUSH_JOBS" =~ ^[1-9][0-9]*$ ]]; then
   echo "SCROLL_PUSH_JOBS must be a positive integer (got: $SCROLL_PUSH_JOBS)" >&2
   exit 2
@@ -32,6 +32,11 @@ registry_host="${SCROLL_REGISTRY_HOST#http://}"
 registry_host="${registry_host#https://}"
 registry_host="${registry_host%%/*}"
 registry_prefix="${registry_host}/${SCROLL_REGISTRY_NAMESPACE}"
+if [[ -n "$SCROLL_OWNER_ID" ]]; then
+  [[ "$SCROLL_OWNER_ID" =~ ^[a-z0-9][a-z0-9_-]{0,62}$ ]] || { echo "Invalid owner project" >&2; exit 2; }
+  registry_prefix="${registry_host}/${SCROLL_OWNER_ID}"
+  export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git show -s --format=%ct HEAD)}"
+fi
 runtime_namespace="${SCROLL_REGISTRY_RUNTIME_NAMESPACE:-${SCROLL_REGISTRY_NAMESPACE}}"
 runtime_prefix="${registry_host}/${runtime_namespace}"
 runtime_image="${DRUID_SCROLL_RUNTIME_IMAGE:-${runtime_prefix}/druid:${DRUID_CLI_VERSION}}"
@@ -78,6 +83,26 @@ login_if_configured() {
   fi
 }
 
+rewrite_registry_reference() {
+  local value="$1"
+  local source_prefix="artifacts.druid.gg/druid-team/"
+  if [[ "$value" == "$runtime_image" || "$value" == "$steamcmd_image" ]]; then
+    printf '%s' "$value"
+    return
+  fi
+  if [[ -n "$SCROLL_OWNER_ID" && "$value" == "$source_prefix"* ]]; then
+    local path="${value#"$source_prefix"}"
+    local name="${path%%[:@]*}"
+    if [[ ! "$name" =~ ^[a-z0-9][a-z0-9_-]{0,62}$ ]]; then
+      echo "Invalid owner Scroll repository: $name" >&2
+      return 2
+    fi
+    printf '%s' "${registry_prefix}/${path}"
+  else
+    printf '%s' "${value//artifacts.druid.gg\/druid-team/$registry_prefix}"
+  fi
+}
+
 run() {
   local -a command=("$@")
   local index
@@ -96,12 +121,22 @@ run() {
     command[2]="$ref"
   fi
 
+  # Direct owner repositories carry their own presentation metadata. The
+  # generic publication preflight cannot depend on separate category artifacts.
+  if [[ -n "$SCROLL_OWNER_ID" && "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]]; then
+    command+=(--pack-meta)
+  fi
+
   # The catalog intentionally uses production refs. Retarget them here for
   # local Harbor, staging, or PR namespaces without changing every push line.
   for index in "${!command[@]}"; do
     command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257-steamcmd/$steamcmd_image}"
     command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257/$runtime_image}"
-    command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$registry_prefix}"
+    if [[ "${command[2]:-}" == "category" ]]; then
+      command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$registry_prefix}"
+    else
+      command[$index]="$(rewrite_registry_reference "${command[$index]}")"
+    fi
   done
   if [[ "${command[0]:-}" == "druid" ]]; then
     command[0]="$DRUID_BIN"
@@ -122,14 +157,21 @@ run() {
   fi
 
   if ((SCROLL_PUSH_JOBS == 1)); then
-    "${command[@]}"
+    execute_push "${command[@]}"
     return
   fi
 
-  "${command[@]}" &
+  execute_push "${command[@]}" &
   push_pids+=("$!")
   if ((${#push_pids[@]} >= SCROLL_PUSH_JOBS)); then
     wait_for_oldest_push
+  fi
+}
+
+execute_push() {
+  "$@" || return
+  if [[ -n "${SCROLL_PUSH_MANIFEST:-}" && "$2" == "push" && "$3" != "category" ]]; then
+    printf '%s\n' "$3" >> "$SCROLL_PUSH_MANIFEST"
   fi
 }
 
