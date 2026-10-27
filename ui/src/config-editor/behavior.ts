@@ -30,9 +30,35 @@ export function createEditorBehavior(context: ClientContext): ClientHandlers {
   }));
   const update = () => {
     const store = stores.get(selectedPath);
+    const snapshot = store?.snapshot();
     context.setValue('$editor', JSON.parse(JSON.stringify({
-      manifest, schema: store?.schema, snapshot: store?.snapshot(),
+      manifest, schema: store?.schema, snapshot,
       source: store?.serializeForDisplay(), mode, saving, status, error,
+      ready: !!store && !!manifest,
+      copy,
+      files: manifest?.files.map((file) => ({ value: file.path, label: file.label })),
+      selectedPath,
+      tabs: [
+        { value: 'form', label: copy.formTab, disabled: !store?.schema.sections.length },
+        { value: 'raw', label: copy.rawTab },
+      ],
+      canSave: !!snapshot?.dirty && !saving && !snapshot.issues.some((issue) => issue.severity === 'error'),
+      validation: snapshot?.issues.filter((issue) => issue.severity === 'error').map((issue) => issue.message).join('\n') ?? '',
+      sections: store?.schema.sections.map((section) => ({
+        ...section,
+        fields: section.fields.flatMap((field) => {
+          const state = snapshot?.fields[field.key];
+          return state ? [{
+            key: field.key, label: field.label, description: field.description,
+            type: state.sensitive || field.sensitive || field.type === 'secret' ? 'secret' : field.type,
+            value: state.displayValue, checked: state.displayValue === 'true',
+            min: field.min, max: field.max, step: field.type === 'integer' ? 1 : 'any',
+            options: (field.values ?? []).map((value) => ({ value, label: value })),
+            errors: state.issues.filter((issue) => issue.severity === 'error').map((issue) => issue.message),
+            restartRequired: field.restartRequired,
+          }] : [];
+        }),
+      })),
     })) as JsonValue);
   };
   const select = async (path: string) => {
@@ -69,15 +95,21 @@ export function createEditorBehavior(context: ClientContext): ClientHandlers {
       try {
         status = '';
         switch (action) {
-          case 'SelectFile': await select(text(params, 'path')); break;
+          case 'SelectFile': await select(text(params, 'value')); break;
           case 'SetMode': {
-            const next = text(params, 'mode');
+            const next = text(params, 'value');
             if (next !== 'raw' && next !== 'form') throw new TypeError('Invalid editor mode.');
             mode = next;
             break;
           }
-          case 'SetField': store.setDisplayValue(text(params, 'key'), text(params, 'value')); break;
-          case 'SetRaw': store.replaceWorkingSource(text(params, 'source')); break;
+          case 'SetField': {
+            const value = params.value;
+            if (typeof value !== 'string' && typeof value !== 'boolean' && !(typeof value === 'number' && Number.isFinite(value)))
+              throw new TypeError('Missing configuration field value.');
+            store.setDisplayValue(text(params, 'key'), String(value));
+            break;
+          }
+          case 'SetRaw': store.replaceWorkingSource(text(params, 'value')); break;
           case 'Save': {
             saving = true;
             status = copy.saving;

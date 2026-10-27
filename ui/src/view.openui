@@ -1,2 +1,45 @@
 $editor = null
-root = ConfigEditor($editor)
+root = Stack([
+  $editor == null ? StatusMessage("Loading configuration…") :
+  $editor.error ? StatusMessage($editor.error, "error") :
+  !$editor.ready ? StatusMessage($editor.copy.loading) : Stack([
+    Row([
+      Heading($editor.manifest.server.displayName),
+      $editor.manifest.server.appVersion ? Badge($editor.manifest.server.appVersion) : null
+    ]),
+    Grid([
+      Field($editor.copy.filesHeading, "", [
+        Select($editor.files, $editor.selectedPath, {type: "SelectFile", params: {}}, $editor.saving)
+      ]),
+      Row([
+        Badge($editor.schema.format),
+        Button($editor.saving ? $editor.copy.saving : $editor.copy.save, {type: "Save", params: {}}, !$editor.canSave)
+      ])
+    ]),
+    StatusMessage($editor.status),
+    $editor.snapshot.restartRequired ? StatusMessage($editor.copy.restartAfterSave, "warning") : null,
+    Tabs($editor.tabs, $editor.mode, {type: "SetMode", params: {}}, $editor.copy.modeHeading, $editor.saving, [
+      Separator(),
+      $editor.mode == "raw" ? Field($editor.copy.rawLabel, "", [
+        Textarea($editor.source, {type: "SetRaw", params: {}}, $editor.saving)
+      ]) : Stack(@Each($editor.sections, "section", Card(section.label, [
+        Grid(@Each(section.fields, "field", Field(field.label, field.description, [
+          field.type == "secret" ?
+            PasswordInput(field.value, {type: "SetField", params: {key: field.key}}, $editor.saving) :
+          field.type == "boolean" ?
+            Switch(field.checked, {type: "SetField", params: {key: field.key}}, $editor.saving) :
+          field.type == "enum" ?
+            Select(field.options, field.value, {type: "SetField", params: {key: field.key}}, $editor.saving) :
+          field.type == "integer" || field.type == "number" ?
+            NumberInput(field.value, {type: "SetField", params: {key: field.key}}, $editor.saving, null, field.min, field.max, field.step) :
+            Input(field.value, {type: "SetField", params: {key: field.key}}, $editor.saving),
+          Row([
+            TextContent(field.key),
+            field.restartRequired ? Badge($editor.copy.restartRequired) : null
+          ])
+        ], field.errors, $editor.saving)))
+      ], section.description))),
+      StatusMessage($editor.validation, "error")
+    ])
+  ], "md")
+])
