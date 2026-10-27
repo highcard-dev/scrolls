@@ -1,0 +1,78 @@
+name: Build and push Scrolls
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: Update release tags instead of PR preview tags.
+        required: true
+        type: boolean
+permissions:
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    concurrency:
+      group: scrolls-${{ inputs.release && 'release' || format('pr-{0}', github.event.pull_request.number) }}
+      cancel-in-progress: false
+    env:
+      DRUID_CLI_VERSION: ${{ vars.DRUID_CLI_VERSION || 'v0.1.257' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.7"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Build and test Scroll UI
+        working-directory: ui
+        run: npm ci && npm test && npm run type-check && npm run build
+      - name: Build scroll tree
+        if: github.event_name == 'pull_request'
+        run: make build-tree
+      - name: Download released CLI
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: highcard-dev/druid-cli
+          tag: ${{ env.DRUID_CLI_VERSION }}
+          fileName: druid
+          token: ${{ github.token }}
+      - name: Install CLI
+        run: |
+          mkdir -p "$RUNNER_TEMP/scroll-cli"
+          chmod +x druid
+          mv druid "$RUNNER_TEMP/scroll-cli/druid"
+          echo "$RUNNER_TEMP/scroll-cli" >> "$GITHUB_PATH"
+      - name: Validate catalog and UI
+        run: ./scripts/validate_all_scrolls.sh && bash ./scripts/validate_ui_coverage.sh
+      - name: Test catalog publication
+        run: bash ./scripts/tests/push-parallel.test.sh
+      - name: Push registry updates
+        # Fork PRs validate without receiving registry credentials.
+        if: >-
+          (inputs.release && github.event_name != 'pull_request') ||
+          (!inputs.release && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+        env:
+          SCROLL_REGISTRY_HOST: ${{ vars.SCROLL_REGISTRY_HOST || 'artifacts.druid.gg' }}
+          SCROLL_REGISTRY_NAMESPACE: ${{ inputs.release && (vars.SCROLL_REGISTRY_NAMESPACE || 'druid-team') || (vars.SCROLL_PREVIEW_NAMESPACE || 'druid-team-experimental') }}
+          SCROLL_REGISTRY_RUNTIME_NAMESPACE: ${{ vars.SCROLL_REGISTRY_RUNTIME_NAMESPACE || vars.SCROLL_REGISTRY_NAMESPACE || 'druid-team' }}
+          SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
+          SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
+          SCROLL_PUSH_CATEGORIES: ${{ inputs.release && '1' || '0' }}
+          DRUID_SCROLL_RUNTIME_IMAGE: ${{ vars.DRUID_SCROLL_RUNTIME_IMAGE }}
+          DRUID_SCROLL_STEAMCMD_IMAGE: ${{ vars.DRUID_SCROLL_STEAMCMD_IMAGE }}
+        run: |
+          set -euo pipefail
+          : "${SCROLL_REGISTRY_USER:?Set the SCROLL_REGISTRY_USER secret}"
+          : "${SCROLL_REGISTRY_PASSWORD:?Set the SCROLL_REGISTRY_PASSWORD secret}"
+          if [[ "${{ inputs.release }}" != "true" ]]; then
+            export SCROLL_TAG_SUFFIX="-pr${{ github.event.pull_request.number }}"
+          fi
+          bash ./scripts/push.sh

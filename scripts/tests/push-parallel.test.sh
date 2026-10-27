@@ -38,19 +38,31 @@ artifact_dry_run="$(
   SCROLL_PUSH_DRY_RUN=1 \
   SCROLL_PUSH_CATEGORIES=0 \
   SCROLL_PUSH_ARTIFACTS=1 \
-  SCROLL_OWNER_ID=test-owner \
     bash "$push_script"
 )"
-[[ "$artifact_dry_run" == *"artifacts.druid.gg/test-owner/scroll-minecraft-spigot:1.17"* ]] || \
-  fail "direct pushes must target the owner's private project"
+[[ "$artifact_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17"* ]] || \
+  fail "release pushes must update the existing repositories and tags"
 [[ "$artifact_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.257"* ]] || \
-  fail "owner mapping must leave runtime image references unchanged"
-[[ "$artifact_dry_run" == *"--pack-meta"* ]] || \
-  fail "direct owner pushes must carry presentation metadata"
+  fail "release pushes must preserve runtime image references"
 [[ "$category_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot"* ]] || \
   fail "category metadata must retain the configured registry namespace"
 expected_categories="$(printf '%s\n' "$category_dry_run" | grep -Ec '^"?druid"? push category ')"
 expected_artifacts="$(printf '%s\n' "$artifact_dry_run" | grep -Ec '^"?druid"? push ')"
+
+preview_dry_run="$(
+  SCROLL_PUSH_DRY_RUN=1 \
+  SCROLL_PUSH_CATEGORIES=0 \
+  SCROLL_REGISTRY_NAMESPACE=druid-team-experimental \
+  SCROLL_REGISTRY_RUNTIME_NAMESPACE=druid-team \
+  SCROLL_TAG_SUFFIX=-pr123 \
+    bash "$push_script"
+)"
+[[ "$preview_dry_run" == *"artifacts.druid.gg/druid-team-experimental/scroll-minecraft-spigot:1.17-pr123"* ]] || \
+  fail "preview pushes must use the preview namespace and tag suffix"
+[[ "$preview_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.257"* ]] || \
+  fail "preview pushes must leave runtime images in the release namespace"
+[[ "$preview_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.257-steamcmd"* ]] || \
+  fail "preview pushes must preserve the SteamCMD runtime image"
 
 serial_dry_run="$(SCROLL_PUSH_DRY_RUN=1 SCROLL_PUSH_JOBS=1 bash "$push_script")"
 parallel_dry_run="$(SCROLL_PUSH_DRY_RUN=1 SCROLL_PUSH_JOBS=4 bash "$push_script")"
@@ -85,9 +97,36 @@ assert_equals "1" "$(<"$tmp_dir/state/max")" \
 reset_state
 DRUID_BIN="$fake_druid" \
 FAKE_DRUID_STATE_DIR="$tmp_dir/state" \
+FAKE_DRUID_SLEEP=0 \
+SCROLL_REGISTRY_USER=test-publisher \
+SCROLL_REGISTRY_PASSWORD=test-password \
+SCROLL_PUSH_ARTIFACTS=0 \
+  bash "$push_script" >"$tmp_dir/login.out"
+grep -q '^start artifact login --host artifacts.druid.gg --user test-publisher --password test-password$' "$tmp_dir/state/events.log" || \
+  fail "configured registry credentials must be passed to druid login"
+assert_equals "start artifact login" "$(head -n 1 "$tmp_dir/state/events.log" | cut -d ' ' -f1-3)" \
+  "registry login must happen before any push"
+
+reset_state
+if DRUID_BIN="$fake_druid" \
+  FAKE_DRUID_STATE_DIR="$tmp_dir/state" \
+  FAKE_DRUID_SLEEP=0 \
+  FAKE_DRUID_FAIL_REF=--host \
+  SCROLL_REGISTRY_USER=test-publisher \
+  SCROLL_REGISTRY_PASSWORD=test-password \
+  SCROLL_PUSH_ARTIFACTS=0 \
+    bash "$push_script" >"$tmp_dir/login-failure.out" 2>"$tmp_dir/login-failure.err"; then
+  fail "a failed registry login must make push.sh fail"
+fi
+if grep -q '^start .* push ' "$tmp_dir/state/events.log"; then
+  fail "no artifacts or categories may be pushed after a failed login"
+fi
+
+reset_state
+DRUID_BIN="$fake_druid" \
+FAKE_DRUID_STATE_DIR="$tmp_dir/state" \
 FAKE_DRUID_SLEEP=0.02 \
 SCROLL_PUSH_JOBS=3 \
-SCROLL_PUSH_MANIFEST="$tmp_dir/pushed.txt" \
   bash "$push_script" >"$tmp_dir/parallel.out"
 
 maximum="$(<"$tmp_dir/state/max")"
@@ -100,12 +139,6 @@ assert_equals "$expected_categories" "$actual_categories" \
   "parallel mode must invoke every category push exactly once"
 assert_equals "$expected_artifacts" "$actual_artifacts" \
   "parallel mode must invoke every artifact push exactly once"
-assert_equals "$expected_artifacts" "$(wc -l < "$tmp_dir/pushed.txt" | tr -d ' ')" \
-  "the publication manifest must record each successful artifact push"
-if grep -q 'category' "$tmp_dir/pushed.txt"; then
-  fail "category metadata must not enter the publication manifest"
-fi
-
 last_category_end="$(grep -n '^end category ' "$tmp_dir/state/events.log" | tail -n 1 | cut -d: -f1)"
 first_artifact_start="$(grep -m 1 -n '^start artifact ' "$tmp_dir/state/events.log" | cut -d: -f1)"
 ((last_category_end < first_artifact_start)) || \

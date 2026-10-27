@@ -6,6 +6,7 @@ permissions:
   contents: read
 jobs:
   build-deploy:
-    uses: ./.github/workflows/scroll-lifecycle.yml
+    uses: ./.github/workflows/scrolls.yml
+    secrets: inherit
     with:
-      public: false
+      release: false
