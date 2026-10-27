@@ -42,7 +42,7 @@ artifact_dry_run="$(
 )"
 [[ "$artifact_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17"* ]] || \
   fail "release pushes must update the existing repositories and tags"
-[[ "$artifact_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.257"* ]] || \
+[[ "$artifact_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.281"* ]] || \
   fail "release pushes must preserve runtime image references"
 [[ "$category_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot"* ]] || \
   fail "category metadata must retain the configured registry namespace"
@@ -59,9 +59,9 @@ preview_dry_run="$(
 )"
 [[ "$preview_dry_run" == *"artifacts.druid.gg/druid-team-experimental/scroll-minecraft-spigot:1.17-pr123"* ]] || \
   fail "preview pushes must use the preview namespace and tag suffix"
-[[ "$preview_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.257"* ]] || \
+[[ "$preview_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.281"* ]] || \
   fail "preview pushes must leave runtime images in the release namespace"
-[[ "$preview_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.257-steamcmd"* ]] || \
+[[ "$preview_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.281-steamcmd"* ]] || \
   fail "preview pushes must preserve the SteamCMD runtime image"
 
 serial_dry_run="$(SCROLL_PUSH_DRY_RUN=1 SCROLL_PUSH_JOBS=1 bash "$push_script")"

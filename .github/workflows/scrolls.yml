@@ -17,7 +17,7 @@ jobs:
       group: scrolls-${{ inputs.release && 'release' || format('pr-{0}', github.event.pull_request.number) }}
       cancel-in-progress: false
     env:
-      DRUID_CLI_VERSION: ${{ vars.DRUID_CLI_VERSION || 'v0.1.257' }}
+      DRUID_CLI_VERSION: ${{ vars.DRUID_CLI_VERSION || 'v0.1.281' }}
     steps:
       - uses: actions/checkout@v4
         with:
