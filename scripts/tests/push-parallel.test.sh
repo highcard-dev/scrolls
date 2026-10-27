@@ -42,6 +42,8 @@ artifact_dry_run="$(
 )"
 [[ "$artifact_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17"* ]] || \
   fail "release pushes must update the existing repositories and tags"
+[[ "$artifact_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-forge:26.3 ./scrolls/minecraft/forge/26.3"* ]] || \
+  fail "release pushes must include the new Forge 26.3 Scroll"
 [[ "$artifact_dry_run" == *"-i artifacts.druid.gg/druid-team/druid:v0.1.281"* ]] || \
   fail "release pushes must preserve runtime image references"
 [[ "$category_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot"* ]] || \
