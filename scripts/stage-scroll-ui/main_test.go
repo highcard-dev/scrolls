@@ -345,8 +345,8 @@ func TestCatalogCoversEveryCheckedInGameServerScroll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if count != 127 {
-		t.Fatalf("checked Scroll count = %d, want 127", count)
+	if count != 128 {
+		t.Fatalf("checked Scroll count = %d, want 128", count)
 	}
 }
 
@@ -399,8 +399,8 @@ func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) 
 	if err != nil {
 		t.Fatal(err)
 	}
-	if count != 127 {
-		t.Fatalf("staged Scroll count = %d, want 124", count)
+	if count != 128 {
+		t.Fatalf("staged Scroll count = %d, want 128", count)
 	}
 }
 
