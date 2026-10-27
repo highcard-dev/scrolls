@@ -1,0 +1,2 @@
+$editor = null
+root = ConfigEditor($editor)

@@ -85,7 +85,10 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(destination, "private", "dist", "app.wasm")); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(destination, "private", "src", "app.tsx")); err != nil {
+	if _, err := os.Stat(filepath.Join(destination, "private", "dist", "app.openui")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "src", "app.ts")); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(filepath.Join(destination, "private", "package.json")); err != nil {
@@ -410,13 +413,16 @@ func writeTestUISource(t *testing.T) (string, string) {
 	if err := os.WriteFile(filepath.Join(uiSource, "package.json"), []byte("{}\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(uiSource, "src", "app.tsx"), []byte("export const source = true;\n"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(uiSource, "src", "app.ts"), []byte("export const source = true;\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.MkdirAll(filepath.Join(uiSource, "dist"), 0755); err != nil {
 		t.Fatal(err)
 	}
 	bundle := filepath.Join(uiSource, "dist", "app.wasm")
+	if err := os.WriteFile(filepath.Join(uiSource, "dist", "app.openui"), []byte("root = Text(\"Test\")\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.WriteFile(bundle, []byte("wasm"), 0644); err != nil {
 		t.Fatal(err)
 	}

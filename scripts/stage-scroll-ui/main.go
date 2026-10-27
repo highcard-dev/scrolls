@@ -407,6 +407,9 @@ func stage(source, destination, bundle string) error {
 	if err := copyFile(bundle, filepath.Join(privateDir, "dist", "app.wasm")); err != nil {
 		return err
 	}
+	if err := copyFile(strings.TrimSuffix(bundle, ".wasm")+".openui", filepath.Join(privateDir, "dist", "app.openui")); err != nil {
+		return err
+	}
 	manifestBytes, err := json.MarshalIndent(runtimeManifest, "", "  ")
 	if err != nil {
 		return err

@@ -13,13 +13,7 @@ export {
   saveSelectedFile,
   withMissingFileFallback,
 } from "./gateway.js";
-export { createConfigEditorComponent, EditorApp } from "./components/EditorApp.js";
-export { FileRail } from "./components/FileRail.js";
-export { FieldControl } from "./components/FieldControl.js";
-export { FormEditor } from "./components/FormEditor.js";
-export { RawEditor } from "./components/RawEditor.js";
-export { ActionBar } from "./components/ActionBar.js";
-export { EDITOR_STYLES } from "./styles.js";
+export { createEditorBehavior } from "./behavior.js";
 export { copy } from "./copy.js";
 export type {
   ConfigEditorManifest,
@@ -51,9 +45,3 @@ export type {
   FieldSnapshot,
 } from "./store.js";
 export type { FileGateway, SaveResult } from "./gateway.js";
-export type {
-  ConfigEditorComponentOptions,
-  ConfigEditorComponent,
-  EditorAppProps,
-  EditorMode,
-} from "./components/EditorApp.js";

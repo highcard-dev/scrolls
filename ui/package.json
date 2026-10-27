@@ -4,16 +4,14 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "druid-ui-build --wit=node_modules/@druid-ui/plattform/wit/druid-plattform.wit --world-name=druid-plattform src/app.tsx dist",
-    "build:raw": "druid-ui-build --wit=node_modules/@druid-ui/plattform/wit/druid-plattform.wit --world-name=druid-plattform src/app.tsx --raw dist",
-    "dev": "druid-ui-build --wit=node_modules/@druid-ui/plattform/wit/druid-plattform.wit --world-name=druid-plattform src/app.tsx --watch --raw dist",
+    "build": "druid-ui-build src/app.ts dist --name=app --document=src/view.openui",
+    "dev": "npm run build -- --watch",
     "test": "vitest run src/config-editor",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@druid-ui/build": "^3.0.0",
-    "@druid-ui/component": "^3.0.0",
-    "@druid-ui/plattform": "^3.0.0",
+    "@druid-ui/build": "4.0.0-rc.1",
+    "@druid-ui/client": "4.0.0-rc.1",
     "typescript": "~5.8.3",
     "vitest": "^4.1.10"
   }

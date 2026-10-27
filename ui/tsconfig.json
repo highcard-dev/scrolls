@@ -9,10 +9,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "@druid-ui/component",
-    "types": ["@druid-ui/component/jsx"]
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/config-editor/test-fixtures.ts"]
