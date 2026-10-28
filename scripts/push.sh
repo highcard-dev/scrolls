@@ -13,12 +13,11 @@ SCROLL_REGISTRY_HOST="${SCROLL_REGISTRY_HOST:-artifacts.druid.gg}"
 SCROLL_REGISTRY_NAMESPACE="${SCROLL_REGISTRY_NAMESPACE:-druid-team}"
 SCROLL_REGISTRY_USER="${SCROLL_REGISTRY_USER:-}"
 SCROLL_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD:-}"
-DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.257}"
+DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.281}"
 SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
 SCROLL_PUSH_JOBS="${SCROLL_PUSH_JOBS:-1}"
 SCROLL_PUSH_UI="${SCROLL_PUSH_UI:-1}"
-
 if [[ ! "$SCROLL_PUSH_JOBS" =~ ^[1-9][0-9]*$ ]]; then
   echo "SCROLL_PUSH_JOBS must be a positive integer (got: $SCROLL_PUSH_JOBS)" >&2
   exit 2
@@ -78,6 +77,15 @@ login_if_configured() {
   fi
 }
 
+rewrite_registry_reference() {
+  local value="$1"
+  if [[ "$value" == "$runtime_image" || "$value" == "$steamcmd_image" ]]; then
+    printf '%s' "$value"
+    return
+  fi
+  printf '%s' "${value//artifacts.druid.gg\/druid-team/$registry_prefix}"
+}
+
 run() {
   local -a command=("$@")
   local index
@@ -101,7 +109,11 @@ run() {
   for index in "${!command[@]}"; do
     command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257-steamcmd/$steamcmd_image}"
     command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257/$runtime_image}"
-    command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$registry_prefix}"
+    if [[ "${command[2]:-}" == "category" ]]; then
+      command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$registry_prefix}"
+    else
+      command[$index]="$(rewrite_registry_reference "${command[$index]}")"
+    fi
   done
   if [[ "${command[0]:-}" == "druid" ]]; then
     command[0]="$DRUID_BIN"
@@ -268,6 +280,7 @@ push_release_artifacts() {
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-forge:26.1.1 ./scrolls/minecraft/forge/26.1.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-forge:26.1.2 ./scrolls/minecraft/forge/26.1.2 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-forge:26.2 ./scrolls/minecraft/forge/26.2 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
+  run druid push artifacts.druid.gg/druid-team/scroll-minecraft-forge:26.3 ./scrolls/minecraft/forge/26.3 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-cuberite:latest ./scrolls/minecraft/cuberite/latest -p main=25565 -p webpanel=8080 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
   run druid push artifacts.druid.gg/druid-team/scroll-rust-oxide:latest ./scrolls/rust/rust-oxide/latest -p main=/udp -p query=/udp -p rcon -p rustplus -i artifacts.druid.gg/druid-team/druid:v0.1.257-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1 --smart --category rust
   run druid push artifacts.druid.gg/druid-team/scroll-rust-vanilla:latest ./scrolls/rust/rust-vanilla/latest -p main=/udp -p query=/udp -p rcon -p rustplus -i artifacts.druid.gg/druid-team/druid:v0.1.257-steamcmd --min-disk 10Gi --min-ram 6Gi --min-cpu 1 --smart --category rust

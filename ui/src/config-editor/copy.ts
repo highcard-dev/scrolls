@@ -3,6 +3,7 @@ export const copy = {
   loading: "Loading configuration…",
   formTab: "Form",
   rawTab: "Raw",
+  modeHeading: "Editor mode",
   filesHeading: "Configuration files",
   restartRequired: "Restart required",
   restartAfterSave: "Restart required after saving",
