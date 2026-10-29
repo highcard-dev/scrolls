@@ -33,6 +33,15 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 		t.Fatal(err)
 	}
 	uiSource, bundle := writeTestUISource(t)
+	for _, name := range []string{"guest/src/lib.rs", "guest/Cargo.toml", "guest/Cargo.lock", "build.sh", "wit/client.wit", "guest/target/build/cache"} {
+		file := filepath.Join(uiSource, name)
+		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(file, []byte("fixture"), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
 	if err := os.WriteFile(filepath.Join(uiSource, "dist", "stale.js"), []byte("stale\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -100,8 +109,52 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(destination, "private", "node_modules")); !os.IsNotExist(err) {
 		t.Fatalf("node_modules was packaged: %v", err)
 	}
+	for _, name := range []string{"guest/src/lib.rs", "guest/Cargo.toml", "guest/Cargo.lock", "build.sh", "wit/client.wit"} {
+		if _, err := os.Stat(filepath.Join(destination, "private", name)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "guest", "target")); !os.IsNotExist(err) {
+		t.Fatalf("Rust build output was packaged: %v", err)
+	}
 	if _, err := os.Stat(filepath.Join(destination, "data", "server.properties")); !os.IsNotExist(err) {
 		t.Fatalf("active config was unexpectedly created beside packaged default: %v", err)
+	}
+}
+
+func TestStageRustProjectWithoutNpm(t *testing.T) {
+	root := t.TempDir()
+	source := filepath.Join(root, "scrolls", "minecraft", "minecraft-vanilla", "1.20.4")
+	if err := os.MkdirAll(source, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "scroll.yaml"), []byte("name: test\ndesc: test\nversion: 0.0.1\napp_version: 1.20.4\ncommands: {}\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	uiSource, bundle := writeTestUISource(t)
+	if err := os.Remove(filepath.Join(uiSource, "package.json")); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"build.sh", "guest/Cargo.toml", "guest/Cargo.lock", "wit/client.wit"} {
+		path := filepath.Join(uiSource, name)
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte("fixture"), 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	destination := filepath.Join(root, "staged")
+	if err := stage(source, destination, bundle); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"build.sh", "guest/Cargo.toml", "guest/Cargo.lock", "wit/client.wit", "dist/app.wasm", "dist/app.openui"} {
+		if _, err := os.Stat(filepath.Join(destination, "private", name)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "package.json")); !os.IsNotExist(err) {
+		t.Fatal("Rust staging must not require or synthesize an npm manifest", err)
 	}
 }
 

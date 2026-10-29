@@ -18,6 +18,8 @@ SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
 SCROLL_PUSH_JOBS="${SCROLL_PUSH_JOBS:-1}"
 SCROLL_PUSH_UI="${SCROLL_PUSH_UI:-1}"
+# Optional fixed substring of an artifact's source path, e.g. /minecraft/.
+SCROLL_PUSH_SOURCE_FILTER="${SCROLL_PUSH_SOURCE_FILTER:-}"
 if [[ ! "$SCROLL_PUSH_JOBS" =~ ^[1-9][0-9]*$ ]]; then
   echo "SCROLL_PUSH_JOBS must be a positive integer (got: $SCROLL_PUSH_JOBS)" >&2
   exit 2
@@ -89,6 +91,9 @@ rewrite_registry_reference() {
 run() {
   local -a command=("$@")
   local index
+  if [[ "${command[2]:-}" != "category" && -n "$SCROLL_PUSH_SOURCE_FILTER" && "${command[3]:-}" != *"$SCROLL_PUSH_SOURCE_FILTER"* ]]; then
+    return 0
+  fi
 
   # Add the optional suffix only to artifact tags. Category pushes are metadata
   # for the stable repository and do not get PR suffixes.
@@ -127,9 +132,14 @@ run() {
 
   if [[ "$SCROLL_PUSH_UI" = "1" && "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]]; then
     local staged_root
-    staged_root="$(mktemp -d)"
+    mkdir -p "$repo_root/.builds"
+    staged_root="$(mktemp -d "$repo_root/.builds/stage-XXXXXX")"
     staged_dirs+=("$staged_root")
-    go run ./scripts/stage-scroll-ui "${command[3]}" "$staged_root/artifact" "$repo_root/ui/dist/app.wasm"
+    local ui_bundle="$repo_root/ui/dist/app.wasm"
+    case "${command[3]}" in
+      */minecraft/*) ui_bundle="$repo_root/ui-minecraft/dist/app.wasm" ;;
+    esac
+    go run ./scripts/stage-scroll-ui "${command[3]}" "$staged_root/artifact" "$ui_bundle"
     command[3]="$staged_root/artifact"
   fi
 

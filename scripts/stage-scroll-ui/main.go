@@ -397,7 +397,8 @@ func stage(source, destination, bundle string) error {
 			return false, err
 		}
 		topLevel := strings.Split(filepath.ToSlash(relative), "/")[0]
-		return topLevel == "dist" || topLevel == "node_modules", nil
+		path := filepath.ToSlash(relative)
+		return topLevel == "dist" || topLevel == "node_modules" || path == "guest/target" || strings.HasPrefix(path, "guest/target/"), nil
 	}}); err != nil {
 		return fmt.Errorf("copy UI source: %w", err)
 	}

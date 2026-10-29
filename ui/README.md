@@ -1,6 +1,6 @@
 # Scroll configuration admin UI
 
-Every released game-server Scroll receives the same sandboxed configuration editor during publication. Staging generates a family manifest, copies `dist/app.wasm` and its companion `dist/app.openui` into `private/dist/`, and adds the private UI entry to the staged `scroll.yaml`.
+Non-Minecraft game-server Scrolls receive this sandboxed configuration editor during publication. Minecraft uses the Rust dashboard in `../ui-minecraft`. Staging generates a family manifest, copies the selected `dist/app.wasm` and its companion `dist/app.openui` into `private/dist/`, and adds the private UI entry to the staged `scroll.yaml`.
 
 Minecraft variants share one typed `server.properties` schema. Other families expose their native configuration files and always retain a lossless Raw view, so newly introduced or uncommon options remain editable even before a typed control is added.
 
