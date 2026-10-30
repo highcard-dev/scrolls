@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,6 +34,15 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 		t.Fatal(err)
 	}
 	uiSource, bundle := writeTestUISource(t)
+	for _, name := range []string{"guest/src/lib.rs", "guest/Cargo.toml", "guest/Cargo.lock", "build.sh", "wit/client.wit", "guest/target/build/cache"} {
+		file := filepath.Join(uiSource, name)
+		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(file, []byte("fixture"), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
 	if err := os.WriteFile(filepath.Join(uiSource, "dist", "stale.js"), []byte("stale\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -55,12 +65,36 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(stagedYAML) == "" || !contains(string(stagedYAML), "path: private/dist/app.wasm") {
+	if string(stagedYAML) == "" || !contains(string(stagedYAML), "wasm: private/dist/app.wasm") {
 		t.Fatalf("staged yaml = %s", stagedYAML)
+	}
+	if !strings.Contains(string(stagedYAML), "wasm: public/dist/app.wasm") {
+		t.Fatal("Minecraft release is missing its default public declaration")
+	}
+	for _, name := range []string{"dist/app.wasm", "dist/app.openui", "guest/Cargo.toml", "build.sh", "wit/client.wit"} {
+		if _, err := os.Stat(filepath.Join(destination, "public", name)); err != nil {
+			t.Fatal("default public project is incomplete", err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "public")); !os.IsNotExist(err) {
+		t.Fatal("public project was duplicated inside the private project")
 	}
 	var stagedScroll map[string]any
 	if err := yaml.Unmarshal(stagedYAML, &stagedScroll); err != nil {
 		t.Fatal(err)
+	}
+	ui := stagedScroll["ui"].(map[string]any)
+	commands := stagedScroll["commands"].(map[string]any)
+	for _, scope := range []string{"private", "public"} {
+		declaration := ui[scope].(map[string]any)
+		if declaration["openui"] != scope+"/dist/app.openui" || declaration["buildcommand"] != "build_ui_"+scope {
+			t.Fatalf("incomplete declaration: %#v", declaration)
+		}
+		command := commands[declaration["buildcommand"].(string)].(map[string]any)
+		procedure := command["procedures"].([]any)[0].(map[string]any)
+		if procedure["image"] != "rust:1.99-slim-bookworm" || !strings.Contains(fmt.Sprint(procedure["command"]), "sh ./build.sh") {
+			t.Fatalf("Rust build recipe missing: %#v", procedure)
+		}
 	}
 	if chunks, exists := stagedScroll["chunks"]; exists {
 		t.Fatalf("automatic data chunking was replaced by explicit chunks: %#v", chunks)
@@ -100,8 +134,111 @@ func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(destination, "private", "node_modules")); !os.IsNotExist(err) {
 		t.Fatalf("node_modules was packaged: %v", err)
 	}
+	for _, name := range []string{"guest/src/lib.rs", "guest/Cargo.toml", "guest/Cargo.lock", "build.sh", "wit/client.wit"} {
+		if _, err := os.Stat(filepath.Join(destination, "private", name)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "guest", "target")); !os.IsNotExist(err) {
+		t.Fatalf("Rust build output was packaged: %v", err)
+	}
 	if _, err := os.Stat(filepath.Join(destination, "data", "server.properties")); !os.IsNotExist(err) {
 		t.Fatalf("active config was unexpectedly created beside packaged default: %v", err)
+	}
+}
+
+func TestStagePreservesDeclaredPublicUI(t *testing.T) {
+	root := t.TempDir()
+	source := filepath.Join(root, "scrolls", "minecraft", "vanilla", "1.20.4")
+	if err := os.MkdirAll(filepath.Join(source, "public", "custom"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	content := "name: fixture\ndesc: fixture\nversion: 1.0.0\napp_version: 1.20.4\ncommands: {}\nchunks:\n  - name: data\n    path: data\nui:\n  public:\n    wasm: public/custom/view.wasm\n    openui: public/custom/layout.openui\n"
+	if err := os.WriteFile(filepath.Join(source, "scroll.yaml"), []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"view.wasm", "layout.openui"} {
+		if err := os.WriteFile(filepath.Join(source, "public", "custom", name), []byte("public fixture"), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	_, bundle := writeTestUISource(t)
+	destination := filepath.Join(root, "staged")
+	if err := stage(source, destination, bundle); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(filepath.Join(destination, "scroll.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), "public/custom/view.wasm") || !strings.Contains(string(data), "public-ui") {
+		t.Fatal("public declaration/chunk lost")
+	}
+	for _, name := range []string{"view.wasm", "layout.openui"} {
+		data, err := os.ReadFile(filepath.Join(destination, "public", "custom", name))
+		if err != nil || string(data) != "public fixture" {
+			t.Fatal(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(destination, "public", "dist", "app.wasm")); !os.IsNotExist(err) {
+		t.Fatal("custom public UI was supplemented with the default")
+	}
+}
+
+func TestStageRequiresBothDefaultPublicArtifacts(t *testing.T) {
+	for _, missing := range []string{"app.wasm", "app.openui"} {
+		t.Run(missing, func(t *testing.T) {
+			uiSource, bundle := writeTestUISource(t)
+			if err := os.Remove(filepath.Join(uiSource, "public", "dist", missing)); err != nil {
+				t.Fatal(err)
+			}
+			source := filepath.Join(t.TempDir(), "minecraft", "fixture")
+			if err := os.MkdirAll(source, 0755); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(filepath.Join(source, "scroll.yaml"), []byte("name: fixture\ncommands: {}\n"), 0644); err != nil {
+				t.Fatal(err)
+			}
+			if err := stage(source, filepath.Join(t.TempDir(), "staged"), bundle); err == nil {
+				t.Fatal("staged an incomplete default public UI")
+			}
+		})
+	}
+}
+
+func TestStageRustProjectWithoutNpm(t *testing.T) {
+	root := t.TempDir()
+	source := filepath.Join(root, "scrolls", "minecraft", "minecraft-vanilla", "1.20.4")
+	if err := os.MkdirAll(source, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "scroll.yaml"), []byte("name: test\ndesc: test\nversion: 0.0.1\napp_version: 1.20.4\ncommands: {}\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	uiSource, bundle := writeTestUISource(t)
+	if err := os.Remove(filepath.Join(uiSource, "package.json")); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"build.sh", "guest/Cargo.toml", "guest/Cargo.lock", "wit/client.wit"} {
+		path := filepath.Join(uiSource, name)
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte("fixture"), 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	destination := filepath.Join(root, "staged")
+	if err := stage(source, destination, bundle); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"build.sh", "guest/Cargo.toml", "guest/Cargo.lock", "wit/client.wit", "dist/app.wasm", "dist/app.openui"} {
+		if _, err := os.Stat(filepath.Join(destination, "private", name)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(destination, "private", "package.json")); !os.IsNotExist(err) {
+		t.Fatal("Rust staging must not require or synthesize an npm manifest", err)
 	}
 }
 
@@ -366,6 +503,15 @@ func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) 
 			t.Errorf("stage %s: %v", path, err)
 			return nil
 		}
+		publicWASM := filepath.Join(destination, "public", "dist", "app.wasm")
+		_, publicErr := os.Stat(publicWASM)
+		minecraft := strings.Contains(filepath.ToSlash(path), "/minecraft/")
+		if minecraft && publicErr != nil {
+			t.Errorf("%s is missing its default public UI: %v", path, publicErr)
+		}
+		if !minecraft && !os.IsNotExist(publicErr) {
+			t.Errorf("%s unexpectedly received a Minecraft public UI", path)
+		}
 		manifestBytes, err := os.ReadFile(filepath.Join(destination, "data", ".druid", "config-editor.manifest.json"))
 		if err != nil {
 			t.Errorf("manifest %s: %v", path, err)
@@ -425,6 +571,15 @@ func writeTestUISource(t *testing.T) (string, string) {
 	}
 	if err := os.WriteFile(bundle, []byte("wasm"), 0644); err != nil {
 		t.Fatal(err)
+	}
+	for _, name := range []string{"build.sh", "wit/client.wit", "public/dist/app.wasm", "public/dist/app.openui", "public/guest/Cargo.toml"} {
+		file := filepath.Join(uiSource, name)
+		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(file, []byte("public fixture"), 0644); err != nil {
+			t.Fatal(err)
+		}
 	}
 	return uiSource, bundle
 }

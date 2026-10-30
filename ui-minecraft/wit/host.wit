@@ -1,0 +1,7 @@
+package druid:openui;
+
+interface host {
+    log: func(message: string);
+    /// Await a named operation. Both successful values and errors cross as JSON/text.
+    call: async func(operation: string, params: string) -> result<string, string>;
+}

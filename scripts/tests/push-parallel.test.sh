@@ -50,6 +50,13 @@ artifact_dry_run="$(
   fail "category metadata must retain the configured registry namespace"
 expected_categories="$(printf '%s\n' "$category_dry_run" | grep -Ec '^"?druid"? push category ')"
 expected_artifacts="$(printf '%s\n' "$artifact_dry_run" | grep -Ec '^"?druid"? push ')"
+filtered_dry_run="$(SCROLL_PUSH_DRY_RUN=1 SCROLL_PUSH_CATEGORIES=0 SCROLL_PUSH_SOURCE_FILTER=/minecraft/ bash "$push_script")"
+assert_equals "$(printf '%s\n' "$artifact_dry_run" | grep -c '/minecraft/')" \
+  "$(printf '%s\n' "$filtered_dry_run" | grep -c '/minecraft/')" \
+  "source filtering must preserve every Minecraft artifact"
+if printf '%s\n' "$filtered_dry_run" | grep -qv '/minecraft/'; then
+  fail "source filtering must exclude unrelated artifacts"
+fi
 
 preview_dry_run="$(
   SCROLL_PUSH_DRY_RUN=1 \
@@ -166,5 +173,20 @@ assert_equals "$failure_starts" "$failure_ends" \
   "push.sh must wait for every started job before returning a failure"
 assert_equals "0" "$(<"$tmp_dir/state/active")" \
   "push.sh must not leave background push jobs running after failure"
+
+reset_state
+mkdir -p "$tmp_dir/bin"
+cp "$repo_root/scripts/tests/fixtures/fake-stage-go.sh" "$tmp_dir/bin/go"
+chmod +x "$tmp_dir/bin/go"
+PATH="$tmp_dir/bin:$PATH" \
+DRUID_BIN="$fake_druid" \
+FAKE_DRUID_STATE_DIR="$tmp_dir/state" \
+FAKE_DRUID_SLEEP=0 \
+SCROLL_PUSH_UI=1 \
+SCROLL_PUSH_CATEGORIES=0 \
+SCROLL_PUSH_ARTIFACTS=1 \
+  bash "$push_script" >"$tmp_dir/ui-selection.out"
+grep -q '/ui-minecraft/dist/app.wasm' "$tmp_dir/state/staging.log" || fail "Minecraft Rust UI was not selected"
+grep -q '/ui/dist/app.wasm' "$tmp_dir/state/staging.log" || fail "non-Minecraft UI selection changed"
 
 echo "push parallelism tests passed ($expected_categories categories, $expected_artifacts artifacts)"

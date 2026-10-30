@@ -34,6 +34,18 @@ jobs:
       - name: Build and test Scroll UI
         working-directory: ui
         run: npm ci && npm test && npm run type-check && npm run build
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Build and test Minecraft Rust UI
+        working-directory: ui-minecraft
+        run: |
+          cargo install --locked wasm-tools --version 1.262.0
+          cargo test --manifest-path guest/Cargo.toml --locked
+          cargo fmt --manifest-path guest/Cargo.toml --check
+          ./build.sh guest/Cargo.toml dist --document=src/view.openui
+          cargo fmt --manifest-path public/guest/Cargo.toml --check
+          ./build.sh public/guest/Cargo.toml public/dist --document=public/src/view.openui
       - name: Build scroll tree
         if: github.event_name == 'pull_request'
         run: make build-tree

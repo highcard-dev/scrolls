@@ -371,7 +371,27 @@ func stage(source, destination, bundle string) error {
 		return err
 	}
 	runtimeManifest := runtimeConfigManifest(configManifest)
-	scroll["ui"] = map[string]any{"private": map[string]any{"path": "private/dist/app.wasm"}}
+	ui, _ := scroll["ui"].(map[string]any)
+	if ui == nil {
+		ui = map[string]any{}
+	}
+	uiSource := filepath.Dir(filepath.Dir(bundle))
+	commands, _ := scroll["commands"].(map[string]any)
+	if commands == nil {
+		commands = map[string]any{}
+		scroll["commands"] = commands
+	}
+	ui["private"] = declareUIBuild(commands, "private", uiSource)
+	defaultPublic := strings.Contains(filepath.ToSlash(source), "/minecraft/") && ui["public"] == nil
+	if defaultPublic {
+		ui["public"] = declareUIBuild(commands, "public", filepath.Join(uiSource, "public"))
+	}
+	scroll["ui"] = ui
+	if ui["public"] != nil {
+		if err := ensureChunk(scroll, "public-ui", "public"); err != nil {
+			return err
+		}
+	}
 	if err := ensureChunk(scroll, "config-admin-ui", "private"); err != nil {
 		return err
 	}
@@ -390,25 +410,20 @@ func stage(source, destination, bundle string) error {
 	}
 
 	privateDir := filepath.Join(destination, "private")
-	uiSource := filepath.Dir(filepath.Dir(bundle))
-	if err := cp.Copy(uiSource, privateDir, cp.Options{Skip: func(_ os.FileInfo, src, _ string) (bool, error) {
-		relative, err := filepath.Rel(uiSource, src)
-		if err != nil {
-			return false, err
+	if err := stageUIProject(uiSource, privateDir, bundle); err != nil {
+		return err
+	}
+	if defaultPublic {
+		publicDir := filepath.Join(destination, "public")
+		publicSource := filepath.Join(uiSource, "public")
+		if err := stageUIProject(publicSource, publicDir, filepath.Join(publicSource, "dist", "app.wasm")); err != nil {
+			return fmt.Errorf("stage default public UI: %w", err)
 		}
-		topLevel := strings.Split(filepath.ToSlash(relative), "/")[0]
-		return topLevel == "dist" || topLevel == "node_modules", nil
-	}}); err != nil {
-		return fmt.Errorf("copy UI source: %w", err)
-	}
-	if err := os.MkdirAll(filepath.Join(privateDir, "dist"), 0755); err != nil {
-		return err
-	}
-	if err := copyFile(bundle, filepath.Join(privateDir, "dist", "app.wasm")); err != nil {
-		return err
-	}
-	if err := copyFile(strings.TrimSuffix(bundle, ".wasm")+".openui", filepath.Join(privateDir, "dist", "app.openui")); err != nil {
-		return err
+		for _, shared := range []string{"build.sh", "wit"} {
+			if err := cp.Copy(filepath.Join(uiSource, shared), filepath.Join(publicDir, shared)); err != nil {
+				return fmt.Errorf("copy public UI build support: %w", err)
+			}
+		}
 	}
 	manifestBytes, err := json.MarshalIndent(runtimeManifest, "", "  ")
 	if err != nil {
@@ -423,6 +438,43 @@ func stage(source, destination, bundle string) error {
 		return err
 	}
 	return ensureConfigFiles(destination, configManifest)
+}
+
+func declareUIBuild(commands map[string]any, scope, source string) map[string]any {
+	name := "build_ui_" + scope
+	image := "node:24-bookworm-slim"
+	recipe := "npm ci --include=optional && npm run build"
+	if _, err := os.Stat(filepath.Join(source, "guest", "Cargo.toml")); err == nil {
+		image = "rust:1.99-slim-bookworm"
+		recipe = "rustup target add wasm32-unknown-unknown && (command -v wasm-tools >/dev/null || cargo install --locked wasm-tools --version 1.262.0) && sh ./build.sh guest/Cargo.toml dist --document=src/view.openui"
+	}
+	commands[name] = map[string]any{"procedures": []any{map[string]any{
+		"image": image, "working_dir": "/app/resources/deployment/" + scope,
+		"mounts":  []any{map[string]any{"path": "/app/resources/deployment", "sub_path": "."}},
+		"command": []string{"sh", "-ec", recipe},
+	}}}
+	return map[string]any{"buildcommand": name, "wasm": scope + "/dist/app.wasm", "openui": scope + "/dist/app.openui"}
+}
+
+func stageUIProject(uiSource, destination, bundle string) error {
+	if err := cp.Copy(uiSource, destination, cp.Options{Skip: func(_ os.FileInfo, src, _ string) (bool, error) {
+		relative, err := filepath.Rel(uiSource, src)
+		if err != nil {
+			return false, err
+		}
+		topLevel := strings.Split(filepath.ToSlash(relative), "/")[0]
+		path := filepath.ToSlash(relative)
+		return topLevel == "dist" || topLevel == "node_modules" || topLevel == "public" || path == "guest/target" || strings.HasPrefix(path, "guest/target/"), nil
+	}}); err != nil {
+		return fmt.Errorf("copy UI source: %w", err)
+	}
+	if err := os.MkdirAll(filepath.Join(destination, "dist"), 0755); err != nil {
+		return err
+	}
+	if err := copyFile(bundle, filepath.Join(destination, "dist", "app.wasm")); err != nil {
+		return err
+	}
+	return copyFile(strings.TrimSuffix(bundle, ".wasm")+".openui", filepath.Join(destination, "dist", "app.openui"))
 }
 
 func ensureChunk(scroll map[string]any, name string, path string) error {
