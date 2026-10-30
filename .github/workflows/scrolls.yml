@@ -44,6 +44,8 @@ jobs:
           cargo test --manifest-path guest/Cargo.toml --locked
           cargo fmt --manifest-path guest/Cargo.toml --check
           ./build.sh guest/Cargo.toml dist --document=src/view.openui
+          cargo fmt --manifest-path public/guest/Cargo.toml --check
+          ./build.sh public/guest/Cargo.toml public/dist --document=public/src/view.openui
       - name: Build scroll tree
         if: github.event_name == 'pull_request'
         run: make build-tree
