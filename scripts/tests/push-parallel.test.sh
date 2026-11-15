@@ -14,6 +14,8 @@ mkdir -p "$tmp_dir/bin"
 cp "$repo_root/scripts/tests/fixtures/fake-stage-go.sh" "$tmp_dir/bin/go"
 chmod +x "$tmp_dir/bin/go"
 export PATH="$tmp_dir/bin:$PATH"
+export DRUID_CLI_VERSION=v0.1.281
+unset DRUID_SCROLL_RUNTIME_IMAGE DRUID_SCROLL_STEAMCMD_IMAGE
 
 fail() {
   echo "FAIL: $*" >&2
