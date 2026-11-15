@@ -130,16 +130,25 @@ run() {
     return 0
   fi
 
-  if [[ "$SCROLL_PUSH_UI" = "1" && "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]]; then
+  local preserve_ui=0
+  case "${command[3]:-}" in
+    */spacedruids/*|*/spacedruids-multiplayer/*) preserve_ui=1 ;;
+  esac
+  if [[ "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]] &&
+    { [[ "$preserve_ui" == "1" ]] || [[ "$SCROLL_PUSH_UI" == "1" && -n "${command[3]:-}" ]]; }; then
     local staged_root
     mkdir -p "$repo_root/.builds"
     staged_root="$(mktemp -d "$repo_root/.builds/stage-XXXXXX")"
     staged_dirs+=("$staged_root")
-    local ui_bundle="$repo_root/ui/dist/app.wasm"
-    case "${command[3]}" in
-      */minecraft/*) ui_bundle="$repo_root/ui-minecraft/dist/app.wasm" ;;
-    esac
-    go run ./scripts/stage-scroll-ui "${command[3]}" "$staged_root/artifact" "$ui_bundle"
+    if [[ "$preserve_ui" == "1" ]]; then
+      go run ./scripts/stage-scroll-ui --preserve-ui "${command[3]}" "$staged_root/artifact"
+    else
+      local ui_bundle="$repo_root/ui/dist/app.wasm"
+      case "${command[3]}" in
+        */minecraft/*) ui_bundle="$repo_root/ui-minecraft/dist/app.wasm" ;;
+      esac
+      go run ./scripts/stage-scroll-ui "${command[3]}" "$staged_root/artifact" "$ui_bundle"
+    fi
     command[3]="$staged_root/artifact"
   fi
 
@@ -156,6 +165,8 @@ run() {
 }
 
 push_release_categories() {
+  run druid push category artifacts.druid.gg/druid-team/scroll-spacedruids-multiplayer spacedruids-multiplayer ./scrolls/spacedruids-multiplayer/1.0.0/.meta
+  run druid push category artifacts.druid.gg/druid-team/scroll-spacedruids spacedruids ./scrolls/spacedruids/1.0.0/.meta
   run druid push category artifacts.druid.gg/druid-team/scroll-minecraft-spigot minecraft ./scrolls/minecraft/minecraft-spigot/.meta
   run druid push category artifacts.druid.gg/druid-team/scroll-minecraft-vanilla minecraft ./scrolls/minecraft/minecraft-vanilla/.meta
   run druid push category artifacts.druid.gg/druid-team/scroll-minecraft-paper minecraft ./scrolls/minecraft/papermc/.meta
@@ -177,6 +188,8 @@ push_release_categories() {
 }
 
 push_release_artifacts() {
+  run druid push artifacts.druid.gg/druid-team/scroll-spacedruids-multiplayer:1.0.0 ./scrolls/spacedruids-multiplayer/1.0.0 -p http=8080/http -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 1Gi --min-ram 128Mi --min-cpu 0.1 --category spacedruids-multiplayer
+  run druid push artifacts.druid.gg/druid-team/scroll-spacedruids:1.0.0 ./scrolls/spacedruids/1.0.0 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 1Gi --min-ram 128Mi --min-cpu 0.1 --category spacedruids
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17 ./scrolls/minecraft/minecraft-spigot/1.17 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17.1 ./scrolls/minecraft/minecraft-spigot/1.17.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.18 ./scrolls/minecraft/minecraft-spigot/1.18 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft

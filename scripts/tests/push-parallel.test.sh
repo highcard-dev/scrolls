@@ -10,6 +10,10 @@ trap 'rm -rf "$tmp_dir"' EXIT
 fake_druid="$tmp_dir/fake-druid"
 cp "$fake_druid_source" "$fake_druid"
 chmod +x "$fake_druid"
+mkdir -p "$tmp_dir/bin"
+cp "$repo_root/scripts/tests/fixtures/fake-stage-go.sh" "$tmp_dir/bin/go"
+chmod +x "$tmp_dir/bin/go"
+export PATH="$tmp_dir/bin:$PATH"
 
 fail() {
   echo "FAIL: $*" >&2
@@ -40,6 +44,11 @@ artifact_dry_run="$(
   SCROLL_PUSH_ARTIFACTS=1 \
     bash "$push_script"
 )"
+[[ "$artifact_dry_run" == *"scroll-spacedruids:1.0.0 ./scrolls/spacedruids/1.0.0"* ]] || \
+  fail "release catalog must include the self-contained SpaceDruids Scroll"
+[[ "$artifact_dry_run" == *"scroll-spacedruids-multiplayer:1.0.0 ./scrolls/spacedruids-multiplayer/1.0.0"* ]] || \
+  fail "release catalog must include the multiplayer backend Scroll"
+[[ "$artifact_dry_run" != *"scroll-gunter3"* ]] || fail "local game must not appear in the release catalog"
 [[ "$artifact_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17"* ]] || \
   fail "release pushes must update the existing repositories and tags"
 [[ "$artifact_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-forge:26.3 ./scrolls/minecraft/forge/26.3"* ]] || \
@@ -175,10 +184,6 @@ assert_equals "0" "$(<"$tmp_dir/state/active")" \
   "push.sh must not leave background push jobs running after failure"
 
 reset_state
-mkdir -p "$tmp_dir/bin"
-cp "$repo_root/scripts/tests/fixtures/fake-stage-go.sh" "$tmp_dir/bin/go"
-chmod +x "$tmp_dir/bin/go"
-PATH="$tmp_dir/bin:$PATH" \
 DRUID_BIN="$fake_druid" \
 FAKE_DRUID_STATE_DIR="$tmp_dir/state" \
 FAKE_DRUID_SLEEP=0 \
@@ -188,5 +193,20 @@ SCROLL_PUSH_ARTIFACTS=1 \
   bash "$push_script" >"$tmp_dir/ui-selection.out"
 grep -q '/ui-minecraft/dist/app.wasm' "$tmp_dir/state/staging.log" || fail "Minecraft Rust UI was not selected"
 grep -q '/ui/dist/app.wasm' "$tmp_dir/state/staging.log" || fail "non-Minecraft UI selection changed"
+for game in spacedruids spacedruids-multiplayer; do
+  grep -q "/$game/1.0.0|--preserve-ui" "$tmp_dir/state/staging.log" || fail "$game must preserve its authored UI"
+done
+
+reset_state
+DRUID_BIN="$fake_druid" \
+FAKE_DRUID_STATE_DIR="$tmp_dir/state" \
+FAKE_DRUID_SLEEP=0 \
+SCROLL_PUSH_UI=0 \
+SCROLL_PUSH_SOURCE_FILTER=/spacedruids/ \
+SCROLL_PUSH_CATEGORIES=0 \
+SCROLL_PUSH_ARTIFACTS=1 \
+  bash "$push_script" >"$tmp_dir/authored-staging.out"
+grep -q '/spacedruids/1.0.0|--preserve-ui' "$tmp_dir/state/staging.log" || \
+  fail "disabling editor injection must not skip authored UI staging"
 
 echo "push parallelism tests passed ($expected_categories categories, $expected_artifacts artifacts)"

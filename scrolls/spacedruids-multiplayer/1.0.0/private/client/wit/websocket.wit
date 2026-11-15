@@ -1,0 +1,22 @@
+package druid:browser;
+
+/// Browser-native sockets, supplied by Druid, not the standalone Druid UI SDK.
+interface websocket {
+    record connection { id: u32, protocol: string }
+    variant frame { text(string), binary(list<u8>) }
+    record close-info { code: u16, reason: string, clean: bool }
+    variant event { message(frame), closed(close-info) }
+    /// Requires customer confirmation. No custom headers or Druid token injection.
+    connect: async func(url: string, protocols: list<string>) -> result<connection, string>;
+    /// Browser send queues are bounded to 4 MiB. An accepted send is not a peer acknowledgement.
+    send: func(socket: u32, data: frame) -> result<_, string>;
+    /// Await one text/binary frame or remote close. Only one receive may wait per socket.
+    receive: async func(socket: u32) -> result<event, string>;
+    /// Release the handle. A pending receive rejects; no automatic reconnection.
+    close: func(socket: u32, code: u16, reason: string) -> result<_, string>;
+}
+
+world websocket-client {
+    include druid:openui/browser-client;
+    import websocket;
+}

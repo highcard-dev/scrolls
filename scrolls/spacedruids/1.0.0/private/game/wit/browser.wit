@@ -1,0 +1,9 @@
+package druid:openui;
+
+world browser-client {
+    include openui-client;
+    import animation;
+    import canvas;
+    import audio;
+    export keyboard;
+}

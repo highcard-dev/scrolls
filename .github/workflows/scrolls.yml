@@ -46,6 +46,24 @@ jobs:
           ./build.sh guest/Cargo.toml dist --document=src/view.openui
           cargo fmt --manifest-path public/guest/Cargo.toml --check
           ./build.sh public/guest/Cargo.toml public/dist --document=public/src/view.openui
+      - name: Build and test SpaceDruids
+        working-directory: scrolls/spacedruids/1.0.0/private/game
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/.builds"
+          rustc --edition=2021 --test src/invaders/game.rs -o "$GITHUB_WORKSPACE/.builds/spacedruids-tests"
+          "$GITHUB_WORKSPACE/.builds/spacedruids-tests"
+          cargo fmt --check
+          sh ./build.sh
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.8"
+      - name: Build and test SpaceDruids Multiplayer
+        working-directory: scrolls/spacedruids-multiplayer/1.0.0
+        run: |
+          (cd data && bun test)
+          cargo test --manifest-path private/client/Cargo.toml --locked
+          cargo fmt --manifest-path private/client/Cargo.toml --check
+          sh private/client/build.sh
       - name: Build scroll tree
         if: github.event_name == 'pull_request'
         run: make build-tree

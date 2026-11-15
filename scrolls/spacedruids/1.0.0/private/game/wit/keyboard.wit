@@ -1,0 +1,21 @@
+package druid:openui;
+
+/// Discrete, focus-scoped input from a BrowserKeyboard region. No polling or JSON.
+interface keyboard {
+    enum event-kind { down, up, blur }
+    record key-event {
+        region: string,
+        kind: event-kind,
+        /// Logical key (e.g. "m") and physical code (e.g. "KeyM").
+        key: string,
+        code: string,
+        repeat: bool,
+        shift: bool,
+        control: bool,
+        alt: bool,
+        meta: bool,
+        timestamp: f64,
+    }
+    /// Blur has empty key/code; use it to clear any held-key state.
+    handle-event: async func(event: key-event);
+}

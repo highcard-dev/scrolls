@@ -329,6 +329,20 @@ func familyManifest(source string, appVersion string) (manifest, error) {
 	return manifest{}, fmt.Errorf("no configuration UI catalog entry for %s", source)
 }
 
+// stageAuthored preserves authored projects and artifacts, not local build caches.
+func stageAuthored(source, destination string) error {
+	if _, err := os.Stat(filepath.Join(source, "scroll.yaml")); err != nil {
+		return fmt.Errorf("source scroll.yaml: %w", err)
+	}
+	return cp.Copy(source, destination, cp.Options{Skip: func(_ os.FileInfo, src, _ string) (bool, error) {
+		switch filepath.Base(src) {
+		case "target", ".git", "node_modules", "__pycache__":
+			return true, nil
+		}
+		return false, nil
+	}})
+}
+
 func stage(source, destination, bundle string) error {
 	if source == "" || destination == "" || bundle == "" {
 		return errors.New("source, destination, and bundle are required")
@@ -571,10 +585,16 @@ func copyFile(source, destination string) error {
 
 func main() {
 	if len(os.Args) != 4 {
-		fmt.Fprintln(os.Stderr, "usage: go run ./scripts/stage-scroll-ui <source-scroll> <destination> <app.wasm>")
+		fmt.Fprintln(os.Stderr, "usage: go run ./scripts/stage-scroll-ui <source-scroll> <destination> <app.wasm> | --preserve-ui <source-scroll> <destination>")
 		os.Exit(2)
 	}
-	if err := stage(os.Args[1], os.Args[2], os.Args[3]); err != nil {
+	var err error
+	if os.Args[1] == "--preserve-ui" {
+		err = stageAuthored(os.Args[2], os.Args[3])
+	} else {
+		err = stage(os.Args[1], os.Args[2], os.Args[3])
+	}
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

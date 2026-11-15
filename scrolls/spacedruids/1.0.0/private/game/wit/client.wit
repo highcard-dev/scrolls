@@ -1,0 +1,14 @@
+package druid:openui;
+
+interface client {
+    /// Called once after the host imports are ready.
+    init: async func();
+    /// Params contains the JSON-encoded parameters of a named OpenUI action.
+    handle-action: async func(action: string, params: string);
+}
+
+world openui-client {
+    import host;
+    import state;
+    export client;
+}

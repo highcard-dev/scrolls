@@ -1,0 +1,37 @@
+name: artifacts.druid.gg/druid-team/scroll-spacedruids
+desc: SpaceDruids — Rust WASM arcade
+version: 1.0.0
+app_version: "1.0.0"
+commands:
+  start:
+    run: persistent
+    procedures:
+    - image: alpine:3.20
+      command: ["sleep", "infinity"]
+  build_ui:
+    run: always
+    procedures:
+    - image: rust:1-bookworm
+      mounts:
+      - path: /runtime
+        sub_path: .
+      working_dir: /runtime/private/game
+      command:
+      - sh
+      - -ec
+      - rustup target add wasm32-unknown-unknown && (command -v wasm-tools >/dev/null || cargo install --locked wasm-tools --version 1.262.0) && sh ./build.sh
+serve: start
+ui:
+  private:
+    buildcommand: build_ui
+    wasm: private/dist/app.wasm
+    openui: private/dist/app.openui
+  public:
+    buildcommand: build_ui
+    wasm: public/dist/app.wasm
+    openui: public/dist/app.openui
+chunks:
+- name: private-ui
+  path: private
+- name: public-ui
+  path: public

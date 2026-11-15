@@ -1,0 +1,10 @@
+$invadersScore = "000000"
+$invadersBest = "000000"
+$invadersWave = "01"
+$invadersLives = "3"
+$invadersRemaining = "40"
+$invadersStatus = "AWAITING PILOT"
+$invadersPause = "Pause"
+$invadersSound = "Sound off"
+$invadersError = ""
+root = Stack([Heading("SpaceDruids"), TextContent("A Rust-powered arcade. Defend the galaxy, one wave at a time."), Row([Badge($invadersStatus), TextContent("Score"), Badge($invadersScore), TextContent("Best"), Badge($invadersBest), TextContent("Wave"), Badge($invadersWave), TextContent("Lives"), Badge($invadersLives)]), Card(null, [Keyboard("invaders", ["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Space", "KeyP", "KeyR", "KeyM"], [Canvas("invaders", 960, 640, "SpaceDruids arena")], "SpaceDruids keyboard controls")], null, "none"), Row([Button("Start mission", {type:"PlayInvaders",params:{}}), SecondaryButton("Restart", {type:"RestartInvaders",params:{}}), SecondaryButton($invadersPause, {type:"PauseInvaders",params:{}}), SecondaryButton($invadersSound, {type:"SoundInvaders",params:{}})]), TextContent("Click the arena to focus. Move: ← → / A D · Fire: Space · Pause: P · Restart: R · Sound: M"), Row([Button("Move left", {type:"MoveInvaders",params:{direction:-1}}), Button("Fire", {type:"FireInvaders",params:{}}), Button("Move right", {type:"MoveInvaders",params:{direction:1}})]), TextContent($invadersError)])

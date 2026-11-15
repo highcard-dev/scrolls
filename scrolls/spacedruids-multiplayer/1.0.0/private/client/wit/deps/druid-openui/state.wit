@@ -1,0 +1,8 @@
+package druid:openui;
+
+interface state {
+    /// Read top-level state as JSON. None means absent, not JSON null.
+    get-value: func(name: string) -> option<string>;
+    /// Write a JSON value to top-level state, including a $variable.
+    set-value: func(name: string, json: string);
+}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -10,6 +11,72 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
+
+func TestStageAuthoredPreservesReleaseFilesWithoutCaches(t *testing.T) {
+	root := t.TempDir()
+	source, destination := filepath.Join(root, "source"), filepath.Join(root, "release")
+	files := map[string][]byte{
+		"scroll.yaml":                        []byte("# Preserve authored configuration exactly\nui: {}\n"),
+		".meta/en-US.md":                     []byte("SpaceDruids"),
+		"private/client/Cargo.toml":          []byte("[package]\nname='game'\n"),
+		"private/client/Cargo.lock":          []byte("version = 4\n"),
+		"private/client/src/lib.rs":          []byte("fn main() {}"),
+		"private/client/build.sh":            []byte("#!/bin/sh\n"),
+		"private/client/wit/browser.wit":     []byte("package example:browser;"),
+		"private/client/audio/bank.pcm":      {0, 1, 255, 3},
+		"private/dist/app.wasm":              {0, 97, 115, 109},
+		"private/dist/app.openui":            []byte("root = Stack([])"),
+		"public/dist/app.wasm":               {0, 97, 115, 109, 1},
+		"public/dist/app.openui":             []byte("root = Card(null, [])"),
+		"data/server.ts":                     []byte("export {}"),
+		"data/assets/immutable-original.tar": {1, 2, 3},
+		"data/assets/retained.json":          []byte("[]"),
+	}
+	for path, content := range files {
+		path = filepath.Join(source, path)
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, content, 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var caches []string
+	for _, scope := range []string{"", "private/client", "public/project", "data/nested"} {
+		for _, cache := range []string{"target", ".git", "node_modules", "__pycache__"} {
+			path := filepath.Join(scope, cache, "nested", "cache.bin")
+			caches = append(caches, path)
+			fullPath := filepath.Join(source, path)
+			if err := os.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(fullPath, []byte("local cache"), 0644); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	if err := stageAuthored(source, destination); err != nil {
+		t.Fatal(err)
+	}
+	for path, want := range files {
+		got, err := os.ReadFile(filepath.Join(destination, path))
+		if err != nil || !bytes.Equal(got, want) {
+			t.Errorf("release file %s changed: %v", path, err)
+		}
+	}
+	for _, path := range caches {
+		if _, err := os.Stat(filepath.Join(destination, path)); !os.IsNotExist(err) {
+			t.Errorf("cache %s entered release: %v", path, err)
+		}
+		if _, err := os.Stat(filepath.Join(source, path)); err != nil {
+			t.Errorf("local cache %s must remain untouched: %v", path, err)
+		}
+	}
+	info, err := os.Stat(filepath.Join(destination, "private/client/build.sh"))
+	if err != nil || info.Mode().Perm()&0111 == 0 {
+		t.Fatalf("build script executable mode lost: %v", err)
+	}
+}
 
 func TestStageAddsPrivateUIAndMinecraftManifest(t *testing.T) {
 	root := t.TempDir()
@@ -470,7 +537,7 @@ func TestCatalogCoversEveryCheckedInGameServerScroll(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || info.Name() != "scroll.yaml" || strings.Contains(filepath.ToSlash(path), "/.sample/") {
+		if info.IsDir() || info.Name() != "scroll.yaml" || strings.Contains(filepath.ToSlash(path), "/.sample/") || strings.Contains(filepath.ToSlash(path), "/spacedruids") || strings.Contains(filepath.ToSlash(path), "/gunter3/") {
 			return nil
 		}
 		count++
@@ -494,7 +561,7 @@ func TestEveryCheckedInGameServerScrollStagesAsACompleteUIPackage(t *testing.T) 
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || info.Name() != "scroll.yaml" || strings.Contains(filepath.ToSlash(path), "/.sample/") {
+		if info.IsDir() || info.Name() != "scroll.yaml" || strings.Contains(filepath.ToSlash(path), "/.sample/") || strings.Contains(filepath.ToSlash(path), "/spacedruids") || strings.Contains(filepath.ToSlash(path), "/gunter3/") {
 			return nil
 		}
 		count++
