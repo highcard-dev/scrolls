@@ -1,0 +1,22 @@
+package druid:openui;
+
+/// Browser Web Audio. PCM stays binary, decoded buffers stay in the host.
+interface audio {
+    open: func(sample-rate: option<f32>) -> result<u32, string>;
+    /// Invoke from a user gesture to satisfy browser autoplay policy.
+    resume: async func(context: u32) -> result<_, string>;
+    suspend: async func(context: u32) -> result<_, string>;
+    time: func(context: u32) -> result<f64, string>;
+    create-buffer: func(context: u32, channels: u32, frames: u32, sample-rate: f32) -> result<u32, string>;
+    write-channel: func(buffer: u32, channel: u32, samples: list<f32>, offset: u32) -> result<_, string>;
+    decode: async func(context: u32, encoded: list<u8>) -> result<u32, string>;
+    /// Schedule on the audio clock, not a UI timer. Returns a stoppable voice.
+    play: func(context: u32, buffer: u32, when: f64, gain: f32, looping: bool) -> result<u32, string>;
+    stop: func(voice: u32) -> result<_, string>;
+    /// Load a standalone DSP WASM module in an AudioWorklet. Exports memory and
+    /// process(frames, channels, sample_rate); planar f32 output starts at byte 0.
+    /// Module must preallocate enough memory; no WASI, imports, allocation or growth in process.
+    /// Resume the context first. Resolves only after the worklet initializes.
+    start-processor: async func(context: u32, wasm: list<u8>, channels: u32) -> result<u32, string>;
+    close: func(object: u32) -> result<_, string>;
+}

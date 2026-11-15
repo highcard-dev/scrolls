@@ -1,0 +1,53 @@
+name: artifacts.druid.gg/druid-team/scroll-spacedruids-multiplayer
+desc: Cooperative SpaceDruids with a live backend and SQLite high scores
+version: 1.0.0
+app_version: "1.0.0"
+ports:
+- name: http
+  protocol: http
+  port: 8080
+commands:
+  start:
+    run: persistent
+    identity:
+      permissions: [ui:publish]
+    procedures:
+    - id: arena
+      image: oven/bun:1.3.8
+      expectedPorts:
+      - name: http
+      mounts:
+      - path: /runtime
+        sub_path: .
+      working_dir: /runtime
+      env:
+        SCORES_DB: data/highscores.sqlite
+      command: [bun, data/server.ts]
+  build_ui:
+    run: always
+    procedures:
+    - image: rust:1-bookworm
+      mounts:
+      - path: /runtime
+        sub_path: .
+      working_dir: /runtime/private/client
+      command:
+      - sh
+      - -ec
+      - rustup target add wasm32-unknown-unknown && (command -v wasm-tools >/dev/null || cargo install --locked wasm-tools --version 1.262.0) && sh ./build.sh
+serve: start
+chunks:
+- name: server-source
+  path: "*.ts"
+- name: high-scores
+  path: "highscores.sqlite*"
+  skip_update: true
+ui:
+  private:
+    buildcommand: build_ui
+    wasm: private/dist/app.wasm
+    openui: private/dist/app.openui
+  public:
+    buildcommand: build_ui
+    wasm: public/dist/app.wasm
+    openui: public/dist/app.openui

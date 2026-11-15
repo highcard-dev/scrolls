@@ -10,3 +10,11 @@ ui/dist/app.bundled.js
 ui/dist/wit/
 
 scroll-builder
+scrolls/spacedruids/*/private/game/target/
+scrolls/spacedruids/*/private/dist/
+scrolls/spacedruids/*/public/dist/
+scrolls/spacedruids-multiplayer/*/private/client/target/
+scrolls/spacedruids-multiplayer/*/private/dist/
+scrolls/spacedruids-multiplayer/*/public/dist/
+scrolls/spacedruids-multiplayer/*/data/.scores-test-*/
+scrolls/spacedruids-multiplayer/*/data/highscores.sqlite*

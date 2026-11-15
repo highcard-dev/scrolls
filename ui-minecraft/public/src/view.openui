@@ -1,0 +1,10 @@
+root = Stack([
+  Card("Welcome to our Minecraft server", [
+    TextContent("Build, explore, and play together."),
+    TextContent("Ask the server owner for the connection address and any joining requirements.")
+  ], "Minecraft multiplayer"),
+  Card("Before you join", [
+    TextContent("Use the Minecraft edition and version provided by the server owner."),
+    TextContent("Respect other players, their builds, and the server rules.")
+  ])
+], "lg")

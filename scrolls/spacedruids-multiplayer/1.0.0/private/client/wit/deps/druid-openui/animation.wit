@@ -1,0 +1,7 @@
+package druid:openui;
+
+interface animation {
+    /// Browser timestamp in milliseconds. Suspends without blocking the UI.
+    next-frame: async func() -> result<f64, string>;
+    now: func() -> f64;
+}

@@ -10,6 +10,12 @@ trap 'rm -rf "$tmp_dir"' EXIT
 fake_druid="$tmp_dir/fake-druid"
 cp "$fake_druid_source" "$fake_druid"
 chmod +x "$fake_druid"
+mkdir -p "$tmp_dir/bin"
+cp "$repo_root/scripts/tests/fixtures/fake-stage-go.sh" "$tmp_dir/bin/go"
+chmod +x "$tmp_dir/bin/go"
+export PATH="$tmp_dir/bin:$PATH"
+export DRUID_CLI_VERSION=v0.1.281
+unset DRUID_SCROLL_RUNTIME_IMAGE DRUID_SCROLL_STEAMCMD_IMAGE
 
 fail() {
   echo "FAIL: $*" >&2
@@ -40,6 +46,11 @@ artifact_dry_run="$(
   SCROLL_PUSH_ARTIFACTS=1 \
     bash "$push_script"
 )"
+[[ "$artifact_dry_run" == *"scroll-spacedruids:1.0.0 ./scrolls/spacedruids/1.0.0"* ]] || \
+  fail "release catalog must include the self-contained SpaceDruids Scroll"
+[[ "$artifact_dry_run" == *"scroll-spacedruids-multiplayer:1.0.0 ./scrolls/spacedruids-multiplayer/1.0.0"* ]] || \
+  fail "release catalog must include the multiplayer backend Scroll"
+[[ "$artifact_dry_run" != *"scroll-gunter3"* ]] || fail "local game must not appear in the release catalog"
 [[ "$artifact_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17"* ]] || \
   fail "release pushes must update the existing repositories and tags"
 [[ "$artifact_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-forge:26.3 ./scrolls/minecraft/forge/26.3"* ]] || \
@@ -48,8 +59,26 @@ artifact_dry_run="$(
   fail "release pushes must preserve runtime image references"
 [[ "$category_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot"* ]] || \
   fail "category metadata must retain the configured registry namespace"
+private_demos="$(SCROLL_PUSH_DRY_RUN=1 SCROLL_DEMO_REGISTRY_NAMESPACE=druid-team-private bash "$push_script")"
+for game in spacedruids spacedruids-multiplayer; do
+  [[ "$private_demos" == *"push category artifacts.druid.gg/druid-team-private/scroll-$game "* ]] ||
+    fail "missing private demo category for $game"
+  [[ "$private_demos" == *"artifacts.druid.gg/druid-team-private/scroll-$game:1.0.0 "* ]] ||
+    fail "missing private demo artifact for $game"
+  [[ "$private_demos" != *"artifacts.druid.gg/druid-team/scroll-$game:1.0.0 "* ]] ||
+    fail "demo leaked into the team registry namespace"
+done
+[[ "$private_demos" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17 "* ]] ||
+  fail "private demos must not move other releases"
 expected_categories="$(printf '%s\n' "$category_dry_run" | grep -Ec '^"?druid"? push category ')"
 expected_artifacts="$(printf '%s\n' "$artifact_dry_run" | grep -Ec '^"?druid"? push ')"
+filtered_dry_run="$(SCROLL_PUSH_DRY_RUN=1 SCROLL_PUSH_CATEGORIES=0 SCROLL_PUSH_SOURCE_FILTER=/minecraft/ bash "$push_script")"
+assert_equals "$(printf '%s\n' "$artifact_dry_run" | grep -c '/minecraft/')" \
+  "$(printf '%s\n' "$filtered_dry_run" | grep -c '/minecraft/')" \
+  "source filtering must preserve every Minecraft artifact"
+if printf '%s\n' "$filtered_dry_run" | grep -qv '/minecraft/'; then
+  fail "source filtering must exclude unrelated artifacts"
+fi
 
 preview_dry_run="$(
   SCROLL_PUSH_DRY_RUN=1 \
@@ -166,5 +195,31 @@ assert_equals "$failure_starts" "$failure_ends" \
   "push.sh must wait for every started job before returning a failure"
 assert_equals "0" "$(<"$tmp_dir/state/active")" \
   "push.sh must not leave background push jobs running after failure"
+
+reset_state
+DRUID_BIN="$fake_druid" \
+FAKE_DRUID_STATE_DIR="$tmp_dir/state" \
+FAKE_DRUID_SLEEP=0 \
+SCROLL_PUSH_UI=1 \
+SCROLL_PUSH_CATEGORIES=0 \
+SCROLL_PUSH_ARTIFACTS=1 \
+  bash "$push_script" >"$tmp_dir/ui-selection.out"
+grep -q '/ui-minecraft/dist/app.wasm' "$tmp_dir/state/staging.log" || fail "Minecraft Rust UI was not selected"
+grep -q '/ui/dist/app.wasm' "$tmp_dir/state/staging.log" || fail "non-Minecraft UI selection changed"
+for game in spacedruids spacedruids-multiplayer; do
+  grep -q "/$game/1.0.0|--preserve-ui" "$tmp_dir/state/staging.log" || fail "$game must preserve its authored UI"
+done
+
+reset_state
+DRUID_BIN="$fake_druid" \
+FAKE_DRUID_STATE_DIR="$tmp_dir/state" \
+FAKE_DRUID_SLEEP=0 \
+SCROLL_PUSH_UI=0 \
+SCROLL_PUSH_SOURCE_FILTER=/spacedruids/ \
+SCROLL_PUSH_CATEGORIES=0 \
+SCROLL_PUSH_ARTIFACTS=1 \
+  bash "$push_script" >"$tmp_dir/authored-staging.out"
+grep -q '/spacedruids/1.0.0|--preserve-ui' "$tmp_dir/state/staging.log" || \
+  fail "disabling editor injection must not skip authored UI staging"
 
 echo "push parallelism tests passed ($expected_categories categories, $expected_artifacts artifacts)"

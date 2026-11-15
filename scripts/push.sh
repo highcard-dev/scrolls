@@ -11,6 +11,7 @@ DRUID_BIN="${DRUID_BIN:-druid}"
 SCROLL_PUSH_DRY_RUN="${SCROLL_PUSH_DRY_RUN:-0}"
 SCROLL_REGISTRY_HOST="${SCROLL_REGISTRY_HOST:-artifacts.druid.gg}"
 SCROLL_REGISTRY_NAMESPACE="${SCROLL_REGISTRY_NAMESPACE:-druid-team}"
+SCROLL_DEMO_REGISTRY_NAMESPACE="${SCROLL_DEMO_REGISTRY_NAMESPACE:-}"
 SCROLL_REGISTRY_USER="${SCROLL_REGISTRY_USER:-}"
 SCROLL_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD:-}"
 DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.281}"
@@ -18,6 +19,8 @@ SCROLL_PUSH_CATEGORIES="${SCROLL_PUSH_CATEGORIES:-1}"
 SCROLL_PUSH_ARTIFACTS="${SCROLL_PUSH_ARTIFACTS:-1}"
 SCROLL_PUSH_JOBS="${SCROLL_PUSH_JOBS:-1}"
 SCROLL_PUSH_UI="${SCROLL_PUSH_UI:-1}"
+# Optional fixed substring of an artifact's source path, e.g. /minecraft/.
+SCROLL_PUSH_SOURCE_FILTER="${SCROLL_PUSH_SOURCE_FILTER:-}"
 if [[ ! "$SCROLL_PUSH_JOBS" =~ ^[1-9][0-9]*$ ]]; then
   echo "SCROLL_PUSH_JOBS must be a positive integer (got: $SCROLL_PUSH_JOBS)" >&2
   exit 2
@@ -79,16 +82,20 @@ login_if_configured() {
 
 rewrite_registry_reference() {
   local value="$1"
+  local prefix="$2"
   if [[ "$value" == "$runtime_image" || "$value" == "$steamcmd_image" ]]; then
     printf '%s' "$value"
     return
   fi
-  printf '%s' "${value//artifacts.druid.gg\/druid-team/$registry_prefix}"
+  printf '%s' "${value//artifacts.druid.gg\/druid-team/$prefix}"
 }
 
 run() {
   local -a command=("$@")
   local index
+  if [[ "${command[2]:-}" != "category" && -n "$SCROLL_PUSH_SOURCE_FILTER" && "${command[3]:-}" != *"$SCROLL_PUSH_SOURCE_FILTER"* ]]; then
+    return 0
+  fi
 
   # Add the optional suffix only to artifact tags. Category pushes are metadata
   # for the stable repository and do not get PR suffixes.
@@ -104,15 +111,29 @@ run() {
     command[2]="$ref"
   fi
 
+  local source="${command[3]:-}"
+  if [[ "${command[2]:-}" == "category" ]]; then
+    source="${command[5]:-}"
+  fi
+  local preserve_ui=0 target_prefix="$registry_prefix"
+  case "$source" in
+    */spacedruids/*|*/spacedruids-multiplayer/*)
+      preserve_ui=1
+      if [[ -n "$SCROLL_DEMO_REGISTRY_NAMESPACE" ]]; then
+        target_prefix="$registry_host/$SCROLL_DEMO_REGISTRY_NAMESPACE"
+      fi
+      ;;
+  esac
+
   # The catalog intentionally uses production refs. Retarget them here for
   # local Harbor, staging, or PR namespaces without changing every push line.
   for index in "${!command[@]}"; do
     command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257-steamcmd/$steamcmd_image}"
     command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257/$runtime_image}"
     if [[ "${command[2]:-}" == "category" ]]; then
-      command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$registry_prefix}"
+      command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$target_prefix}"
     else
-      command[$index]="$(rewrite_registry_reference "${command[$index]}")"
+      command[$index]="$(rewrite_registry_reference "${command[$index]}" "$target_prefix")"
     fi
   done
   if [[ "${command[0]:-}" == "druid" ]]; then
@@ -125,11 +146,21 @@ run() {
     return 0
   fi
 
-  if [[ "$SCROLL_PUSH_UI" = "1" && "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]]; then
+  if [[ "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]] &&
+    { [[ "$preserve_ui" == "1" ]] || [[ "$SCROLL_PUSH_UI" == "1" && -n "${command[3]:-}" ]]; }; then
     local staged_root
-    staged_root="$(mktemp -d)"
+    mkdir -p "$repo_root/.builds"
+    staged_root="$(mktemp -d "$repo_root/.builds/stage-XXXXXX")"
     staged_dirs+=("$staged_root")
-    go run ./scripts/stage-scroll-ui "${command[3]}" "$staged_root/artifact" "$repo_root/ui/dist/app.wasm"
+    if [[ "$preserve_ui" == "1" ]]; then
+      go run ./scripts/stage-scroll-ui --preserve-ui "${command[3]}" "$staged_root/artifact"
+    else
+      local ui_bundle="$repo_root/ui/dist/app.wasm"
+      case "${command[3]}" in
+        */minecraft/*) ui_bundle="$repo_root/ui-minecraft/dist/app.wasm" ;;
+      esac
+      go run ./scripts/stage-scroll-ui "${command[3]}" "$staged_root/artifact" "$ui_bundle"
+    fi
     command[3]="$staged_root/artifact"
   fi
 
@@ -146,6 +177,8 @@ run() {
 }
 
 push_release_categories() {
+  run druid push category artifacts.druid.gg/druid-team/scroll-spacedruids-multiplayer spacedruids-multiplayer ./scrolls/spacedruids-multiplayer/1.0.0/.meta
+  run druid push category artifacts.druid.gg/druid-team/scroll-spacedruids spacedruids ./scrolls/spacedruids/1.0.0/.meta
   run druid push category artifacts.druid.gg/druid-team/scroll-minecraft-spigot minecraft ./scrolls/minecraft/minecraft-spigot/.meta
   run druid push category artifacts.druid.gg/druid-team/scroll-minecraft-vanilla minecraft ./scrolls/minecraft/minecraft-vanilla/.meta
   run druid push category artifacts.druid.gg/druid-team/scroll-minecraft-paper minecraft ./scrolls/minecraft/papermc/.meta
@@ -167,6 +200,8 @@ push_release_categories() {
 }
 
 push_release_artifacts() {
+  run druid push artifacts.druid.gg/druid-team/scroll-spacedruids-multiplayer:1.0.0 ./scrolls/spacedruids-multiplayer/1.0.0 -p http=8080/http -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 1Gi --min-ram 128Mi --min-cpu 0.1 --category spacedruids-multiplayer
+  run druid push artifacts.druid.gg/druid-team/scroll-spacedruids:1.0.0 ./scrolls/spacedruids/1.0.0 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 1Gi --min-ram 128Mi --min-cpu 0.1 --category spacedruids
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17 ./scrolls/minecraft/minecraft-spigot/1.17 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17.1 ./scrolls/minecraft/minecraft-spigot/1.17.1 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft
   run druid push artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.18 ./scrolls/minecraft/minecraft-spigot/1.18 -p main=25565 -p rcon=25575 -i artifacts.druid.gg/druid-team/druid:v0.1.257 --min-disk 3Gi --min-ram 512Mi --min-cpu 0.25 --smart --category minecraft

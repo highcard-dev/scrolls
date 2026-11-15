@@ -1,0 +1,8 @@
+$serverUrl = ""
+$name = ""
+$joined = false
+$busy = false
+$status = "Join the same arena from another browser to play together. The server owns all gameplay and scores."
+$hud = "One spaceship per pilot · up to 8 pilots · arrows / A D to move · Space to fire · R to respawn"
+$scores = []
+root = Stack([Heading("SpaceDruids Multiplayer"), TextContent("Cooperate against shared waves. Your own ship, your own score, one persistent leaderboard."), Card("Join the arena", [Grid([Field("Pilot name", "Optional display name; not an authenticated account.", [Input($name, {type:"SetName",params:{}}, $joined || $busy)]), Field("WebSocket server", "The deployment endpoint ending in /ws. Connections require browser confirmation.", [Input($serverUrl, {type:"SetServer",params:{}}, $joined || $busy)])]), Row([Button("Join arena", {type:"Join",params:{}}, $joined || $busy), SecondaryButton("Leave", {type:"Leave",params:{}}, !$joined)]), StatusMessage($status)]), TextContent($hud), Card(null, [Keyboard("multiplayer", ["ArrowLeft","ArrowRight","KeyA","KeyD","Space","KeyR"], [Canvas("multiplayer",960,640,"Shared multiplayer arena")], "Multiplayer keyboard controls")], null, "none"), TextContent("Click the arena to focus keyboard controls. Each colored ship belongs to one connected pilot; your ship is underlined."), Row([Button("Move left", {type:"Tap",params:{bits:1}}, !$joined), Button("Fire", {type:"Tap",params:{bits:4}}, !$joined), Button("Move right", {type:"Tap",params:{bits:2}}, !$joined), SecondaryButton("Respawn (after 3s)", {type:"Respawn",params:{}}, !$joined)]), Card("High scores", [TextContent("Saved in this deployment’s SQLite database. Anonymous demo: display names are not verified identities."), Stack(@Each($scores,"line",TextContent(line)))])], "md")

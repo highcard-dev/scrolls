@@ -1,0 +1,25 @@
+package druid:openui;
+
+/// Browser-local Canvas 2D. Handles belong to one UI instance, not the document.
+interface canvas {
+    record rect { x: f32, y: f32, width: f32, height: f32 }
+    record painted-rect { bounds: rect, color: string }
+    record point { x: f32, y: f32 }
+    record text { value: string, at: point, font: string, color: string }
+    variant draw-command {
+        clear(rect), fill-rect(painted-rect), stroke-rect(painted-rect),
+        begin-path, move-to(point), line-to(point), close-path,
+        fill(string), stroke(string), line-width(f32), fill-text(text), save, restore,
+    }
+    /// Matches a BrowserCanvas surface ID. Width/height are backing pixels.
+    open: func(id: string, width: u32, height: u32) -> result<u32, string>;
+    resize: func(surface: u32, width: u32, height: u32) -> result<_, string>;
+    /// One synchronous crossing per batch; no JSON and no React state updates.
+    draw: func(surface: u32, commands: list<draw-command>) -> result<_, string>;
+    /// Packed x,y,width,height tuples: avoids per-command record/variant allocation.
+    fill-rects: func(surface: u32, rectangles: list<f32>, color: string) -> result<_, string>;
+    write-pixels: func(surface: u32, rgba: list<u8>, width: u32, height: u32, x: s32, y: s32) -> result<_, string>;
+    /// Explicit readback; avoid it in a rendering loop.
+    read-pixels: func(surface: u32, x: s32, y: s32, width: u32, height: u32) -> result<list<u8>, string>;
+    close: func(surface: u32) -> result<_, string>;
+}
