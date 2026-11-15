@@ -57,6 +57,17 @@ artifact_dry_run="$(
   fail "release pushes must preserve runtime image references"
 [[ "$category_dry_run" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot"* ]] || \
   fail "category metadata must retain the configured registry namespace"
+private_demos="$(SCROLL_PUSH_DRY_RUN=1 SCROLL_DEMO_REGISTRY_NAMESPACE=druid-team-private bash "$push_script")"
+for game in spacedruids spacedruids-multiplayer; do
+  [[ "$private_demos" == *"push category artifacts.druid.gg/druid-team-private/scroll-$game "* ]] ||
+    fail "missing private demo category for $game"
+  [[ "$private_demos" == *"artifacts.druid.gg/druid-team-private/scroll-$game:1.0.0 "* ]] ||
+    fail "missing private demo artifact for $game"
+  [[ "$private_demos" != *"artifacts.druid.gg/druid-team/scroll-$game:1.0.0 "* ]] ||
+    fail "demo leaked into the team registry namespace"
+done
+[[ "$private_demos" == *"artifacts.druid.gg/druid-team/scroll-minecraft-spigot:1.17 "* ]] ||
+  fail "private demos must not move other releases"
 expected_categories="$(printf '%s\n' "$category_dry_run" | grep -Ec '^"?druid"? push category ')"
 expected_artifacts="$(printf '%s\n' "$artifact_dry_run" | grep -Ec '^"?druid"? push ')"
 filtered_dry_run="$(SCROLL_PUSH_DRY_RUN=1 SCROLL_PUSH_CATEGORIES=0 SCROLL_PUSH_SOURCE_FILTER=/minecraft/ bash "$push_script")"

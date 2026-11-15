@@ -92,6 +92,7 @@ jobs:
         env:
           SCROLL_REGISTRY_HOST: ${{ vars.SCROLL_REGISTRY_HOST || 'artifacts.druid.gg' }}
           SCROLL_REGISTRY_NAMESPACE: ${{ inputs.release && (vars.SCROLL_REGISTRY_NAMESPACE || 'druid-team') || (vars.SCROLL_PREVIEW_NAMESPACE || 'druid-team-experimental') }}
+          SCROLL_DEMO_REGISTRY_NAMESPACE: ${{ inputs.release && vars.SPACEDRUIDS_REGISTRY_NAMESPACE || '' }}
           SCROLL_REGISTRY_RUNTIME_NAMESPACE: ${{ vars.SCROLL_REGISTRY_RUNTIME_NAMESPACE || vars.SCROLL_REGISTRY_NAMESPACE || 'druid-team' }}
           SCROLL_REGISTRY_USER: ${{ secrets.SCROLL_REGISTRY_USER }}
           SCROLL_REGISTRY_PASSWORD: ${{ secrets.SCROLL_REGISTRY_PASSWORD }}
@@ -104,5 +105,7 @@ jobs:
           : "${SCROLL_REGISTRY_PASSWORD:?Set the SCROLL_REGISTRY_PASSWORD secret}"
           if [[ "${{ inputs.release }}" != "true" ]]; then
             export SCROLL_TAG_SUFFIX="-pr${{ github.event.pull_request.number }}"
+          else
+            : "${SCROLL_DEMO_REGISTRY_NAMESPACE:?Set SPACEDRUIDS_REGISTRY_NAMESPACE to the demo account private project}"
           fi
           bash ./scripts/push.sh

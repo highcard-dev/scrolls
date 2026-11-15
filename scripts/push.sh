@@ -11,6 +11,7 @@ DRUID_BIN="${DRUID_BIN:-druid}"
 SCROLL_PUSH_DRY_RUN="${SCROLL_PUSH_DRY_RUN:-0}"
 SCROLL_REGISTRY_HOST="${SCROLL_REGISTRY_HOST:-artifacts.druid.gg}"
 SCROLL_REGISTRY_NAMESPACE="${SCROLL_REGISTRY_NAMESPACE:-druid-team}"
+SCROLL_DEMO_REGISTRY_NAMESPACE="${SCROLL_DEMO_REGISTRY_NAMESPACE:-}"
 SCROLL_REGISTRY_USER="${SCROLL_REGISTRY_USER:-}"
 SCROLL_REGISTRY_PASSWORD="${SCROLL_REGISTRY_PASSWORD:-}"
 DRUID_CLI_VERSION="${DRUID_CLI_VERSION:-v0.1.281}"
@@ -81,11 +82,12 @@ login_if_configured() {
 
 rewrite_registry_reference() {
   local value="$1"
+  local prefix="$2"
   if [[ "$value" == "$runtime_image" || "$value" == "$steamcmd_image" ]]; then
     printf '%s' "$value"
     return
   fi
-  printf '%s' "${value//artifacts.druid.gg\/druid-team/$registry_prefix}"
+  printf '%s' "${value//artifacts.druid.gg\/druid-team/$prefix}"
 }
 
 run() {
@@ -109,15 +111,29 @@ run() {
     command[2]="$ref"
   fi
 
+  local source="${command[3]:-}"
+  if [[ "${command[2]:-}" == "category" ]]; then
+    source="${command[5]:-}"
+  fi
+  local preserve_ui=0 target_prefix="$registry_prefix"
+  case "$source" in
+    */spacedruids/*|*/spacedruids-multiplayer/*)
+      preserve_ui=1
+      if [[ -n "$SCROLL_DEMO_REGISTRY_NAMESPACE" ]]; then
+        target_prefix="$registry_host/$SCROLL_DEMO_REGISTRY_NAMESPACE"
+      fi
+      ;;
+  esac
+
   # The catalog intentionally uses production refs. Retarget them here for
   # local Harbor, staging, or PR namespaces without changing every push line.
   for index in "${!command[@]}"; do
     command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257-steamcmd/$steamcmd_image}"
     command[$index]="${command[$index]//artifacts.druid.gg\/druid-team\/druid:v0.1.257/$runtime_image}"
     if [[ "${command[2]:-}" == "category" ]]; then
-      command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$registry_prefix}"
+      command[$index]="${command[$index]//artifacts.druid.gg\/druid-team/$target_prefix}"
     else
-      command[$index]="$(rewrite_registry_reference "${command[$index]}")"
+      command[$index]="$(rewrite_registry_reference "${command[$index]}" "$target_prefix")"
     fi
   done
   if [[ "${command[0]:-}" == "druid" ]]; then
@@ -130,10 +146,6 @@ run() {
     return 0
   fi
 
-  local preserve_ui=0
-  case "${command[3]:-}" in
-    */spacedruids/*|*/spacedruids-multiplayer/*) preserve_ui=1 ;;
-  esac
   if [[ "${command[1]:-}" == "push" && "${command[2]:-}" != "category" ]] &&
     { [[ "$preserve_ui" == "1" ]] || [[ "$SCROLL_PUSH_UI" == "1" && -n "${command[3]:-}" ]]; }; then
     local staged_root
